@@ -1,9 +1,9 @@
 #pragma once
-#include "Player.hpp"
+#include "../Player.hpp"
 
 class Spy final : public Player {
 public:
-    explicit  Spy(std::string name);
+    explicit  Spy(const std::string& name);
     void watchCoins(Player *target);
 
     void blockArrest(Player *target);

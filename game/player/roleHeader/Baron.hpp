@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Player.hpp"
+#include "../Player.hpp"
 
 class Baron final : public Player {
 public:
-    explicit Baron(std::string name);
+    explicit Baron(const std::string& name);
     void legitInvestment();
 
     void passiveAbility();

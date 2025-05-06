@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "Player.hpp"
+#include "player/Player.hpp"
 
 namespace coup {
     class Game {

@@ -1,0 +1,21 @@
+/*
+ * TODO ROLES
+ * add logics to each role
+ /
+
+ /*
+  * TODO Game
+  * adds the base game logic, with each role gameplay
+  /
+
+  /*
+  * TODO TESTS
+  * make simples test for basic logic
+  * players coins, roles' ability, throws etc…
+  /
+
+  /*
+   * TODO GUI
+   * learning how to make GUI in cpp, use Figma to make base gui
+   * search how to from Figma to cpp files
+   /

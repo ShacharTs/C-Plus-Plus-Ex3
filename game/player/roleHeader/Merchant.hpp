@@ -1,8 +1,8 @@
 #pragma once
-#include "Player.hpp"
+#include "../Player.hpp"
 
 class Merchant final :public Player {
 public:
-    explicit Merchant(std::string name);
+    explicit Merchant(const std::string& name);
     void passiveAbility();
 };

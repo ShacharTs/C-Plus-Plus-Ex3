@@ -574,7 +574,7 @@ DOCTEST_INTERFACE extern bool is_running_in_test;
 //              and the "is small" bit remains "0" ("as well as the capacity left") so its OK
 // Idea taken from this lecture about the string implementation of facebook/folly - fbstring
 // https://www.youtube.com/watch?v=kPR8h4-qZdk
-// TODO:
+// TODO.txt:
 // - optimizations - like not deleting memory unnecessarily in operator= and etc.
 // - resize/reserve/clear
 // - replace
@@ -1398,7 +1398,7 @@ DOCTEST_CLANG_SUPPRESS_WARNING_WITH_PUSH("-Wunused-comparison")
         bool   m_passed;
         String m_decomp;
 
-        Result() = default; // TODO: Why do we need this? (To remove NOLINT)
+        Result() = default; // TODO.txt: Why do we need this? (To remove NOLINT)
         Result(bool passed, const String& decomposition = String());
 
         // forbidding some expressions based on this table: https://en.cppreference.com/w/cpp/language/operator_precedence
@@ -3593,7 +3593,7 @@ using ticks_t = timer_large_integer::type;
     ContextState* g_cs = nullptr;
 
     // used to avoid locks for the debug output
-    // TODO: figure out if this is indeed necessary/correct - seems like either there still
+    // TODO.txt: figure out if this is indeed necessary/correct - seems like either there still
     // could be a race or that there wouldn't be a race even if using the context directly
     DOCTEST_THREAD_LOCAL bool g_no_colors;
 
@@ -3908,7 +3908,7 @@ const char* skipPathFromFilename(const char* file) {
             const auto prefix_size = pos - prefix_start;
             if(prefix_size > longest_match)
             {
-                // TODO under DOCTEST_MSVC: does the comparison need strnicmp() to work with drive letter capitalization?
+                // TODO.txt under DOCTEST_MSVC: does the comparison need strnicmp() to work with drive letter capitalization?
                 if(0 == std::strncmp(prefixes.c_str() + prefix_start, file, prefix_size))
                 {
                     longest_match = prefix_size;
@@ -4890,7 +4890,7 @@ namespace {
 #ifdef DOCTEST_PLATFORM_WINDOWS
 #define DOCTEST_OUTPUT_DEBUG_STRING(text) ::OutputDebugStringA(text)
 #else
-    // TODO: integration with XCode and other IDEs
+    // TODO.txt: integration with XCode and other IDEs
 #define DOCTEST_OUTPUT_DEBUG_STRING(text)
 #endif // Platform
 
@@ -5547,7 +5547,7 @@ namespace {
             if(opt.no_version == false)
                 xml.writeAttribute("version", DOCTEST_VERSION_STR);
 
-            // only the consequential ones (TODO: filters)
+            // only the consequential ones (TODO.txt: filters)
             xml.scopedElement("Options")
                     .writeAttribute("order_by", opt.order_by.c_str())
                     .writeAttribute("rand_seed", opt.rand_seed)
@@ -5726,7 +5726,7 @@ namespace {
         }
     }
 
-    // TODO:
+    // TODO.txt:
     // - log_message()
     // - respond to queries
     // - honor remaining options
@@ -6587,7 +6587,7 @@ namespace {
 
         if(type) {
             // integer
-            // TODO: change this to use std::stoi or something else! currently it uses undefined behavior - assumes '0' on failed parse...
+            // TODO.txt: change this to use std::stoi or something else! currently it uses undefined behavior - assumes '0' on failed parse...
             int theInt = std::atoi(parsedValue.c_str());
             if (theInt != 0) {
                 res = theInt; //!OCLINT parameter reassignment
@@ -6881,7 +6881,7 @@ int Context::run() {
             p->reporters_currently_used.push_back(curr.second(*g_cs));
     }
 
-    // TODO: check if there is nothing in reporters_currently_used
+    // TODO.txt: check if there is nothing in reporters_currently_used
 
     // prepend all listeners
     for(auto& curr : getListeners())

@@ -4,12 +4,12 @@
 #include <ctime>
 #include <limits>
 
-#include "Baron.hpp"
-#include "General.hpp"
-#include "Governor.hpp"
-#include "Judge.hpp"
-#include "Merchant.hpp"
-#include "Spy.hpp"
+#include "player/roleHeader/Baron.hpp"
+#include "player/roleHeader/General.hpp"
+#include "player/roleHeader/Governor.hpp"
+#include "player/roleHeader/Judge.hpp"
+#include "player/roleHeader/Merchant.hpp"
+#include "player/roleHeader/Spy.hpp"
 
 using namespace std;
 
