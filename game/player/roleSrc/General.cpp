@@ -1,7 +1,7 @@
 #include "../roleHeader/General.hpp"
 #include <iostream>
 
-General::General(const std::string& name) :Player(getName()) {
+General::General(const std::string& name) :Player(name) {
     role = Role::General;
 }
 

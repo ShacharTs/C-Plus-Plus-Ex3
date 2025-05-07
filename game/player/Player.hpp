@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-
+#include <stdexcept>
 namespace coup {
     class Game;
 }

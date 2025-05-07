@@ -1,7 +1,7 @@
 #include "../roleHeader/Spy.hpp"
 #include <iostream>
 
-Spy::Spy(const std::string &name) : Player(getName()) {
+Spy::Spy(const std::string &name) : Player(name) {
     role = Role::Spy;
 }
 

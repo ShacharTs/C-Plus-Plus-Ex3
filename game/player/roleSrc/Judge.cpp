@@ -1,7 +1,7 @@
 #include "../roleHeader/Judge.hpp"
 #include <iostream>
 
-Judge::Judge(const std::string &name) : Player(getName()) {
+Judge::Judge(const std::string &name) : Player(name) {
     role = Role::Judge;
 }
 

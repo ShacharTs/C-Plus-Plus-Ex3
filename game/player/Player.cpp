@@ -13,6 +13,10 @@ string Player::getName() const {
     return playerName;
 }
 
+Role Player::getRole() const {
+    return role;
+}
+
 int Player::getCoins() const {
     return coins;
 }

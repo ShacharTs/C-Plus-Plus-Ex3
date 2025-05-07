@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <limits>
 
 
@@ -15,6 +16,13 @@
 using namespace std;
 
 namespace coup {
+
+    constexpr int COUP_COST = 7;
+    constexpr int BRIBE_COST = 4;
+    constexpr int SANCTION_COST = 3;
+
+
+
     /**
      * constructor
      */
@@ -58,13 +66,35 @@ namespace coup {
         runGame();
     }
 
-    // FOR TEST ONLY
-    Game::Game(const std::vector<std::string> &playerNames) {
-        for (const std::string &name: playerNames) {
+
+    /**
+     * FOR TEST ONLY
+     * @param names list of names
+     */
+    Game::Game(vector<string>names) {
+        for (const string &name : names) {
             players.push_back(new Player(name));
         }
-        getRandomRole(players);
+
+
+        for (size_t i = 0; i < players.size(); ++i) {
+            string name = players[i]->getName();
+            delete players[i];
+
+            switch (i) {
+                case 0: players[i] = new Governor(name); break;
+                case 1: players[i] = new Spy(name); break;
+                case 2: players[i] = new Baron(name); break;
+                case 3: players[i] = new General(name); break;
+                case 4: players[i] = new Judge(name); break;
+                case 5: players[i] = new Merchant(name); break;
+                default: players[i] = new Player(name); break;
+            }
+        }
+        currentPlayerTurn = 0;
     }
+
+
 
 
     /**
@@ -116,6 +146,10 @@ namespace coup {
         currentPlayerTurn = (currentPlayerTurn + 1) % players.size();
     }
 
+    const std::vector<Player *> &Game::getPlayers() const {
+        return players;
+    }
+
     void Game::addCoins(Player *target, const int amount) {
         target->addCoins(amount);
     }
@@ -145,12 +179,12 @@ namespace coup {
     }
 
     void Game::bribe(Player *actor) {
-        if (actor->getCoins() < 4) {
+        if (actor->getCoins() < BRIBE_COST) {
             throw runtime_error("Bribe failed not enough coins.");
         }
-        removeCoins(actor,4);
+        removeCoins(actor, BRIBE_COST);
         if (!actor->canBribe) {
-            throw runtime_error ("Bribe failed.");
+            throw runtime_error("Bribe failed.");
         }
         actor->addExtraTurn();
     }
@@ -161,9 +195,9 @@ namespace coup {
         }
 
         try {
-            removeCoins(target,1);
+            removeCoins(target, 1);
             addCoins(actor, 1);
-        }catch (exception &e) {
+        } catch (exception &e) {
             throw runtime_error("Arrest failed: " + string(e.what()));
         }
 
@@ -172,12 +206,17 @@ namespace coup {
 
 
     void Game::sanction(Player *actor, Player *target) {
-        if (actor->getCoins() < 3) {
+        if (actor->getCoins() < SANCTION_COST) {
             throw runtime_error("sanction failed not enough coins.");
         }
-        target->canGather = false;
-        target->canTax = false;
-        removeCoins(actor, 3);
+        try {
+            removeCoins(actor, SANCTION_COST);
+            target->canGather = false;
+            target->canTax = false;
+        } catch (exception &e) {
+            actor->addExtraTurn(); // failed no coins reward extra turn to do something
+            throw runtime_error("Sanction failed: " + string(e.what()));
+        }
     }
 
     /**
@@ -188,10 +227,10 @@ namespace coup {
      * @param target another player
      */
     void Game::coup(Player *actor, const Player *target) {
-        if (actor->getCoins() < 7) {
+        if (actor->getCoins() < COUP_COST) {
             throw runtime_error("coup failed not enough coins.");
         }
-        removeCoins(actor, 7);
+        removeCoins(actor, COUP_COST);
         if (target->isShieldActive) {
             throw runtime_error("coup blocked by another player.");
         }
@@ -211,7 +250,7 @@ namespace coup {
                 }
                 players.erase(players.begin() + i);
                 delete target; // delete player, TODO check gui later for bugs
-                break;
+                return;
             }
         }
     }
@@ -230,18 +269,21 @@ namespace coup {
      * @return winner player
      */
     string Game::winner(const vector<Player *> &players) const {
-        return players.at(0)->getName();
+        if (players.size() == 1) {
+            return players[0]->getName();
+        }
+        throw logic_error("Game not finished yet.");
+
     }
 
 
-    void Game::useAbility(Player* actor, Player* target) {
+    void Game::useAbility(Player *actor, Player *target) {
         actor->useAbility(target);
     }
 
-    void Game::useAbility(Player* actor) {
+    void Game::useAbility(Player *actor) {
         actor->useAbility();
     }
-
 
 
     /**

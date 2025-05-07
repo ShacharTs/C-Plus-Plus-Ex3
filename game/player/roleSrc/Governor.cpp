@@ -1,7 +1,7 @@
 #include "../roleHeader/Governor.hpp"
 #include <iostream>
 
-Governor::Governor(const std::string& name) :Player(getName()) {
+Governor::Governor(const std::string& name) :Player(name) {
     role = Role::Governor;
 }
 

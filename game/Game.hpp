@@ -12,7 +12,7 @@ namespace coup {
         void addCoins(Player* target,int amount);
 
         void removeCoins(Player* target,int amount);
-        void Game::coupKicker(const Player* target);
+        void coupKicker(const Player* target);
 
         void useAbility(Player* actor, Player* target);
         void useAbility(Player* actor);
@@ -21,14 +21,16 @@ namespace coup {
 
     public:
         Game();
-        Game(const std::vector<std::string>& playerNames);
+        Game(std::vector<std::string>names); // for test only
         ~Game();
+
          void runGame();  // loop that run the game
          std::string winner(const std::vector<Player*> &players) const;
          std::string turn();
          void getRandomRole(std::vector<Player*> &players);
         int getTurn();
         void nextTurn();
+        const std::vector<Player*>& getPlayers() const;
 
         // Self-actions
         void gather(Player* actor);
