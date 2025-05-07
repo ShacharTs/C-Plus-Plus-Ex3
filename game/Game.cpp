@@ -4,6 +4,7 @@
 #include <ctime>
 #include <limits>
 
+
 #include "player/roleHeader/Baron.hpp"
 #include "player/roleHeader/General.hpp"
 #include "player/roleHeader/Governor.hpp"
@@ -14,7 +15,6 @@
 using namespace std;
 
 namespace coup {
-
     /**
      * constructor
      */
@@ -59,13 +59,12 @@ namespace coup {
     }
 
     // FOR TEST ONLY
-    Game::Game(const std::vector<std::string>& playerNames) {
-        for (const std::string& name : playerNames) {
+    Game::Game(const std::vector<std::string> &playerNames) {
+        for (const std::string &name: playerNames) {
             players.push_back(new Player(name));
         }
         getRandomRole(players);
     }
-
 
 
     /**
@@ -106,12 +105,123 @@ namespace coup {
         }
     }
 
+    int Game::getTurn() {
+        return currentPlayerTurn;
+    }
 
     /**
-     *  swapping turns
+     * swap to the next turn
+     */
+    void Game::nextTurn() {
+        currentPlayerTurn = (currentPlayerTurn + 1) % players.size();
+    }
+
+    void Game::addCoins(Player *target, const int amount) {
+        target->addCoins(amount);
+    }
+
+    void Game::removeCoins(Player *target, const int amount) {
+        target->removeCoins(amount);
+    }
+
+
+    void Game::gather(Player *actor) {
+        if (!actor->canGather) {
+            throw runtime_error("Gather action failed.");
+        }
+        addCoins(actor, 1);
+    }
+
+    void Game::tax(Player *actor) {
+        if (!actor->canTax) {
+            throw runtime_error("Tax action failed.");
+        }
+        // Governor can get 3 coins
+        if (actor->getRole() == Role::Governor) {
+            addCoins(actor, 3);
+            return;
+        }
+        addCoins(actor, 2);
+    }
+
+    void Game::bribe(Player *actor) {
+        if (actor->getCoins() < 4) {
+            throw runtime_error("Bribe failed not enough coins.");
+        }
+        removeCoins(actor,4);
+        if (!actor->canBribe) {
+            throw runtime_error ("Bribe failed.");
+        }
+        actor->addExtraTurn();
+    }
+
+    void Game::arrest(Player *actor, Player *target) {
+        if (target->getLastArrestedBy() == actor) {
+            throw runtime_error("You cannot arrest the same player twice in a row.");
+        }
+
+        try {
+            removeCoins(target,1);
+            addCoins(actor, 1);
+        }catch (exception &e) {
+            throw runtime_error("Arrest failed: " + string(e.what()));
+        }
+
+        target->setLastArrestedBy(actor);
+    }
+
+
+    void Game::sanction(Player *actor, Player *target) {
+        if (actor->getCoins() < 3) {
+            throw runtime_error("sanction failed not enough coins.");
+        }
+        target->canGather = false;
+        target->canTax = false;
+        removeCoins(actor, 3);
+    }
+
+    /**
+     * check if player has the amount of coins
+     * after that remove from player coins
+     * and then checked if target has a shield, if target does not has shield, kick that player
+     * @param actor current player
+     * @param target another player
+     */
+    void Game::coup(Player *actor, const Player *target) {
+        if (actor->getCoins() < 7) {
+            throw runtime_error("coup failed not enough coins.");
+        }
+        removeCoins(actor, 7);
+        if (target->isShieldActive) {
+            throw runtime_error("coup blocked by another player.");
+        }
+        coupKicker(target);
+    }
+
+    /**
+     * when a player uses coup, this will kick him from the game
+     * @param target couped player
+     */
+    void Game::coupKicker(const Player *target) {
+        for (size_t i = 0; i < players.size(); ++i) {
+            if (players[i] == target) {
+                // Adjust currentPlayerTurn if needed
+                if (i < currentPlayerTurn) {
+                    --currentPlayerTurn; // shift currentPlayerTurn back since players after 'i' will move left
+                }
+                players.erase(players.begin() + i);
+                delete target; // delete player, TODO check gui later for bugs
+                break;
+            }
+        }
+    }
+
+
+    /**
+     *  print current player turn
      */
     string Game::turn() {
-        return "";
+        return players.at(currentPlayerTurn)->getName();
     }
 
     /**
@@ -123,9 +233,21 @@ namespace coup {
         return players.at(0)->getName();
     }
 
+
+    void Game::useAbility(Player* actor, Player* target) {
+        actor->useAbility(target);
+    }
+
+    void Game::useAbility(Player* actor) {
+        actor->useAbility();
+    }
+
+
+
     /**
      * core of the game, all the logic inside the while loop
      */
     void Game::runGame() {
+        // add while loop with try and catch
     }
 }

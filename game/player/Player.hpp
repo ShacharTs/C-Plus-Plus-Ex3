@@ -1,37 +1,86 @@
 #pragma once
 
 #include <string>
-    class Player {
-    private:
-        int coins = 0;
-        std::string playerName;
 
-    public:
-        explicit Player(std::string playerName);
+namespace coup {
+    class Game;
+}
 
-        virtual ~Player();
-
-
-        std::string getName() const;
-
-        int getCoins() const;
-
-        // core actions
-        void gather();
-
-        void tax();
-
-        void bribe();
-
-        void arrest(Player *target);
-
-        void sanction(Player *target);
-
-        void coup(Player *target);
+enum class Role {
+    Governor,
+    Spy,
+    Baron,
+    General,
+    Judge,
+    Merchant,
+    Unknown
+};
 
 
-        void addCoins(int amount);
+class Player {
+private:
+    int coins = 0;
+    std::string playerName;
+    const Player *lastArrestedBy = nullptr;
+    bool extraTurn = false;
 
-        void removeCoins(int amount);
-    };
+protected:
+    Role role = Role::Unknown;
+
+public:
+    // flags is ability doable
+    bool canGather = true;
+    bool canTax = true;
+    bool canBribe = true;
+    bool canArrest = true;
+    bool canSanction = true;
+    bool isShieldActive = false;
+
+
+
+public:
+    explicit Player(std::string playerName);
+
+    virtual ~Player();
+
+    virtual void useAbility(Player* target) {
+        throw std::runtime_error("This player has no special ability.");
+    }
+    virtual void useAbility() {
+        throw std::runtime_error("This player has no special ability.");
+    }
+
+
+    std::string getName() const;
+    Role getRole() const;
+
+    int getCoins() const;
+    const Player *getLastArrestedBy() const;
+    void setLastArrestedBy(const Player *ptrPlayer);
+
+    void addCoins(int amount);
+    void removeCoins(int amount);
+    void removeExtraTurn();
+    void addExtraTurn();
+    bool hasExtraTurn();
+
+private:
+    // core actions
+    void requestGather(coup::Game &game);
+
+    void requestTax(coup::Game &game);
+
+    void requestBribe(coup::Game &game);
+
+    void requestArrest(coup::Game &game, Player *target);
+
+
+    void requestSanction(coup::Game &game, Player *target);
+
+    void requestCoup(coup::Game &game, Player *target);
+
+
+
+};
+
 

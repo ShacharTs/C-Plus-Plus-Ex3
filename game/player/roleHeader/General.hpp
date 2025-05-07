@@ -8,5 +8,5 @@ class General final : public Player {
 public:
     explicit General(const std::string& name);
     void shield(Player* target);
-    void passiveAbility();
+    void useAbility(Player* target) override;
 };

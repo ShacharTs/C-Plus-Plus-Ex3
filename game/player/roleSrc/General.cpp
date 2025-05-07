@@ -1,7 +1,9 @@
 #include "../roleHeader/General.hpp"
 #include <iostream>
 
-General::General(const std::string& name) :Player(getName()) {}
+General::General(const std::string& name) :Player(getName()) {
+    role = Role::General;
+}
 
 /**
  * active a shield that protected
@@ -10,11 +12,11 @@ General::General(const std::string& name) :Player(getName()) {}
 void General::shield(Player *target) {
 }
 
-/**
- * passive ability
- */
-void General::passiveAbility() {
+void General::useAbility(Player* target) {
+
 }
+
+
 
 
 

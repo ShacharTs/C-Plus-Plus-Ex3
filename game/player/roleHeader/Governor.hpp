@@ -7,5 +7,5 @@ public:
     explicit Governor(const std::string& name);
     void blockTax(Player *target);
 
-    void passiveAbility();
+    void useAbility(Player *target) override;
 };

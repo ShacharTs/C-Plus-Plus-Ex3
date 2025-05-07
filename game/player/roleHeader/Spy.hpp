@@ -7,4 +7,6 @@ public:
     void watchCoins(Player *target);
 
     void blockArrest(Player *target);
+
+    void useAbility(Player *target) override;
 };

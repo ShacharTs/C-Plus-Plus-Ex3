@@ -2,14 +2,19 @@
 #include <iostream>
 
 
-Baron::Baron(const std::string& name) : Player(getName()) {}
+Baron::Baron(const std::string& name) : Player(getName()) {
+    role = Role::Baron;
+}
+
 void Baron::legitInvestment() {
 
 }
 
-void Baron::passiveAbility() {
-
+void Baron::useAbility() {
+    legitInvestment();
 }
+
+
 
 
 

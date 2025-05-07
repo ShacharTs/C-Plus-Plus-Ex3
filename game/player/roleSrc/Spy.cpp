@@ -1,7 +1,9 @@
 #include "../roleHeader/Spy.hpp"
 #include <iostream>
 
-Spy::Spy(const std::string &name) : Player(getName()) {}
+Spy::Spy(const std::string &name) : Player(getName()) {
+    role = Role::Spy;
+}
 
 /**
  * allow spy to block another player from using arrest for one turn
@@ -16,6 +18,13 @@ void Spy::blockArrest(Player *target) {
  * @param target another player
  */
 void Spy::watchCoins(Player *target) {
-    
+
 }
+
+void Spy::useAbility(Player *target) {
+    watchCoins(target);
+    blockArrest(target);
+}
+
+
 

@@ -1,7 +1,9 @@
 #include "../roleHeader/Governor.hpp"
 #include <iostream>
 
-Governor::Governor(const std::string& name) :Player(getName()) {}
+Governor::Governor(const std::string& name) :Player(getName()) {
+    role = Role::Governor;
+}
 
 
 /**
@@ -9,15 +11,15 @@ Governor::Governor(const std::string& name) :Player(getName()) {}
  * @param target another player
  */
 void Governor::blockTax(Player *target) {
-
+        target->canTax = false;
 }
 
-/**
- *
- */
-void Governor::passiveAbility() {
-
+void Governor::useAbility(Player* target)  {
+    blockTax(target);
 }
+
+
+
 
 
 

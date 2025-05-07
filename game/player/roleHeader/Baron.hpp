@@ -7,5 +7,5 @@ public:
     explicit Baron(const std::string& name);
     void legitInvestment();
 
-    void passiveAbility();
+    void useAbility() override;
 };
