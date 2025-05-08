@@ -8,7 +8,7 @@ Spy::Spy(const std::string &name) : Player(name) {
 
 /**
  * allow spy to block another player from using arrest for one turn
- * for some reasons, this is a free ablilty
+ * for some reasons, this is a free ablilty (Gods know why)
  */
 void Spy::blockArrest(coup::Game &game) {
     const std::string blockArrest = "Block Arrest";
