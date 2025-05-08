@@ -9,7 +9,7 @@
 namespace coup {
     class Game {
     private:
-        std::vector<Player*> players;
+
         int currentPlayerTurn = 0;
         void addCoins(Player* targetPlayer,int amount);
 
@@ -19,19 +19,19 @@ namespace coup {
         void useAbility(Player* currentPlayer, Player* targetPlayer);
         void useAbility(Player* currentPlayer);
 
-        int choosePlayer(const std::vector<Player *> &players, Player *currentPlayer, const std::string &action);
 
     public:
+        std::vector<Player*> players;
+
         Game();
         Game(std::vector<std::string>names); // for test only
         ~Game();
 
-
-
-         void runGame();  // loop that run the game
-         std::string winner(const std::vector<Player*> &players) const;
-         std::string turn();
-         void getRandomRole(std::vector<Player*> &players);
+        int choosePlayer(const std::vector<Player *> &players, Player *currentPlayer, const std::string &action);
+        void runGame();  // loop that run the game
+        std::string winner(const std::vector<Player*> &players) const;
+        std::string turn();
+        void getRandomRole(std::vector<Player*> &players);
         int getTurn();
         void nextTurn();
         const std::vector<Player*>& getPlayers() const;

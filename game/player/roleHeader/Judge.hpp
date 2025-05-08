@@ -5,5 +5,5 @@ class Judge final : public Player {
 public:
     explicit Judge(const std::string& name);
     void cancelBribe(Player* target);
-    void useAbility(Player* target) override;
+    void useAbility(coup::Game &game) override;
 };

@@ -6,12 +6,9 @@ Baron::Baron(const std::string& name) : Player(name) {
 }
 
 
-void Baron::legitInvestment() {
-    std::cout << "TEST" << std::endl;
-}
 
-void Baron::useAbility() {
-    legitInvestment();
+void Baron::useAbility(coup::Game &game) {
+
 }
 
 

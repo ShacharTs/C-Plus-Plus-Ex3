@@ -1,13 +1,14 @@
 #pragma once
+#include <vector>
+
 #include "../Player.hpp"
 
 class Spy final : public Player {
 public:
     explicit  Spy(const std::string& name);
-    void watchCoins(Player *target);
+    void watchCoins(const std::vector<Player *> &players);
 
-    void blockArrest(Player *target);
+    void blockArrest(coup::Game &game);
 
-    void useAbility(Player *target) override;
-    void useAbility() override;
+    void useAbility(coup::Game &game) override;
 };
