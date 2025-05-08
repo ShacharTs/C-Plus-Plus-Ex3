@@ -9,3 +9,7 @@ Governor::Governor(const std::string& name) :Player(name) {
 void Governor::useAbility(coup::Game &game) {
     Player::useAbility(game);
 }
+
+void Governor::tax() {
+    addCoins(3);
+}

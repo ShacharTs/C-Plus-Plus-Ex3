@@ -22,6 +22,9 @@ namespace coup {
     constexpr int SANCTION_COST = 3;
     constexpr int FORCE_COUP = 10;
 
+    constexpr int GATHER_GAIN = 1;
+    constexpr int TAX_GAIN = 2;
+
 
     Game::Game() {
         cout << "========= Starting New Game =========" << endl;
@@ -168,7 +171,7 @@ namespace coup {
         if (!currentPlayer->canGather) {
             throw runtime_error("Gather action failed.");
         }
-        addCoins(currentPlayer, 1);
+        currentPlayer->gather();
     }
 
     /**
@@ -179,12 +182,7 @@ namespace coup {
         if (!currentPlayer->canTax) {
             throw runtime_error("Tax action failed.");
         }
-        // Governor role gain 3 coins
-        if (currentPlayer->getRole() == Role::Governor) {
-            addCoins(currentPlayer, 3);
-            return;
-        }
-        addCoins(currentPlayer, 2); // normal role will gain 2 coins
+        currentPlayer->tax();
     }
 
     /**
@@ -368,9 +366,6 @@ namespace coup {
     }
 
 
-    bool isMerchant(const Player *currentPlayer) {
-        return (currentPlayer->getRole() == Role::Merchant);
-    }
 
     /**
      * check if current player is merchant and checks if has more than 2 coins to active passtive ability
@@ -378,8 +373,7 @@ namespace coup {
      */
     void tryMerchantAbility(Player *currentPlayer) {
         if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
-            // downcasting from player to merchant
-            if (Merchant *merchant = dynamic_cast<Merchant *>(currentPlayer)) {
+            if (Merchant* merchant = dynamic_cast<Merchant*>(currentPlayer)) {
                 merchant->passiveAbility();
             }
         }
@@ -404,10 +398,7 @@ namespace coup {
             Player *current = players[currentPlayerTurn];
             while (true) {
                 try {
-                    if (isMerchant(current)) {
-                        tryMerchantAbility(current);
-                    }
-
+                    tryMerchantAbility(current);
                     if (forcedToCoup(current)) {
                         // check if playerm must to coup
                         printPlayerStats(current);

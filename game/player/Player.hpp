@@ -44,7 +44,8 @@ public:
     virtual ~Player();
 
     virtual void useAbility(coup::Game &game);
-
+    virtual void gather();
+    virtual void tax();
 
 
     std::string getName() const;
@@ -63,22 +64,6 @@ public:
     void removeExtraTurn();
     void addExtraTurn();
     bool hasExtraTurn();
-
-private:
-    // core actions
-    void requestGather(coup::Game &game);
-
-    void requestTax(coup::Game &game);
-
-    void requestBribe(coup::Game &game);
-
-    void requestArrest(coup::Game &game, Player *target);
-
-
-    void requestSanction(coup::Game &game, Player *target);
-
-    void requestCoup(coup::Game &game, Player *target);
-
 
 
 };

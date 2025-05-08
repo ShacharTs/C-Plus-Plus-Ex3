@@ -6,7 +6,6 @@ Baron::Baron(const std::string& name) : Player(name) {
 }
 
 
-
 void Baron::useAbility(coup::Game &game) {
 
 }
