@@ -301,13 +301,6 @@ namespace coup {
     }
 
 
-    // void Game::useAbility(Player *currentPlayer, Player *targetPlayer) {
-    //     currentPlayer->useAbility(targetPlayer);
-    // }
-
-    // void Game::useAbility(Player *currentPlayer) {
-    //
-    // }
 
     int Game::choosePlayer(const vector<Player *> &players, Player *currentPlayer, const string &action) {
         cout << "Choose player to " << action << ":\n";
