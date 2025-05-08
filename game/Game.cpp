@@ -22,9 +22,6 @@ namespace coup {
     constexpr int SANCTION_COST = 3;
     constexpr int FORCE_COUP = 10;
 
-    constexpr int GATHER_GAIN = 1;
-    constexpr int TAX_GAIN = 2;
-
 
     Game::Game() {
         cout << "========= Starting New Game =========" << endl;
@@ -294,7 +291,7 @@ namespace coup {
      */
     string Game::winner(const vector<Player *> &players) const {
         if (players.size() == 1) {
-            return players[0]->getName();
+            return players.at(0)->getName();
         }
         throw logic_error("Game not finished yet.");
     }
