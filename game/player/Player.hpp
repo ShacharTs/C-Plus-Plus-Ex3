@@ -49,11 +49,14 @@ public:
 
     std::string getName() const;
     Role getRole() const;
+
+
+
     static std::string roleToString(Role role);
 
     int getCoins() const;
-    const Player *getLastArrestedBy() const;
-    void setLastArrestedBy(const Player *ptrPlayer);
+    const Player *getLastArrestedPlayer() const;
+    void setLastArrestedPlayer(const Player *ptrPlayer);
 
     void addCoins(int amount);
     void removeCoins(int amount);

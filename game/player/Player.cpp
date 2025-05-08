@@ -62,11 +62,11 @@ bool Player::hasExtraTurn() {
     return extraTurn;
 }
 
-void Player::setLastArrestedBy(const Player *ptrPlayer) {
+void Player::setLastArrestedPlayer(const Player *ptrPlayer) {
     lastArrestedBy = ptrPlayer;
 }
 
-const Player *Player::getLastArrestedBy() const {
+const Player *Player::getLastArrestedPlayer() const {
     return lastArrestedBy;
 }
 
