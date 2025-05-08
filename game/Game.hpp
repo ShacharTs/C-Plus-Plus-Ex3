@@ -4,6 +4,8 @@
 #include <vector>
 #include "player/Player.hpp"
 
+
+
 namespace coup {
     class Game {
     private:
@@ -17,12 +19,14 @@ namespace coup {
         void useAbility(Player* currentPlayer, Player* targetPlayer);
         void useAbility(Player* currentPlayer);
 
-
+        int choosePlayer(const std::vector<Player *> &players, Player *currentPlayer, const std::string &action);
 
     public:
         Game();
         Game(std::vector<std::string>names); // for test only
         ~Game();
+
+
 
          void runGame();  // loop that run the game
          std::string winner(const std::vector<Player*> &players) const;

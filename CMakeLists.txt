@@ -1,25 +1,38 @@
 cmake_minimum_required(VERSION 3.10)
 project(DemoGame LANGUAGES CXX)
 
-# tell CMake to dump a compile_commands.json next to your build dir
+# Generate compile_commands.json for tooling
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(demogame
-        #tests/Demo.cpp
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Add include directories
+include_directories(
+        game
+        game/player/roleHeader
+)
+
+# Define source files
+set(SOURCES
         game/Game.cpp
-        tests/Test.cpp
+        main.cpp
         game/player/Player.cpp
-        game/player/roleHeader/General.hpp
-        game/player/roleHeader/Baron.hpp
-        game/player/roleHeader/Judge.hpp
-        game/player/roleHeader/Governor.hpp
-        game/player/roleHeader/Merchant.hpp
-        game/player/roleHeader/Spy.hpp
-        game/player/roleSrc/Governor.cpp
-        game/player/roleSrc/Judge.cpp
-        game/player/roleSrc/Merchant.cpp
-        game/player/roleSrc/Spy.cpp
         game/player/roleSrc/Baron.cpp
         game/player/roleSrc/General.cpp
+        game/player/roleSrc/Governor.cpp
+        game/player/roleSrc/Merchant.cpp
+        game/player/roleSrc/Spy.cpp
+        game/player/roleSrc/Judge.cpp
+        #tests/Test.cpp
+)
 
+# Optional: Add test file if needed
+# set(TESTS tests/Test.cpp)
+
+# Define the executable
+add_executable(demogame
+        ${SOURCES}
+        # ${TESTS} # Uncomment if you want to build tests too
 )

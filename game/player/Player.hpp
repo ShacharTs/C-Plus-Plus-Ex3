@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <stdexcept>
+
 namespace coup {
     class Game;
 }
@@ -43,16 +43,14 @@ public:
 
     virtual ~Player();
 
-    virtual void useAbility(Player* target) {
-        throw std::runtime_error("This player has no special ability.");
-    }
-    virtual void useAbility() {
-        throw std::runtime_error("This player has no special ability.");
-    }
+    virtual void useAbility(Player* target);
+    virtual void useAbility();
+
 
 
     std::string getName() const;
     Role getRole() const;
+    static std::string roleToString(Role role);
 
     int getCoins() const;
     const Player *getLastArrestedBy() const;

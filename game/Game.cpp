@@ -13,19 +13,16 @@
 #include "player/roleHeader/Merchant.hpp"
 #include "player/roleHeader/Spy.hpp"
 
+
 using namespace std;
 
 namespace coup {
-
     constexpr int COUP_COST = 7;
     constexpr int BRIBE_COST = 4;
     constexpr int SANCTION_COST = 3;
+    constexpr int FORCE_COUP = 10;
 
 
-
-    /**
-     * constructor
-     */
     Game::Game() {
         cout << "========= Starting New Game =========" << endl;
         int numberOfPlayers = 0;
@@ -35,7 +32,7 @@ namespace coup {
                 cin >> numberOfPlayers;
 
                 if (cin.fail()) {
-                    cin.clear(); // clear the error flag
+                    cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     throw invalid_argument("Invalid input: not a number.");
                 }
@@ -56,7 +53,7 @@ namespace coup {
             cout << "Enter player name" << endl;
             string name;
             cin >> name;
-            auto *player = new Player(name);
+            Player *player = new Player(name);
             players.push_back(player);
         }
 
@@ -71,30 +68,35 @@ namespace coup {
      * FOR TEST ONLY
      * @param names list of names
      */
-    Game::Game(vector<string>names) {
-        for (const string &name : names) {
+    Game::Game(vector<string> names) {
+        for (const string &name: names) {
             players.push_back(new Player(name));
         }
-
 
         for (size_t i = 0; i < players.size(); ++i) {
             string name = players[i]->getName();
             delete players[i];
 
             switch (i) {
-                case 0: players[i] = new Governor(name); break;
-                case 1: players[i] = new Spy(name); break;
-                case 2: players[i] = new Baron(name); break;
-                case 3: players[i] = new General(name); break;
-                case 4: players[i] = new Judge(name); break;
-                case 5: players[i] = new Merchant(name); break;
-                default: players[i] = new Player(name); break;
+                case 0: players[i] = new Governor(name);
+                    break;
+                case 1: players[i] = new Spy(name);
+                    break;
+                case 2: players[i] = new Baron(name);
+                    break;
+                case 3: players[i] = new General(name);
+                    break;
+                case 4: players[i] = new Judge(name);
+                    break;
+                case 5: players[i] = new Merchant(name);
+                    break;
+                default: players[i] = new Player(name);
+                    break;
             }
         }
         currentPlayerTurn = 0;
+        runGame();
     }
-
-
 
 
     /**
@@ -110,8 +112,8 @@ namespace coup {
      * each player gain a role for the game
      * @param players list of the players
      */
-    void Game::getRandomRole(std::vector<Player *> &players) {
-        srand(std::time(nullptr));
+    void Game::getRandomRole(vector<Player *> &players) {
+        srand(time(nullptr));
         for (Player *&p: players) {
             const string name = p->getName();
             delete p; // delete old player to gain new player with role
@@ -146,7 +148,7 @@ namespace coup {
         currentPlayerTurn = (currentPlayerTurn + 1) % players.size();
     }
 
-    const std::vector<Player *> &Game::getPlayers() const {
+    const vector<Player *> &Game::getPlayers() const {
         return players;
     }
 
@@ -159,7 +161,7 @@ namespace coup {
     }
 
     /**
-     * 
+     * player gain 1 coin from gathering
      * @param currentPlayer
      */
     void Game::gather(Player *currentPlayer) {
@@ -171,7 +173,7 @@ namespace coup {
 
     /**
      * Player use tax gain 2 coins, if player role's is governor, gain 3 coins instead of 2
-     * @param currentPlayer current player turn
+     * @param currentPlayer
      */
     void Game::tax(Player *currentPlayer) {
         if (!currentPlayer->canTax) {
@@ -186,8 +188,8 @@ namespace coup {
     }
 
     /**
-     * 
-     * @param currentPlayer 
+     * Player can use bribe to gain extra turn next turn
+     * @param currentPlayer
      */
     void Game::bribe(Player *currentPlayer) {
         if (currentPlayer->getCoins() < BRIBE_COST) {
@@ -201,9 +203,9 @@ namespace coup {
     }
 
     /**
-     * 
-     * @param currentPlayer 
-     * @param targetPlayer 
+     * Player can take one coin from another player
+     * @param currentPlayer
+     * @param targetPlayer
      */
     void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
         if (targetPlayer->getLastArrestedBy() == currentPlayer) {
@@ -221,9 +223,9 @@ namespace coup {
     }
 
     /**
-     * 
-     * @param currentPlayer 
-     * @param targetPlayer 
+     * Player can block another player from using gather and tax
+     * @param currentPlayer
+     * @param targetPlayer
      */
     void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
         if (currentPlayer->getCoins() < SANCTION_COST) {
@@ -250,6 +252,7 @@ namespace coup {
         if (currentPlayer->getCoins() < COUP_COST) {
             throw runtime_error("coup failed not enough coins.");
         }
+
         removeCoins(currentPlayer, COUP_COST);
         if (targetPlayer->isShieldActive) {
             throw runtime_error("coup blocked by another player.");
@@ -293,23 +296,175 @@ namespace coup {
             return players[0]->getName();
         }
         throw logic_error("Game not finished yet.");
-
     }
 
 
-    void Game::useAbility(Player *currentPlayer, Player *targetPlayer) {
-        currentPlayer->useAbility(targetPlayer);
-    }
+    // void Game::useAbility(Player *currentPlayer, Player *targetPlayer) {
+    //     currentPlayer->useAbility(targetPlayer);
+    // }
 
     void Game::useAbility(Player *currentPlayer) {
-        currentPlayer->useAbility();
+    }
+
+    int Game::choosePlayer(const vector<Player *> &players, Player *currentPlayer, const string &action) {
+        cout << "Choose player to " << action << ":\n";
+        for (size_t i = 0; i < players.size(); ++i) {
+            if (i != currentPlayerTurn) {
+                cout << i << ". " << players[i]->getName() << endl;
+            }
+        }
+        size_t targetIndex;
+        cin >> targetIndex;
+        return targetIndex;
+    }
+
+
+    void printPlayerStats(const Player *current) {
+        cout << "\n--- Turn: " << current->getName() << " ---" << endl;
+        cout << "Coins: " << current->getCoins() << endl;
+        cout << "Role: " << current->roleToString(current->getRole()) << endl;
+    }
+
+    void printChose(const Player *current) {
+        printPlayerStats(current);
+
+        cout << "Choose an action:\n"
+                << "1. Gather\n"
+                << "2. Tax\n"
+                << "3. Bribe\n"
+                << "4. Arrest\n"
+                << "5. Sanction\n"
+                << "6. Coup\n"
+                << "7. Use Ability\n"
+                << "0. Skip Turn\n"
+                << "Enter choice: ";
+    }
+
+
+
+    void restSanction(Player *currentPlayer) {
+        currentPlayer->canGather = true;
+        currentPlayer->canTax = true;
+    }
+
+    /**
+     * check if player used extra turn after choice
+     * if true, remove extra turn (used)
+     * @param currentPlayer
+     */
+    bool consumeExtraTurn(Player *currentPlayer) {
+        if (currentPlayer->hasExtraTurn()) {
+            currentPlayer->removeExtraTurn();
+            restSanction(currentPlayer);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * check if a player is forced to coup
+     * @param currentPlayer
+     */
+    bool forcedToCoup(const Player *currentPlayer) {
+        if (currentPlayer->getCoins() >= FORCE_COUP) {
+            return true;
+        }
+        return false;
     }
 
 
     /**
-     * core of the game, all the logic inside the while loop
+     * Game main logic
      */
     void Game::runGame() {
-        // add while loop with try and catch
+        while (players.size() > 1) {
+            Player *current = players[currentPlayerTurn];
+            while (true) {
+                try {
+                    if (forcedToCoup(current)) {
+                        printPlayerStats(current);
+                        const size_t targetIndex = choosePlayer(players, current, "coup");
+                        coup(current, players.at(targetIndex));
+                        if (consumeExtraTurn(current)) {
+                            continue;
+                        }
+                        break;
+                    }
+                    printChose(current);
+
+                    int choice;
+                    cin >> choice;
+                    switch (choice) {
+                        case 1:
+                            gather(current);
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+                        case 2:
+                            tax(current);
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+
+                        case 3:
+                            bribe(current);
+                            break;
+
+                        case 4: {
+                            const size_t targetIndex = choosePlayer(players, current, "arrest");
+                            arrest(current, players.at(targetIndex));
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+                        }
+                        case 5: {
+                            const size_t targetIndex = choosePlayer(players, current, "sanction");
+                            sanction(current, players.at(targetIndex));
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+                        }
+                        case 6: {
+                            const size_t targetIndex = choosePlayer(players, current, "coup");
+                            coup(current, players.at(targetIndex));
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+                        }
+                        case 7:
+                            current->useAbility();
+                            if (consumeExtraTurn(current)) {
+                                continue;
+                            }
+                            break;
+                        case 0:
+                            cout << current->getName() << " skip turn" <<endl;
+                            break;
+                        default:
+                            cout << "Invalid choice. Try again." << endl;
+                            cin.clear();
+                            continue;
+                    }
+                    restSanction(current); // at the end of turn rest sanction if player had
+                    // action succeeded chosen
+                    break;
+                } catch (const exception &e) {
+                    cerr << "Error: " << e.what() << "\nPlease try a different action.\n";
+                }
+            }
+            // print winner
+            if (players.size() == 1) {
+                cout << "\n========= GAME OVER =========\n";
+                cout << "Winner: " << winner(players) << endl;
+                break;
+            }
+
+            nextTurn();
+        }
     }
 }

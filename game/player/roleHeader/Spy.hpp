@@ -9,4 +9,5 @@ public:
     void blockArrest(Player *target);
 
     void useAbility(Player *target) override;
+    void useAbility() override;
 };

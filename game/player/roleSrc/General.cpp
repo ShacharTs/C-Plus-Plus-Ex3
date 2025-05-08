@@ -13,7 +13,7 @@ void General::shield(Player *target) {
 }
 
 void General::useAbility(Player* target) {
-
+        return;
 }
 
 

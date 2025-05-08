@@ -1,5 +1,5 @@
 #include "../roleHeader/Baron.hpp"
-
+#include <iostream>
 
 Baron::Baron(const std::string& name) : Player(name) {
     role = Role::Baron;
@@ -7,7 +7,7 @@ Baron::Baron(const std::string& name) : Player(name) {
 
 
 void Baron::legitInvestment() {
-
+    std::cout << "TEST" << std::endl;
 }
 
 void Baron::useAbility() {

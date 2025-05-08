@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Player.hpp"
-#include "../Game.hpp"
+
 
 using namespace std;
 
@@ -9,6 +9,15 @@ Player::Player(string playerName) : playerName(std::move(playerName)) {
 
 Player::~Player() = default;
 
+void Player::useAbility(Player* target) {
+
+}
+
+void Player::useAbility() {
+
+}
+
+
 string Player::getName() const {
     return playerName;
 }
@@ -16,6 +25,23 @@ string Player::getName() const {
 Role Player::getRole() const {
     return role;
 }
+
+
+
+
+
+string Player::roleToString(Role role) {
+    switch (role) {
+        case Role::Governor: return "Governor";
+        case Role::Spy: return "Spy";
+        case Role::Baron: return "Baron";
+        case Role::General: return "General";
+        case Role::Judge: return "Judge";
+        case Role::Merchant: return "Merchant";
+        default: return "Unknown";
+    }
+}
+
 
 int Player::getCoins() const {
     return coins;

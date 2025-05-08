@@ -21,6 +21,11 @@ void Spy::watchCoins(Player *target) {
 
 }
 
+void Spy::useAbility() {
+
+    std::cout << "SPY ABLILTY "<< std::endl;
+}
+
 void Spy::useAbility(Player *target) {
     watchCoins(target);
     blockArrest(target);
