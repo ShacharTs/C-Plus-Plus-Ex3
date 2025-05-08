@@ -197,6 +197,7 @@ namespace coup {
         if (!currentPlayer->canBribe) {
             throw runtime_error("Bribe failed.");
         }
+
         currentPlayer->addExtraTurn();
     }
 
@@ -347,7 +348,7 @@ namespace coup {
      */
     bool consumeExtraTurn(Player *currentPlayer) {
         if (currentPlayer->hasExtraTurn()) {
-            currentPlayer->removeExtraTurn();
+            currentPlayer->playerUseTurn();
             removeDebuff(currentPlayer);
             return true;
         }
@@ -396,6 +397,7 @@ namespace coup {
     void Game::runGame() {
         while (players.size() > 1) {
             Player *current = players[currentPlayerTurn];
+            current->resetPlayerTurn();
             while (true) {
                 try {
                     tryMerchantAbility(current);
@@ -429,7 +431,7 @@ namespace coup {
 
                         case 3:
                             bribe(current);
-                            break;
+                            continue;
 
                         case 4: {
                             const size_t targetIndex = choosePlayer(players, current, "arrest");

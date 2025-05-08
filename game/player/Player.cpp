@@ -24,8 +24,9 @@ Role Player::getRole() const {
     return role;
 }
 
-
-
+void Player::resetPlayerTurn() {
+    numberOfTurns = 1;
+}
 
 
 string Player::roleToString(const Role role) {
@@ -48,26 +49,29 @@ int Player::getCoins() const {
 /**
  * if a player has extra turn, at the end of his turn, disable it
  */
-void Player::removeExtraTurn() {
-    if (extraTurn) {
-        extraTurn = false;
+void Player::playerUseTurn() {
+    if (numberOfTurns > 0) {
+        numberOfTurns--;
     }
 }
 
+
 void Player::addExtraTurn() {
-    extraTurn = true;
+    numberOfTurns = 2;
 }
 
 bool Player::hasExtraTurn() {
-    return extraTurn;
+    return numberOfTurns > 0;
 }
 
 void Player::gather() {
     addCoins(1);
+    playerUseTurn();
 }
 
 void Player::tax() {
     addCoins(2);
+    playerUseTurn();
 }
 
 

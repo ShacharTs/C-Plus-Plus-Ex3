@@ -22,7 +22,7 @@ private:
     int coins = 0;
     std::string playerName;
     const Player *lastArrestedBy = nullptr;
-    bool extraTurn = false;
+    int numberOfTurns = 1;
 
 protected:
     Role role = Role::Unknown;
@@ -52,7 +52,7 @@ public:
     Role getRole() const;
 
 
-
+    void resetPlayerTurn();
     static std::string roleToString(Role role);
 
     int getCoins() const;
@@ -61,7 +61,7 @@ public:
 
     void addCoins(int amount);
     void removeCoins(int amount);
-    void removeExtraTurn();
+    void playerUseTurn();
     void addExtraTurn();
     bool hasExtraTurn();
 
