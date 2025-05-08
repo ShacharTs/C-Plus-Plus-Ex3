@@ -150,71 +150,91 @@ namespace coup {
         return players;
     }
 
-    void Game::addCoins(Player *target, const int amount) {
-        target->addCoins(amount);
+    void Game::addCoins(Player *targetPlayer, const int amount) {
+        targetPlayer->addCoins(amount);
     }
 
-    void Game::removeCoins(Player *target, const int amount) {
-        target->removeCoins(amount);
+    void Game::removeCoins(Player *targetPlayer, const int amount) {
+        targetPlayer->removeCoins(amount);
     }
 
-
-    void Game::gather(Player *actor) {
-        if (!actor->canGather) {
+    /**
+     * 
+     * @param currentPlayer
+     */
+    void Game::gather(Player *currentPlayer) {
+        if (!currentPlayer->canGather) {
             throw runtime_error("Gather action failed.");
         }
-        addCoins(actor, 1);
+        addCoins(currentPlayer, 1);
     }
 
-    void Game::tax(Player *actor) {
-        if (!actor->canTax) {
+    /**
+     * Player use tax gain 2 coins, if player role's is governor, gain 3 coins instead of 2
+     * @param currentPlayer current player turn
+     */
+    void Game::tax(Player *currentPlayer) {
+        if (!currentPlayer->canTax) {
             throw runtime_error("Tax action failed.");
         }
-        // Governor can get 3 coins
-        if (actor->getRole() == Role::Governor) {
-            addCoins(actor, 3);
+        // Governor role gain 3 coins
+        if (currentPlayer->getRole() == Role::Governor) {
+            addCoins(currentPlayer, 3);
             return;
         }
-        addCoins(actor, 2);
+        addCoins(currentPlayer, 2); // normal role will gain 2 coins
     }
 
-    void Game::bribe(Player *actor) {
-        if (actor->getCoins() < BRIBE_COST) {
+    /**
+     * 
+     * @param currentPlayer 
+     */
+    void Game::bribe(Player *currentPlayer) {
+        if (currentPlayer->getCoins() < BRIBE_COST) {
             throw runtime_error("Bribe failed not enough coins.");
         }
-        removeCoins(actor, BRIBE_COST);
-        if (!actor->canBribe) {
+        removeCoins(currentPlayer, BRIBE_COST);
+        if (!currentPlayer->canBribe) {
             throw runtime_error("Bribe failed.");
         }
-        actor->addExtraTurn();
+        currentPlayer->addExtraTurn();
     }
 
-    void Game::arrest(Player *actor, Player *target) {
-        if (target->getLastArrestedBy() == actor) {
+    /**
+     * 
+     * @param currentPlayer 
+     * @param targetPlayer 
+     */
+    void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
+        if (targetPlayer->getLastArrestedBy() == currentPlayer) {
             throw runtime_error("You cannot arrest the same player twice in a row.");
         }
 
         try {
-            removeCoins(target, 1);
-            addCoins(actor, 1);
+            removeCoins(targetPlayer, 1);
+            addCoins(currentPlayer, 1);
         } catch (exception &e) {
             throw runtime_error("Arrest failed: " + string(e.what()));
         }
 
-        target->setLastArrestedBy(actor);
+        targetPlayer->setLastArrestedBy(currentPlayer);
     }
 
-
-    void Game::sanction(Player *actor, Player *target) {
-        if (actor->getCoins() < SANCTION_COST) {
+    /**
+     * 
+     * @param currentPlayer 
+     * @param targetPlayer 
+     */
+    void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
+        if (currentPlayer->getCoins() < SANCTION_COST) {
             throw runtime_error("sanction failed not enough coins.");
         }
         try {
-            removeCoins(actor, SANCTION_COST);
-            target->canGather = false;
-            target->canTax = false;
+            removeCoins(currentPlayer, SANCTION_COST);
+            targetPlayer->canGather = false;
+            targetPlayer->canTax = false;
         } catch (exception &e) {
-            actor->addExtraTurn(); // failed no coins reward extra turn to do something
+            currentPlayer->addExtraTurn(); // failed no coins reward extra turn to do something
             throw runtime_error("Sanction failed: " + string(e.what()));
         }
     }
@@ -223,33 +243,33 @@ namespace coup {
      * check if player has the amount of coins
      * after that remove from player coins
      * and then checked if target has a shield, if target does not has shield, kick that player
-     * @param actor current player
-     * @param target another player
+     * @param currentPlayer current player
+     * @param targetPlayer another player
      */
-    void Game::coup(Player *actor, const Player *target) {
-        if (actor->getCoins() < COUP_COST) {
+    void Game::coup(Player *currentPlayer, const Player *targetPlayer) {
+        if (currentPlayer->getCoins() < COUP_COST) {
             throw runtime_error("coup failed not enough coins.");
         }
-        removeCoins(actor, COUP_COST);
-        if (target->isShieldActive) {
+        removeCoins(currentPlayer, COUP_COST);
+        if (targetPlayer->isShieldActive) {
             throw runtime_error("coup blocked by another player.");
         }
-        coupKicker(target);
+        coupKicker(targetPlayer);
     }
 
     /**
      * when a player uses coup, this will kick him from the game
-     * @param target couped player
+     * @param targetPlayer couped player
      */
-    void Game::coupKicker(const Player *target) {
+    void Game::coupKicker(const Player *targetPlayer) {
         for (size_t i = 0; i < players.size(); ++i) {
-            if (players[i] == target) {
+            if (players[i] == targetPlayer) {
                 // Adjust currentPlayerTurn if needed
                 if (i < currentPlayerTurn) {
                     --currentPlayerTurn; // shift currentPlayerTurn back since players after 'i' will move left
                 }
                 players.erase(players.begin() + i);
-                delete target; // delete player, TODO check gui later for bugs
+                delete targetPlayer; // delete player, TODO check gui later for bugs
                 return;
             }
         }
@@ -277,12 +297,12 @@ namespace coup {
     }
 
 
-    void Game::useAbility(Player *actor, Player *target) {
-        actor->useAbility(target);
+    void Game::useAbility(Player *currentPlayer, Player *targetPlayer) {
+        currentPlayer->useAbility(targetPlayer);
     }
 
-    void Game::useAbility(Player *actor) {
-        actor->useAbility();
+    void Game::useAbility(Player *currentPlayer) {
+        currentPlayer->useAbility();
     }
 
 

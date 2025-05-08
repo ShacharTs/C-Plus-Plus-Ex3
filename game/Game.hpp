@@ -9,13 +9,13 @@ namespace coup {
     private:
         std::vector<Player*> players;
         int currentPlayerTurn = 0;
-        void addCoins(Player* target,int amount);
+        void addCoins(Player* targetPlayer,int amount);
 
-        void removeCoins(Player* target,int amount);
-        void coupKicker(const Player* target);
+        void removeCoins(Player* targetPlayer,int amount);
+        void coupKicker(const Player* targetPlayer);
 
-        void useAbility(Player* actor, Player* target);
-        void useAbility(Player* actor);
+        void useAbility(Player* currentPlayer, Player* targetPlayer);
+        void useAbility(Player* currentPlayer);
 
 
 
@@ -33,13 +33,13 @@ namespace coup {
         const std::vector<Player*>& getPlayers() const;
 
         // Self-actions
-        void gather(Player* actor);
-        void tax( Player* actor);
-        void bribe(Player* actor);
+        void gather(Player* currentPlayer);
+        void tax( Player* currentPlayer);
+        void bribe(Player* currentPlayer);
         // Targeted actions
-        void arrest(Player* actor, Player* target);
-        void sanction(Player* actor, Player* target);
-        void coup(Player* actor, const Player* target);
+        void arrest(Player* currentPlayer, Player* targetPlayer);
+        void sanction(Player* currentPlayer, Player* targetPlayer);
+        void coup(Player* currentPlayer, const Player* targetPlayer);
 
 
 
