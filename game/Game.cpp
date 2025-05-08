@@ -208,7 +208,7 @@ namespace coup {
      * @param targetPlayer
      */
     void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
-        if (targetPlayer->getLastArrestedBy() == currentPlayer) {
+        if (currentPlayer->getLastArrestedPlayer() == targetPlayer) {
             throw runtime_error("You cannot arrest the same player twice in a row.");
         }
         if (!currentPlayer->canArrest) {
@@ -221,7 +221,7 @@ namespace coup {
             throw runtime_error("Arrest failed: " + string(e.what()));
         }
 
-        targetPlayer->setLastArrestedBy(currentPlayer);
+        currentPlayer->setLastArrestedPlayer(targetPlayer);
     }
 
     /**
@@ -301,7 +301,6 @@ namespace coup {
     }
 
 
-
     int Game::choosePlayer(const vector<Player *> &players, Player *currentPlayer, const string &action) {
         cout << "Choose player to " << action << ":\n";
         for (size_t i = 0; i < players.size(); ++i) {
@@ -337,7 +336,6 @@ namespace coup {
     }
 
 
-
     void removeDebuff(Player *currentPlayer) {
         currentPlayer->canGather = true;
         currentPlayer->canTax = true;
@@ -370,6 +368,34 @@ namespace coup {
     }
 
 
+    bool isMerchant(const Player *currentPlayer) {
+        return (currentPlayer->getRole() == Role::Merchant);
+    }
+
+    /**
+     * check if current player is merchant and checks if has more than 2 coins to active passtive ability
+     * @param currentPlayer
+     */
+    void tryMerchantAbility(Player *currentPlayer) {
+        if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
+            // downcasting from player to merchant
+            if (Merchant *merchant = dynamic_cast<Merchant *>(currentPlayer)) {
+                merchant->passiveAbility();
+            }
+        }
+    }
+
+    bool Game::isGameOver(const vector<Player *> &players) {
+        // print winner
+        if (players.size() == 1) {
+            cout << "\n========= GAME OVER =========\n";
+            cout << "Winner: " << winner(players) << endl;
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * Game main logic
      */
@@ -378,7 +404,12 @@ namespace coup {
             Player *current = players[currentPlayerTurn];
             while (true) {
                 try {
+                    if (isMerchant(current)) {
+                        tryMerchantAbility(current);
+                    }
+
                     if (forcedToCoup(current)) {
+                        // check if playerm must to coup
                         printPlayerStats(current);
                         const size_t targetIndex = choosePlayer(players, current, "coup");
                         coup(current, players.at(targetIndex));
@@ -440,7 +471,7 @@ namespace coup {
                             }
                             break;
                         case 0:
-                            cout << current->getName() << " skip turn" <<endl;
+                            cout << current->getName() << " skip turn" << endl;
                             break;
                         default:
                             cout << "Invalid choice. Try again." << endl;
@@ -454,11 +485,9 @@ namespace coup {
                     cerr << "Error: " << e.what() << "\nPlease try a different action.\n";
                 }
             }
-            // print winner
-            if (players.size() == 1) {
-                cout << "\n========= GAME OVER =========\n";
-                cout << "Winner: " << winner(players) << endl;
-                break;
+            // check if one player is left
+            if (isGameOver(players)) {
+                return;
             }
 
             nextTurn();

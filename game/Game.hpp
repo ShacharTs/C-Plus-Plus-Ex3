@@ -12,22 +12,22 @@ namespace coup {
 
         int currentPlayerTurn = 0;
         void addCoins(Player* targetPlayer,int amount);
-
         void removeCoins(Player* targetPlayer,int amount);
         void coupKicker(const Player* targetPlayer);
-
-        void useAbility(Player* currentPlayer, Player* targetPlayer);
-        void useAbility(Player* currentPlayer);
 
 
     public:
         std::vector<Player*> players;
 
         Game();
-        Game(std::vector<std::string>names); // for test only
+
+        explicit Game(std::vector<std::string>names); // for test only
         ~Game();
 
         int choosePlayer(const std::vector<Player *> &players, Player *currentPlayer, const std::string &action);
+
+        bool isGameOver(const std::vector<Player *> &players);
+
         void runGame();  // loop that run the game
         std::string winner(const std::vector<Player*> &players) const;
         std::string turn();
