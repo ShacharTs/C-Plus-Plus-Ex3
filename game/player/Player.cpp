@@ -9,11 +9,9 @@ Player::Player(string playerName) : playerName(std::move(playerName)) {
 
 Player::~Player() = default;
 
-void Player::useAbility(Player* target) {
 
-}
 
-void Player::useAbility() {
+void Player::useAbility(coup::Game& game) {
 
 }
 
@@ -30,7 +28,7 @@ Role Player::getRole() const {
 
 
 
-string Player::roleToString(Role role) {
+string Player::roleToString(const Role role) {
     switch (role) {
         case Role::Governor: return "Governor";
         case Role::Spy: return "Spy";

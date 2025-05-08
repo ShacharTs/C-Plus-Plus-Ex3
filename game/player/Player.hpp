@@ -43,8 +43,7 @@ public:
 
     virtual ~Player();
 
-    virtual void useAbility(Player* target);
-    virtual void useAbility();
+    virtual void useAbility(coup::Game &game);
 
 
 

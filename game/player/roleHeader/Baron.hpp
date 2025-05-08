@@ -5,7 +5,6 @@
 class Baron final : public Player {
 public:
     explicit Baron(const std::string& name);
-    void legitInvestment();
 
-    void useAbility() override;
+    void useAbility(coup::Game &game) override;
 };

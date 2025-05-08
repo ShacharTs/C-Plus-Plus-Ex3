@@ -5,5 +5,5 @@
 class Governor final : public Player {
 public:
     explicit Governor(const std::string& name);
-    void useAbility(Player *target) override;
+    void useAbility(coup::Game &game) override;
 };

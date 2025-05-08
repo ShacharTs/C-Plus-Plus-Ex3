@@ -49,7 +49,7 @@ namespace coup {
         }
 
         // adding player names
-        for (int i = 0; i < numberOfPlayers; i++) {
+        for (size_t i = 0; i < numberOfPlayers; i++) {
             cout << "Enter player name" << endl;
             string name;
             cin >> name;
@@ -211,7 +211,9 @@ namespace coup {
         if (targetPlayer->getLastArrestedBy() == currentPlayer) {
             throw runtime_error("You cannot arrest the same player twice in a row.");
         }
-
+        if (!currentPlayer->canArrest) {
+            throw runtime_error("Arrest failed. Player blocked by spy");
+        }
         try {
             removeCoins(targetPlayer, 1);
             addCoins(currentPlayer, 1);
@@ -303,8 +305,9 @@ namespace coup {
     //     currentPlayer->useAbility(targetPlayer);
     // }
 
-    void Game::useAbility(Player *currentPlayer) {
-    }
+    // void Game::useAbility(Player *currentPlayer) {
+    //
+    // }
 
     int Game::choosePlayer(const vector<Player *> &players, Player *currentPlayer, const string &action) {
         cout << "Choose player to " << action << ":\n";
@@ -342,9 +345,10 @@ namespace coup {
 
 
 
-    void restSanction(Player *currentPlayer) {
+    void removeDebuff(Player *currentPlayer) {
         currentPlayer->canGather = true;
         currentPlayer->canTax = true;
+        currentPlayer->canArrest = true;
     }
 
     /**
@@ -355,7 +359,7 @@ namespace coup {
     bool consumeExtraTurn(Player *currentPlayer) {
         if (currentPlayer->hasExtraTurn()) {
             currentPlayer->removeExtraTurn();
-            restSanction(currentPlayer);
+            removeDebuff(currentPlayer);
             return true;
         }
         return false;
@@ -437,7 +441,7 @@ namespace coup {
                             break;
                         }
                         case 7:
-                            current->useAbility();
+                            current->useAbility(*this);
                             if (consumeExtraTurn(current)) {
                                 continue;
                             }
@@ -450,7 +454,7 @@ namespace coup {
                             cin.clear();
                             continue;
                     }
-                    restSanction(current); // at the end of turn rest sanction if player had
+                    removeDebuff(current); // at the end of turn rest sanction if player had
                     // action succeeded chosen
                     break;
                 } catch (const exception &e) {

@@ -6,18 +6,6 @@ Governor::Governor(const std::string& name) :Player(name) {
     role = Role::Governor;
 }
 
-
-
-/**
- * Ability to block another player to use tax ability for one turn
- * @param target another player
- */
-void Governor::useAbility(Player* target)  {
-
+void Governor::useAbility(coup::Game &game) {
+    Player::useAbility(game);
 }
-
-
-
-
-
-
