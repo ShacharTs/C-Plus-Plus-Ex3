@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Igame -Igame/player/roleHeader
 
-.PHONY: all clean
+.PHONY: all clean valgrind
 
 SRC = game/Game.cpp \
       main.cpp \
@@ -25,5 +25,7 @@ $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	del /Q $(subst /,\,$(OBJ)) $(TARGET).exe
+	rm -f $(OBJ) $(TARGET)
 
+valgrind: $(TARGET)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET)
