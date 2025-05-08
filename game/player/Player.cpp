@@ -95,5 +95,11 @@ void Player::removeCoins(int amount) {
     coins -= amount;
 }
 
+void Player::removeDebuff() {
+    canGather = true;
+    canTax = true;
+    canArrest = true;
+}
+
 
 

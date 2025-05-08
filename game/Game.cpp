@@ -216,7 +216,7 @@ namespace coup {
         } catch (exception &e) {
             throw runtime_error("Arrest failed: " + string(e.what()));
         }
-
+        currentPlayer->playerUseTurn();
         currentPlayer->setLastArrestedPlayer(targetPlayer);
     }
 
@@ -234,9 +234,9 @@ namespace coup {
             targetPlayer->canGather = false;
             targetPlayer->canTax = false;
         } catch (exception &e) {
-            currentPlayer->addExtraTurn(); // failed no coins reward extra turn to do something
             throw runtime_error("Sanction failed: " + string(e.what()));
         }
+        currentPlayer->playerUseTurn();
     }
 
     /**
@@ -256,6 +256,7 @@ namespace coup {
             throw runtime_error("coup blocked by another player.");
         }
         coupKicker(targetPlayer);
+        currentPlayer->playerUseTurn();
     }
 
     /**
@@ -399,7 +400,7 @@ namespace coup {
                 try {
                     tryMerchantAbility(current);
                     if (forcedToCoup(current)) {
-                        // check if playerm must to coup
+                        // check if player must to coup
                         printPlayerStats(current);
                         const size_t targetIndex = choosePlayer(players, current, "coup");
                         coup(current, players.at(targetIndex));
@@ -468,7 +469,8 @@ namespace coup {
                             cin.clear();
                             continue;
                     }
-                    removeDebuff(current); // at the end of turn rest sanction if player had
+                    current->removeDebuff();
+                    //removeDebuff(current); // at the end of turn rest sanction if player had
                     // action succeeded chosen
                     break;
                 } catch (const exception &e) {

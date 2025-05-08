@@ -61,6 +61,9 @@ public:
 
     void addCoins(int amount);
     void removeCoins(int amount);
+
+    void removeDebuff();
+
     void playerUseTurn();
     void addExtraTurn();
     bool hasExtraTurn();
