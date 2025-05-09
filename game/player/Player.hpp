@@ -51,6 +51,8 @@ public:
     void arrest(Player *targetPlayer);
     void sanction(Player *target);
 
+    bool isTargetSelf(const Player *target);
+
 
     virtual void useAbility(coup::Game &game);
 

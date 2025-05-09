@@ -5,6 +5,7 @@
 #include <functional>
 #include <limits>
 
+#include "GameExceptions.hpp"
 
 #include "player/roleHeader/Baron.hpp"
 #include "player/roleHeader/General.hpp"
@@ -192,7 +193,9 @@ namespace coup {
         }
         removeCoins(currentPlayer, BRIBE_COST);
         if (!currentPlayer->isBribeAllow()) {
-            throw runtime_error("Bribe failed.");
+            currentPlayer->playerUsedTurn();
+            currentPlayer->canBribe = true;
+            throw JudgeBlockBribeError("Judge blocked you from using bribe");
         }
 
         currentPlayer->bribe();
@@ -227,7 +230,6 @@ namespace coup {
         }
 
         try {
-            removeCoins(currentPlayer, SANCTION_COST);
             currentPlayer->sanction(targetPlayer);
         } catch (const exception &e) {
             throw runtime_error("Sanction failed: " + string(e.what()));
@@ -431,8 +433,26 @@ namespace coup {
                     }
                     // action succeeded
                     break;
-                } catch (const exception &e) {
-                    cerr << "Error: " << e.what() << "\nPlease try a different action.\n";
+                }
+                catch (const SelfError &e) {
+                    cerr << "[Self Error] " << e.what() << endl;
+                }
+                catch (const ArrestError &e) {
+                    cerr << "[Arrest Error] " << e.what() << endl;
+                    break;
+                }catch (const JudgeBlockBribeError &e) {
+                    cerr << "[Judge Block Bribe Error] " << e.what() << endl;
+                    break;
+                }
+                catch (const BribeError &e) {
+                    cerr << "[Bribe Error] " << e.what() << endl;
+                }
+                catch (const CoupError &e) {
+                    cerr << "[Coup Error] " << e.what() << endl;
+                    break;
+                }
+                catch (const std::exception &e) {
+                    cerr << "Unexpected Error: " << e.what() << "\nPlease try again.\n";
                 }
 
             }

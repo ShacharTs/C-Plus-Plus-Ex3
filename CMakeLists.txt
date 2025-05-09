@@ -25,6 +25,7 @@ set(SOURCES
         game/player/roleSrc/Merchant.cpp
         game/player/roleSrc/Spy.cpp
         game/player/roleSrc/Judge.cpp
+        game/GameExceptions.hpp
         #tests/Test.cpp
 )
 

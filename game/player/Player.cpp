@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Player.hpp"
 
-
+#include "GameExceptions.hpp"
 
 
 using namespace std;
@@ -133,24 +133,41 @@ void Player::bribe() {
 
 
 void Player::arrest(Player *targetPlayer) {
+    if (isTargetSelf(targetPlayer)) {
+        throw SelfError("You cannot arrest yourself.");
+    }
+
+    if (targetPlayer->getRole() == Role::General) {
+        this->playerUsedTurn();
+        this->setLastArrestedPlayer(targetPlayer);
+        throw ArrestError("Coin stole from General. Action cancelled.");
+    }
+
     try {
         targetPlayer->removeCoins(1);
         this->addCoins(1);
-    } catch (exception &e) {
-        throw runtime_error("Arrest failed: " + string(e.what()));
+    } catch (const std::exception& e) {
+        throw ArrestError("Arrest failed: " + std::string(e.what()));
     }
+
     this->playerUsedTurn();
     this->setLastArrestedPlayer(targetPlayer);
-
 }
 
+
 void Player::sanction(Player *target) {
+    if (isTargetSelf(target)) {
+        throw SelfError("You cannot sanction yourself.");
+    }
+    removeCoins(3);
     target->canGather = false;
     target->canTax = false;
     playerUsedTurn();
 }
 
-
+bool Player::isTargetSelf(const Player *target) {
+    return (this == target);
+}
 
 void Player::setLastArrestedPlayer(const Player *ptrPlayer) {
     lastArrestedBy = ptrPlayer;

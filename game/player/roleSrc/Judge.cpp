@@ -1,20 +1,19 @@
 #include "../roleHeader/Judge.hpp"
+#include <Game.hpp>
 #include <iostream>
 
 Judge::Judge(const std::string &name) : Player(name) {
     role = Role::Judge;
 }
 
-/**
- * Judge can use cancel a bribe that another player cast
- * @param player another player
- */
-void Judge::cancelBribe(Player *player) {
 
-}
 
 void Judge::useAbility(coup::Game &game) {
-    useAbility(game);
+    const std::string blockBribe = "Block a player from using bribe";
+    size_t playerIndex = game.getTurn();
+    playerIndex = game.choosePlayer(this, blockBribe);
+    game.getPlayers().at(playerIndex)->canBribe = false;
+    playerUsedTurn();
 }
 
 
