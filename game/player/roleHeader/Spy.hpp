@@ -11,4 +11,6 @@ public:
     void blockArrest(coup::Game &game);
 
     void useAbility(coup::Game &game) override;
+
+    void listOptions() const;
 };

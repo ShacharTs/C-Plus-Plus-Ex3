@@ -299,6 +299,10 @@ namespace coup {
         }
         size_t targetIndex;
         cin >> targetIndex;
+        if (targetIndex >= getPlayers().size() || targetIndex == currentPlayerTurn) {
+            throw SelfError("Invalid selection.");
+        }
+
         return targetIndex;
     }
 
@@ -418,6 +422,10 @@ namespace coup {
                             break;
                         }
                         case 7:
+                            if (current->getRole() == Role::Merchant) {
+                                throw MerchantError("Invaild input");
+                                continue;
+                            }
                             current->useAbility(*this);
                             if (consumeExtraTurn(current)) {
                                 continue;

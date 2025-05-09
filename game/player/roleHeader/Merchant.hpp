@@ -6,4 +6,6 @@ public:
     explicit Merchant(const std::string& name);
 
     void passiveAbility();
+
+    void listOptions() const;
 };

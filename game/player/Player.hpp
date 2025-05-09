@@ -90,5 +90,7 @@ public:
     void removeDebuff();
     static std::string roleToString(Role role);
     void printPlayerStats() const;
-    void listOptions() const;
+
+    virtual void listOptions() const;
+
 };

@@ -34,4 +34,10 @@ public:
         : std::runtime_error(message){}
 };
 
+class MerchantError : public std::runtime_error {
+public:
+    explicit MerchantError (const std::string& message)
+        : std::runtime_error(message){}
+};
+
 
