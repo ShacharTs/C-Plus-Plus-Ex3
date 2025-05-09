@@ -33,7 +33,6 @@ public:
     bool canTax = true;
     bool canBribe = true;
     bool canArrest = true;
-    bool canSanction = true;
     bool canCoup = true;
     bool coupShield = false;
 
@@ -82,7 +81,6 @@ public:
     bool isTaxAllow() const;
     bool isBribeAllow() const;
     bool isArrestAllow() const;
-    bool isSanctionAllow() const;
     bool isCoupAllow() const;
     bool isCoupShieldActive() const;
 

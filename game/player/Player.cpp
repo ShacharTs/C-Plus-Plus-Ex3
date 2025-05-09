@@ -1,8 +1,6 @@
 #include <iostream>
 #include "Player.hpp"
 
-#include <Game.hpp>
-
 #include "GameExceptions.hpp"
 
 
@@ -112,9 +110,7 @@ bool Player::isArrestAllow() const {
     return canArrest;
 }
 
-bool Player::isSanctionAllow() const {
-    return canSanction;
-}
+
 
 bool Player::isCoupAllow() const {
     return canCoup;
@@ -192,7 +188,7 @@ void Player::addCoins(const int amount) {
 
 void Player::removeCoins(const int amount) {
     if (coins < amount) {
-        throw logic_error("Not enough coins.");
+        throw CoinsError("Not enough coins.");
     }
     coins -= amount;
 }

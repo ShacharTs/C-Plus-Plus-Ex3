@@ -3,6 +3,33 @@
 #include <stdexcept>
 #include <string>
 
+
+class CoinsError : public std::runtime_error {
+public:
+    explicit CoinsError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+class GatherError : public std::runtime_error {
+public:
+    explicit GatherError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+
+class TaxError : public std::runtime_error {
+public:
+    explicit TaxError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+class ArrestTwiceInRow : public std::runtime_error {
+public:
+    explicit ArrestTwiceInRow(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+
 class ArrestError : public std::runtime_error {
 public:
     explicit ArrestError(const std::string& message)
@@ -21,9 +48,10 @@ public:
         : std::runtime_error(message) {}
 };
 
-class CoupError : public std::runtime_error {
+
+class CoupBlocked : public std::runtime_error {
 public:
-    explicit CoupError(const std::string& message)
+    explicit CoupBlocked(const std::string& message)
         : std::runtime_error(message) {}
 };
 

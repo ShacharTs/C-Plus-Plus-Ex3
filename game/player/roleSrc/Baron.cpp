@@ -12,7 +12,7 @@ void Baron::useAbility(coup::Game &game) {
         addCoins(6);
         playerUsedTurn();
     } catch (std::exception &e) {
-        throw std::logic_error(e.what());
+        throw std::runtime_error(e.what());
     }
 }
 
