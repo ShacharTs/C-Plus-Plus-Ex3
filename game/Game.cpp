@@ -191,11 +191,11 @@ namespace coup {
             throw runtime_error("Bribe failed not enough coins.");
         }
         removeCoins(currentPlayer, BRIBE_COST);
-        if (!currentPlayer->canBribe) {
+        if (!currentPlayer->isBribeAllow()) {
             throw runtime_error("Bribe failed.");
         }
 
-        currentPlayer->addExtraTurn();
+        currentPlayer->bribe();
     }
 
     /**
@@ -207,17 +207,10 @@ namespace coup {
         if (currentPlayer->getLastArrestedPlayer() == targetPlayer) {
             throw runtime_error("You cannot arrest the same player twice in a row.");
         }
-        if (!currentPlayer->canArrest) {
+        if (!currentPlayer->isArrestAllow()) {
             throw runtime_error("Arrest failed. Player blocked by spy");
         }
-        try {
-            removeCoins(targetPlayer, 1);
-            addCoins(currentPlayer, 1);
-        } catch (exception &e) {
-            throw runtime_error("Arrest failed: " + string(e.what()));
-        }
-        currentPlayer->playerUseTurn();
-        currentPlayer->setLastArrestedPlayer(targetPlayer);
+        currentPlayer->arrest(targetPlayer);
     }
 
     /**
@@ -227,17 +220,22 @@ namespace coup {
      */
     void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
         if (currentPlayer->getCoins() < SANCTION_COST) {
-            throw runtime_error("sanction failed not enough coins.");
+            throw runtime_error("Sanction failed: not enough coins.");
         }
+        if (!currentPlayer->isSanctionAllow()) {
+            throw runtime_error("Sanction action is not allowed.");
+        }
+
         try {
             removeCoins(currentPlayer, SANCTION_COST);
-            targetPlayer->canGather = false;
-            targetPlayer->canTax = false;
-        } catch (exception &e) {
+            currentPlayer->sanction(targetPlayer);
+        } catch (const exception &e) {
             throw runtime_error("Sanction failed: " + string(e.what()));
         }
-        currentPlayer->playerUseTurn();
+
+        currentPlayer->playerUsedTurn();
     }
+
 
     /**
      * check if player has the amount of coins
@@ -252,11 +250,11 @@ namespace coup {
         }
 
         removeCoins(currentPlayer, COUP_COST);
-        if (targetPlayer->isShieldActive) {
+        if (targetPlayer->isCoupShieldActive()) {
             throw runtime_error("coup blocked by another player.");
         }
         coupKicker(targetPlayer);
-        currentPlayer->playerUseTurn();
+        currentPlayer->playerUsedTurn();
     }
 
     /**
@@ -311,34 +309,6 @@ namespace coup {
     }
 
 
-    void printPlayerStats(const Player *current) {
-        cout << "\n--- Turn: " << current->getName() << " ---" << endl;
-        cout << "Coins: " << current->getCoins() << endl;
-        cout << "Role: " << current->roleToString(current->getRole()) << endl;
-    }
-
-    void printChose(const Player *current) {
-        printPlayerStats(current);
-
-        cout << "Choose an action:\n"
-                << "1. Gather\n"
-                << "2. Tax\n"
-                << "3. Bribe\n"
-                << "4. Arrest\n"
-                << "5. Sanction\n"
-                << "6. Coup\n"
-                << "7. Use Ability\n"
-                << "0. Skip Turn\n"
-                << "Enter choice: ";
-    }
-
-
-    void removeDebuff(Player *currentPlayer) {
-        currentPlayer->canGather = true;
-        currentPlayer->canTax = true;
-        currentPlayer->canArrest = true;
-    }
-
     /**
      * check if player used extra turn after choice
      * if true, remove extra turn (used)
@@ -346,8 +316,8 @@ namespace coup {
      */
     bool consumeExtraTurn(Player *currentPlayer) {
         if (currentPlayer->hasExtraTurn()) {
-            currentPlayer->playerUseTurn();
-            removeDebuff(currentPlayer);
+            currentPlayer->playerUsedTurn();
+            currentPlayer->removeDebuff();
             return true;
         }
         return false;
@@ -365,14 +335,13 @@ namespace coup {
     }
 
 
-
     /**
      * check if current player is merchant and checks if has more than 2 coins to active passtive ability
      * @param currentPlayer
      */
     void tryMerchantAbility(Player *currentPlayer) {
         if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
-            if (Merchant* merchant = dynamic_cast<Merchant*>(currentPlayer)) {
+            if (Merchant *merchant = dynamic_cast<Merchant *>(currentPlayer)) {
                 merchant->passiveAbility();
             }
         }
@@ -401,7 +370,7 @@ namespace coup {
                     tryMerchantAbility(current);
                     if (forcedToCoup(current)) {
                         // check if player must to coup
-                        printPlayerStats(current);
+                        current->printPlayerStats();
                         const size_t targetIndex = choosePlayer(players, current, "coup");
                         coup(current, players.at(targetIndex));
                         if (consumeExtraTurn(current)) {
@@ -409,7 +378,7 @@ namespace coup {
                         }
                         break;
                     }
-                    printChose(current);
+                    current->listOptions();
 
                     int choice;
                     cin >> choice;

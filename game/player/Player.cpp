@@ -2,6 +2,8 @@
 #include "Player.hpp"
 
 
+
+
 using namespace std;
 
 Player::Player(string playerName) : playerName(std::move(playerName)) {
@@ -41,6 +43,26 @@ string Player::roleToString(const Role role) {
     }
 }
 
+void Player::printPlayerStats() const {
+    cout << "\n--- Turn: " << getName() << " ---" << endl;
+    cout << "Coins: " << getCoins() << endl;
+    cout << "Role: " << roleToString(getRole()) << endl;
+}
+
+void Player::listOptions() const {
+    printPlayerStats();
+    cout << "Choose an action:\n"
+            << "1. Gather\n"
+            << "2. Tax\n"
+            << "3. Bribe\n"
+            << "4. Arrest\n"
+            << "5. Sanction\n"
+            << "6. Coup\n"
+            << "7. Use Ability\n"
+            << "0. Skip Turn\n"
+            << "Enter choice: ";
+}
+
 
 int Player::getCoins() const {
     return coins;
@@ -49,7 +71,7 @@ int Player::getCoins() const {
 /**
  * if a player has extra turn, at the end of his turn, disable it
  */
-void Player::playerUseTurn() {
+void Player::playerUsedTurn() {
     if (numberOfTurns > 0) {
         numberOfTurns--;
     }
@@ -64,15 +86,66 @@ bool Player::hasExtraTurn() {
     return numberOfTurns > 0;
 }
 
+bool Player::isGatherAllow() const {
+    return canGather;
+}
+
+bool Player::isTaxAllow() const {
+    return canTax;
+}
+
+bool Player::isBribeAllow() const {
+    return canBribe;
+}
+
+bool Player::isArrestAllow() const {
+    return canArrest;
+}
+
+bool Player::isSanctionAllow() const {
+    return canSanction;
+}
+
+bool Player::isCoupAllow() const {
+    return canCoup;
+}
+
+bool Player::isCoupShieldActive() const {
+    return hasCoupShield;
+}
+
 void Player::gather() {
     addCoins(1);
-    playerUseTurn();
+    playerUsedTurn();
 }
 
 void Player::tax() {
     addCoins(2);
-    playerUseTurn();
+    playerUsedTurn();
 }
+
+void Player::bribe() {
+    addExtraTurn();
+}
+
+
+void Player::arrest(Player *targetPlayer) {
+    try {
+        targetPlayer->removeCoins(1);
+        this->addCoins(1);
+    } catch (exception &e) {
+        throw runtime_error("Arrest failed: " + string(e.what()));
+    }
+    this->playerUsedTurn();
+    this->setLastArrestedPlayer(targetPlayer);
+
+}
+
+void Player::sanction(Player *target) {
+    target->canGather = false;
+    target->canTax = false;
+}
+
 
 
 void Player::setLastArrestedPlayer(const Player *ptrPlayer) {

@@ -16,7 +16,6 @@ enum class Role {
     Unknown
 };
 
-
 class Player {
 private:
     int coins = 0;
@@ -24,51 +23,70 @@ private:
     const Player *lastArrestedBy = nullptr;
     int numberOfTurns = 1;
 
+
 protected:
     Role role = Role::Unknown;
 
 public:
-    // flags is ability doable
+    // Ability flags
     bool canGather = true;
     bool canTax = true;
     bool canBribe = true;
     bool canArrest = true;
     bool canSanction = true;
-    bool isShieldActive = false;
-
+    bool canCoup = true;
+    bool hasCoupShield = false;
 
 
 public:
     explicit Player(std::string playerName);
-
     virtual ~Player();
 
-    virtual void useAbility(coup::Game &game);
+    // Abilities - Self
     virtual void gather();
     virtual void tax();
 
+    // Abilities - Targeted
+    void bribe();
+    void arrest(Player *targetPlayer);
+    void sanction(Player *target);
 
+
+    virtual void useAbility(coup::Game &game);
+
+    // Getters
     std::string getName() const;
     Role getRole() const;
-
-
-    void resetPlayerTurn();
-    static std::string roleToString(Role role);
-
     int getCoins() const;
     const Player *getLastArrestedPlayer() const;
+
+    // Setters
     void setLastArrestedPlayer(const Player *ptrPlayer);
 
+    // Coin management
     void addCoins(int amount);
     void removeCoins(int amount);
 
-    void removeDebuff();
-
-    void playerUseTurn();
+    // Turn management
+    void resetPlayerTurn();
+    void playerUsedTurn();
     void addExtraTurn();
     bool hasExtraTurn();
 
+    // flag management
+    bool isGatherAllow() const;
+    bool isTaxAllow() const;
+    bool isBribeAllow() const;
+    bool isArrestAllow() const;
+    bool isSanctionAllow() const;
+    bool isCoupAllow() const;
+    bool isCoupShieldActive() const;
 
+
+
+    // Misc
+    void removeDebuff();
+    static std::string roleToString(Role role);
+    void printPlayerStats() const;
+    void listOptions() const;
 };
-
-

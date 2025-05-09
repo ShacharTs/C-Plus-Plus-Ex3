@@ -36,6 +36,7 @@ namespace coup {
         void nextTurn();
         const std::vector<Player*>& getPlayers() const;
 
+
         // Self-actions
         void gather(Player* currentPlayer);
         void tax( Player* currentPlayer);

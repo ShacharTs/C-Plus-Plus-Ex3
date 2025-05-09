@@ -12,5 +12,5 @@ void Governor::useAbility(coup::Game &game) {
 
 void Governor::tax() {
     addCoins(3);
-    playerUseTurn();
+    playerUsedTurn();
 }
