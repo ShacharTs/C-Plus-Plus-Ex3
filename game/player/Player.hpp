@@ -55,6 +55,8 @@ public:
 
 
     virtual void useAbility(coup::Game &game);
+    virtual void passiveAbility();
+    virtual void passiveAbility(Player *target);
 
     // Getters
     std::string getName() const;

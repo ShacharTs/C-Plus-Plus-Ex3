@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Player.hpp"
 
+#include <Game.hpp>
+
 #include "GameExceptions.hpp"
 
 
@@ -12,9 +14,15 @@ Player::Player(string playerName) : playerName(std::move(playerName)) {
 Player::~Player() = default;
 
 
+// Virtual ability for roles
+void Player::useAbility(coup::Game &game) {
 
-void Player::useAbility(coup::Game& game) {
+}
 
+void Player::passiveAbility() {
+}
+
+void Player::passiveAbility(Player *target) {
 }
 
 

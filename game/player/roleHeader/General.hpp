@@ -9,5 +9,5 @@ public:
     explicit General(const std::string& name);
     void useAbility(coup::Game &game) override;
 
-    void listOptions() const;
+    void listOptions() const override;
 };

@@ -7,6 +7,6 @@ public:
     explicit Baron(const std::string& name);
 
     void useAbility(coup::Game &game) override;
-
-    void listOptions() const;
+    void passiveAbility() override;
+    void listOptions() const override;
 };

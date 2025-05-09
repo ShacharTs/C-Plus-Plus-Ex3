@@ -161,6 +161,54 @@ namespace coup {
         targetPlayer->removeCoins(amount);
     }
 
+    bool Game::checkRoleBlock(Player* currentPlayer, Role role, const std::string& action) {
+        for (Player* player : players) {
+            if (player != currentPlayer && player->getRole() == role) {
+                std::string answer;
+                std::cout << player->getName() << " (" << Player::roleToString(player->getRole()) << ")"
+                          << ", do you want to block the " << action << " of "
+                          << currentPlayer->getName() << "? (y/n): ";
+                std::cin >> answer;
+                if (answer == "y" || answer == "Y") {
+                    std::cout << action << " was blocked by " << player->getName() << ".\n";
+                    currentPlayer->playerUsedTurn();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool Game::handleActionBlock(Player* currentPlayer, ActionType action) {
+        switch (action) {
+            case ActionType::Tax:
+                return checkRoleBlock(currentPlayer, Role::Governor, "tax");
+            case ActionType::Bribe:
+                return checkRoleBlock(currentPlayer, Role::Judge, "bribe");
+            case ActionType::Arrest:
+                return checkRoleBlock(currentPlayer, Role::Spy, "arrest");
+            case ActionType::Coup:
+                for (Player* player : players) {
+                    if (player != currentPlayer && player->getRole() == Role::General && player->getCoins() >= 5) {
+                        string answer;
+                        cout << player->getName() << " " <<  player->roleToString(player->getRole()) <<" , do you want to block the coup against "
+                                  << currentPlayer->getName() << " for 5 coins? (y/n): ";
+                        cin >> answer;
+                        if (answer == "y" || answer == "Y") {
+                            player->removeCoins(5);
+                            currentPlayer->playerUsedTurn();
+                            cout << "Coup was blocked by " << player->getName() << ".\n";
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+
     /**
      * player gain 1 coin from gathering
      * @param currentPlayer
@@ -176,9 +224,12 @@ namespace coup {
      * Player use tax gain 2 coins, if player role's is governor, gain 3 coins instead of 2
      * @param currentPlayer
      */
-    void Game::tax(Player *currentPlayer) {
+    void Game::tax(Player* currentPlayer) {
         if (!currentPlayer->isTaxAllow()) {
             throw runtime_error("Tax action failed.");
+        }
+        if (handleActionBlock(currentPlayer, ActionType::Tax)) {
+            return;
         }
         currentPlayer->tax();
     }
@@ -187,32 +238,42 @@ namespace coup {
      * Player can use bribe to gain extra turn next turn
      * @param currentPlayer
      */
-    void Game::bribe(Player *currentPlayer) {
+    void Game::bribe(Player* currentPlayer) {
         if (currentPlayer->getCoins() < BRIBE_COST) {
-            throw runtime_error("Bribe failed not enough coins.");
+            throw BribeError("Not enough coins for bribe.");
         }
         removeCoins(currentPlayer, BRIBE_COST);
+
+        if (handleActionBlock(currentPlayer, ActionType::Bribe)) {
+            throw JudgeBlockBribeError("Bribe blocked before executing.");
+        }
+
         if (!currentPlayer->isBribeAllow()) {
-            currentPlayer->playerUsedTurn();
             currentPlayer->canBribe = true;
-            throw JudgeBlockBribeError("Judge blocked you from using bribe");
+            throw JudgeBlockBribeError("Bribe blocked by judge logic.");
         }
 
         currentPlayer->bribe();
     }
+
 
     /**
      * Player can take one coin from another player
      * @param currentPlayer
      * @param targetPlayer
      */
-    void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
+    void Game::arrest(Player* currentPlayer, Player* targetPlayer) {
         if (currentPlayer->getLastArrestedPlayer() == targetPlayer) {
             throw runtime_error("You cannot arrest the same player twice in a row.");
         }
         if (!currentPlayer->isArrestAllow()) {
             throw runtime_error("Arrest failed. Player blocked by spy");
         }
+
+        if (handleActionBlock(currentPlayer, ActionType::Arrest)) {
+            return;
+        }
+
         currentPlayer->arrest(targetPlayer);
     }
 
@@ -230,10 +291,27 @@ namespace coup {
         }
 
         try {
-            currentPlayer->sanction(targetPlayer);
-        } catch (const exception &e) {
+            currentPlayer->sanction(targetPlayer); // includes playerUsedTurn()
+
+            // passive reactions — after turn is already consumed
+            if (targetPlayer->getRole() == Role::Baron) {
+                targetPlayer->passiveAbility();
+            }
+
+            if (targetPlayer->getRole() == Role::Judge) {
+                // try to punish the attacker — if fails, no undo
+                try {
+                    targetPlayer->passiveAbility(currentPlayer);
+                } catch ([[maybe_unused]] const exception& e) {
+                    cerr << "[Sanction] Judge retaliation: " << currentPlayer->getName() << " loses an additional coin." <<endl;
+
+                }
+            }
+        }
+        catch (const exception &e) {
             throw runtime_error("Sanction failed: " + string(e.what()));
         }
+
     }
 
 
@@ -244,29 +322,33 @@ namespace coup {
      * @param currentPlayer current player
      * @param targetPlayer another player
      */
-    void Game::coup(Player *currentPlayer, Player *targetPlayer) {
+    void Game::coup(Player* currentPlayer, Player* targetPlayer) {
         if (currentPlayer->getCoins() < COUP_COST) {
-            throw runtime_error("coup failed not enough coins.");
+            throw runtime_error("Coup failed: not enough coins.");
         }
         if (currentPlayer == targetPlayer) {
-            throw logic_error("You can not coup yourself");
+            throw logic_error("You cannot coup yourself.");
         }
 
         removeCoins(currentPlayer, COUP_COST);
+
+        if (handleActionBlock(currentPlayer, ActionType::Coup)) {
+            return;
+        }
+
         if (targetPlayer->isCoupShieldActive()) {
             targetPlayer->coupShield = false;
             currentPlayer->playerUsedTurn();
-            throw runtime_error("coup blocked by another player.");
+            throw runtime_error("Coup blocked by shield.");
         }
-        // remove target player from the game
-        for (size_t i = 0; i < getPlayers().size(); ++i) {
-            if (getPlayers()[i] == targetPlayer) {
-                // Adjust currentPlayerTurn if needed
-                if (i < getTurn()) {
-                    --currentPlayerTurn; // shift currentPlayerTurn back since players after 'i' will move left
+
+        for (size_t i = 0; i < players.size(); ++i) {
+            if (players[i] == targetPlayer) {
+                if (i < currentPlayerTurn) {
+                    --currentPlayerTurn;
                 }
                 players.erase(players.begin() + i);
-                delete targetPlayer; // delete player, TODO check gui later for bugs
+                delete targetPlayer; // TODO check GUI for bugs
                 break;
             }
         }
@@ -339,9 +421,7 @@ namespace coup {
      */
     void tryMerchantAbility(Player *currentPlayer) {
         if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
-            if (Merchant *merchant = dynamic_cast<Merchant *>(currentPlayer)) {
-                merchant->passiveAbility(); // only him got passive ability like this
-            }
+            currentPlayer->passiveAbility();
         }
     }
 

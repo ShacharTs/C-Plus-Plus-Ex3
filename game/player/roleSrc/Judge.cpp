@@ -15,6 +15,12 @@ void Judge::useAbility(coup::Game &game) {
     playerUsedTurn();
 }
 
+void Judge::passiveAbility(Player *target) {
+    target->removeCoins(1);
+
+}
+
+
 void Judge::listOptions() const {
     printPlayerStats();
     std::cout << "Choose an action:\n"

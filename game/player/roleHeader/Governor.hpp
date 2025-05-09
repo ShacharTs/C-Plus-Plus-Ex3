@@ -8,5 +8,5 @@ public:
     void useAbility(coup::Game &game) override;
     void tax() override;
 
-    void listOptions() const;
+    void listOptions() const override;
 };

@@ -7,5 +7,5 @@ public:
 
     void passiveAbility();
 
-    void listOptions() const;
+    void listOptions() const override;
 };

@@ -16,6 +16,12 @@ void Baron::useAbility(coup::Game &game) {
     }
 }
 
+void Baron::passiveAbility() {
+    addCoins(1);
+}
+
+
+
 void Baron::listOptions() const {
     printPlayerStats();
     std::cout << "Choose an action:\n"
