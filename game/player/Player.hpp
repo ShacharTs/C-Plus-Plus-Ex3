@@ -35,7 +35,7 @@ public:
     bool canArrest = true;
     bool canSanction = true;
     bool canCoup = true;
-    bool hasCoupShield = false;
+    bool coupShield = false;
 
 
 public:

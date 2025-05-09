@@ -77,9 +77,11 @@ void Player::playerUsedTurn() {
     }
 }
 
-
+/**
+ *
+ */
 void Player::addExtraTurn() {
-    numberOfTurns = 2;
+    numberOfTurns +=1;
 }
 
 bool Player::hasExtraTurn() {
@@ -111,7 +113,7 @@ bool Player::isCoupAllow() const {
 }
 
 bool Player::isCoupShieldActive() const {
-    return hasCoupShield;
+    return coupShield;
 }
 
 void Player::gather() {
@@ -125,6 +127,7 @@ void Player::tax() {
 }
 
 void Player::bribe() {
+    addExtraTurn();
     addExtraTurn();
 }
 
@@ -144,6 +147,7 @@ void Player::arrest(Player *targetPlayer) {
 void Player::sanction(Player *target) {
     target->canGather = false;
     target->canTax = false;
+    playerUsedTurn();
 }
 
 
@@ -161,9 +165,9 @@ void Player::addCoins(const int amount) {
     coins += amount;
 }
 
-void Player::removeCoins(int amount) {
+void Player::removeCoins(const int amount) {
     if (coins < amount) {
-        throw runtime_error("Not enough coins.");
+        throw logic_error("Not enough coins.");
     }
     coins -= amount;
 }

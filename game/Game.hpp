@@ -21,15 +21,15 @@ namespace coup {
 
         Game();
 
-        explicit Game(std::vector<std::string>names); // for test only
+        explicit Game(const std::vector<std::string> &names); // for test only
         ~Game();
 
-        int choosePlayer(const std::vector<Player *> &players, Player *currentPlayer, const std::string &action);
+        int choosePlayer(Player *currentPlayer, const std::string &action);
 
         bool isGameOver(const std::vector<Player *> &players);
 
         void runGame();  // loop that run the game
-        std::string winner(const std::vector<Player*> &players) const;
+        std::string winner() const;
         std::string turn();
         void getRandomRole(std::vector<Player*> &players);
         int getTurn();
@@ -44,7 +44,7 @@ namespace coup {
         // Targeted actions
         void arrest(Player* currentPlayer, Player* targetPlayer);
         void sanction(Player* currentPlayer, Player* targetPlayer);
-        void coup(Player* currentPlayer, const Player* targetPlayer);
+        void coup(Player *currentPlayer, Player *targetPlayer);
 
 
 

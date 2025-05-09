@@ -12,8 +12,11 @@ Spy::Spy(const std::string &name) : Player(name) {
  */
 void Spy::blockArrest(coup::Game &game) {
     const std::string blockArrest = "Block Arrest";
-    const size_t playerIndex = game.choosePlayer(game.players, this, blockArrest);
-    game.players.at(playerIndex)->canArrest = false;
+    const size_t playerIndex = game.choosePlayer(this, blockArrest);
+    if (playerIndex == game.getTurn()) {
+        throw std::logic_error("You can not block yourself");
+    }
+    game.getPlayers().at(playerIndex)->canArrest = false;
     addExtraTurn();
 }
 
@@ -39,7 +42,7 @@ void Spy::useAbility(coup::Game &game) {
     size_t input = 0;
     std::cin >> input;
     if (input == 1) {
-        watchCoins(game.players);
+        watchCoins(game.getPlayers());
     } else if (input == 2) {
         blockArrest(game);
     } else {

@@ -14,7 +14,7 @@ void Judge::cancelBribe(Player *player) {
 }
 
 void Judge::useAbility(coup::Game &game) {
-    Player::useAbility(game);
+    useAbility(game);
 }
 
 

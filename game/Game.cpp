@@ -63,41 +63,41 @@ namespace coup {
         runGame();
     }
 
-
     /**
-     * FOR TEST ONLY
-     * @param names list of names
+     * FOR TESTING ONLY
      */
-    Game::Game(vector<string> names) {
-        for (const string &name: names) {
-            players.push_back(new Player(name));
+    Player* createRoleByIndex(const size_t index, const string& name) {
+        switch (index) {
+            case 0: return new Governor(name);
+            case 1: return new Spy(name);
+            case 2: return new Baron(name);
+            case 3: return new General(name);
+            case 4: return new Judge(name);
+            case 5: return new Merchant(name);
+            default: return new Player(name);
         }
+    }
 
-        for (size_t i = 0; i < players.size(); ++i) {
-            string name = players[i]->getName();
-            delete players[i];
 
-            switch (i) {
-                case 0: players[i] = new Governor(name);
-                    break;
-                case 1: players[i] = new Spy(name);
-                    break;
-                case 2: players[i] = new Baron(name);
-                    break;
-                case 3: players[i] = new General(name);
-                    break;
-                case 4: players[i] = new Judge(name);
-                    break;
-                case 5: players[i] = new Merchant(name);
-                    break;
-                default: players[i] = new Player(name);
-                    break;
-            }
+    Game::Game(const vector<string> &names) {
+        for (size_t i = 0; i < names.size(); ++i) {
+            players.push_back(createRoleByIndex(i, names[i]));
         }
         currentPlayerTurn = 0;
         runGame();
     }
 
+    Player* createRandomRole(const std::string& name) {
+        switch (rand() % 6) {
+            case 0: return new Governor(name);
+            case 1: return new Spy(name);
+            case 2: return new Baron(name);
+            case 3: return new General(name);
+            case 4: return new Judge(name);
+            case 5: return new Merchant(name);
+            default: return new Player(name);
+        }
+    }
 
     /**
      * Destructor
@@ -145,7 +145,7 @@ namespace coup {
      * swap to the next turn
      */
     void Game::nextTurn() {
-        currentPlayerTurn = (currentPlayerTurn + 1) % players.size();
+        currentPlayerTurn = (getTurn() + 1) % getPlayers().size();
     }
 
     const vector<Player *> &Game::getPlayers() const {
@@ -165,7 +165,7 @@ namespace coup {
      * @param currentPlayer
      */
     void Game::gather(Player *currentPlayer) {
-        if (!currentPlayer->canGather) {
+        if (!currentPlayer->isGatherAllow()) {
             throw runtime_error("Gather action failed.");
         }
         currentPlayer->gather();
@@ -176,7 +176,7 @@ namespace coup {
      * @param currentPlayer
      */
     void Game::tax(Player *currentPlayer) {
-        if (!currentPlayer->canTax) {
+        if (!currentPlayer->isTaxAllow()) {
             throw runtime_error("Tax action failed.");
         }
         currentPlayer->tax();
@@ -232,8 +232,6 @@ namespace coup {
         } catch (const exception &e) {
             throw runtime_error("Sanction failed: " + string(e.what()));
         }
-
-        currentPlayer->playerUsedTurn();
     }
 
 
@@ -244,35 +242,33 @@ namespace coup {
      * @param currentPlayer current player
      * @param targetPlayer another player
      */
-    void Game::coup(Player *currentPlayer, const Player *targetPlayer) {
+    void Game::coup(Player *currentPlayer, Player *targetPlayer) {
         if (currentPlayer->getCoins() < COUP_COST) {
             throw runtime_error("coup failed not enough coins.");
+        }
+        if (currentPlayer == targetPlayer) {
+            throw logic_error("You can not coup yourself");
         }
 
         removeCoins(currentPlayer, COUP_COST);
         if (targetPlayer->isCoupShieldActive()) {
+            targetPlayer->coupShield = false;
+            currentPlayer->playerUsedTurn();
             throw runtime_error("coup blocked by another player.");
         }
-        coupKicker(targetPlayer);
-        currentPlayer->playerUsedTurn();
-    }
-
-    /**
-     * when a player uses coup, this will kick him from the game
-     * @param targetPlayer couped player
-     */
-    void Game::coupKicker(const Player *targetPlayer) {
-        for (size_t i = 0; i < players.size(); ++i) {
-            if (players[i] == targetPlayer) {
+        // remove target player from the game
+        for (size_t i = 0; i < getPlayers().size(); ++i) {
+            if (getPlayers()[i] == targetPlayer) {
                 // Adjust currentPlayerTurn if needed
-                if (i < currentPlayerTurn) {
+                if (i < getTurn()) {
                     --currentPlayerTurn; // shift currentPlayerTurn back since players after 'i' will move left
                 }
                 players.erase(players.begin() + i);
                 delete targetPlayer; // delete player, TODO check gui later for bugs
-                return;
+                break;
             }
         }
+        currentPlayer->playerUsedTurn();
     }
 
 
@@ -280,28 +276,24 @@ namespace coup {
      *  print current player turn
      */
     string Game::turn() {
-        return players.at(currentPlayerTurn)->getName();
+        return getPlayers().at(getTurn())->getName();
     }
 
     /**
-     *
-     * @param players list of the players
      * @return winner player
      */
-    string Game::winner(const vector<Player *> &players) const {
-        if (players.size() == 1) {
-            return players.at(0)->getName();
+    string Game::winner() const {
+        if (getPlayers().size() == 1) {
+            return getPlayers().at(0)->getName();
         }
         throw logic_error("Game not finished yet.");
     }
 
 
-    int Game::choosePlayer(const vector<Player *> &players, Player *currentPlayer, const string &action) {
+    int Game::choosePlayer(Player *currentPlayer, const string &action) {
         cout << "Choose player to " << action << ":\n";
-        for (size_t i = 0; i < players.size(); ++i) {
-            if (i != currentPlayerTurn) {
-                cout << i << ". " << players[i]->getName() << endl;
-            }
+        for (size_t i = 0; i < getPlayers().size(); ++i) {
+                cout << i << ". " << getPlayers()[i]->getName() << endl;
         }
         size_t targetIndex;
         cin >> targetIndex;
@@ -336,22 +328,21 @@ namespace coup {
 
 
     /**
-     * check if current player is merchant and checks if has more than 2 coins to active passtive ability
+     * check if current player's role is merchant and checks if has more than 2 coins to active passtive ability
      * @param currentPlayer
      */
     void tryMerchantAbility(Player *currentPlayer) {
         if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
             if (Merchant *merchant = dynamic_cast<Merchant *>(currentPlayer)) {
-                merchant->passiveAbility();
+                merchant->passiveAbility(); // only him got passive ability like this
             }
         }
     }
 
     bool Game::isGameOver(const vector<Player *> &players) {
-        // print winner
         if (players.size() == 1) {
             cout << "\n========= GAME OVER =========\n";
-            cout << "Winner: " << winner(players) << endl;
+            cout << "Winner: " << winner() << endl;
             return true;
         }
         return false;
@@ -362,8 +353,8 @@ namespace coup {
      * Game main logic
      */
     void Game::runGame() {
-        while (players.size() > 1) {
-            Player *current = players[currentPlayerTurn];
+        while (getPlayers().size() > 1) {
+            Player *current = getPlayers()[currentPlayerTurn];
             current->resetPlayerTurn();
             while (true) {
                 try {
@@ -371,8 +362,8 @@ namespace coup {
                     if (forcedToCoup(current)) {
                         // check if player must to coup
                         current->printPlayerStats();
-                        const size_t targetIndex = choosePlayer(players, current, "coup");
-                        coup(current, players.at(targetIndex));
+                        const size_t targetIndex = choosePlayer(current, "coup");
+                        coup(current, getPlayers().at(targetIndex));
                         if (consumeExtraTurn(current)) {
                             continue;
                         }
@@ -390,35 +381,35 @@ namespace coup {
                             }
                             break;
                         case 2:
-                            tax(current);
+                            tax(current); //TODO add a method that can cancel in runtime
                             if (consumeExtraTurn(current)) {
                                 continue;
                             }
                             break;
 
                         case 3:
-                            bribe(current);
+                            bribe(current); //TODO add a method that can cancel in runtime
                             continue;
 
                         case 4: {
-                            const size_t targetIndex = choosePlayer(players, current, "arrest");
-                            arrest(current, players.at(targetIndex));
+                            const size_t targetIndex = choosePlayer(current, "arrest");
+                            arrest(current, getPlayers().at(targetIndex)); //TODO add a method that can cancel in runtime
                             if (consumeExtraTurn(current)) {
                                 continue;
                             }
                             break;
                         }
                         case 5: {
-                            const size_t targetIndex = choosePlayer(players, current, "sanction");
-                            sanction(current, players.at(targetIndex));
+                            const size_t targetIndex = choosePlayer(current, "sanction");
+                            sanction(current, getPlayers().at(targetIndex)); //TODO add a method that can cancel in runtime
                             if (consumeExtraTurn(current)) {
                                 continue;
                             }
                             break;
                         }
                         case 6: {
-                            const size_t targetIndex = choosePlayer(players, current, "coup");
-                            coup(current, players.at(targetIndex));
+                            const size_t targetIndex = choosePlayer(current, "coup");
+                            coup(current, getPlayers().at(targetIndex)); //TODO add a method that can cancel in runtime
                             if (consumeExtraTurn(current)) {
                                 continue;
                             }
@@ -438,19 +429,18 @@ namespace coup {
                             cin.clear();
                             continue;
                     }
-                    current->removeDebuff();
-                    //removeDebuff(current); // at the end of turn rest sanction if player had
-                    // action succeeded chosen
+                    // action succeeded
                     break;
                 } catch (const exception &e) {
                     cerr << "Error: " << e.what() << "\nPlease try a different action.\n";
                 }
+
             }
             // check if one player is left
-            if (isGameOver(players)) {
+            if (isGameOver(getPlayers())) {
                 return;
             }
-
+            current->removeDebuff();
             nextTurn();
         }
     }
