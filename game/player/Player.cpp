@@ -14,7 +14,6 @@ Player::~Player() = default;
 
 // Virtual ability for roles
 void Player::useAbility(coup::Game &game) {
-
 }
 
 void Player::passiveAbility() {
@@ -87,7 +86,7 @@ void Player::playerUsedTurn() {
  *
  */
 void Player::addExtraTurn() {
-    numberOfTurns +=1;
+    numberOfTurns += 1;
 }
 
 bool Player::hasExtraTurn() {
@@ -109,7 +108,6 @@ bool Player::isBribeAllow() const {
 bool Player::isArrestAllow() const {
     return canArrest;
 }
-
 
 
 bool Player::isCoupAllow() const {
@@ -150,7 +148,7 @@ void Player::arrest(Player *targetPlayer) {
     try {
         targetPlayer->removeCoins(1);
         this->addCoins(1);
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         throw ArrestError("Arrest failed: " + std::string(e.what()));
     }
 
@@ -199,5 +197,11 @@ void Player::removeDebuff() {
     canArrest = true;
 }
 
-
-
+/**
+     * check if current player's role is merchant and checks if has more than 2 coins to active passtive ability
+     */
+void Player::tryMerchantAbility() {
+    if (getRole() == Role::Merchant && getCoins() > 2) {
+        passiveAbility();
+    }
+}

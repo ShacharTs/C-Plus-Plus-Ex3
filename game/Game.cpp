@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <functional>
-#include <limits>
+#include <random>
 
 #include "GameExceptions.hpp"
 
@@ -24,48 +24,8 @@ namespace coup {
     constexpr int FORCE_COUP = 10;
 
 
-    Game::Game() {
-        cout << "========= Starting New Game =========" << endl;
-        int numberOfPlayers = 0;
-        while (true) {
-            try {
-                cout << "Enter number of players (2–6): ";
-                cin >> numberOfPlayers;
-
-                if (cin.fail()) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    throw invalid_argument("Invalid input: not a number.");
-                }
-
-                if (numberOfPlayers < 2 || numberOfPlayers > 6) {
-                    throw out_of_range("Players must be between 2 and 6.");
-                }
-
-                //  valid input
-                break;
-            } catch (const exception &e) {
-                cerr << "Error: " << e.what() << "\nPlease try again.\n" << endl;
-            }
-        }
-
-        // adding player names
-        for (size_t i = 0; i < numberOfPlayers; i++) {
-            cout << "Enter player name" << endl;
-            string name;
-            cin >> name;
-            Player *player = new Player(name);
-            players.push_back(player);
-        }
-
-        getRandomRole(players); // each player get it role
-
-        // all the players are set, start the game
-        runGame();
-    }
-
     /**
-     * FOR TESTING ONLY
+     * TEST ONLY TO GET ALL THE ROLES
      */
     Player *createRoleByIndex(const size_t index, const string &name) {
         switch (index) {
@@ -75,30 +35,53 @@ namespace coup {
             case 3: return new General(name);
             case 4: return new Judge(name);
             case 5: return new Merchant(name);
-            default: return new Player(name);
+            default: throw runtime_error("Error failed to give a role");
         }
     }
 
-
+    /**
+     * @param names player list
+     */
     Game::Game(const vector<string> &names) {
+        // Temp look for create all the roles
+
         for (size_t i = 0; i < names.size(); ++i) {
             players.push_back(createRoleByIndex(i, names[i]));
         }
+
+        // Each player will get a random role
+
+        // for (size_t i = 0; i < names.size(); ++i) {
+        //     players.push_back(createRandomRole(names[i]));
+        // }
+
+
         currentPlayerTurn = 0;
-        runGame();
+        runGame(); // USE ONLY FOR TERMINAL
     }
 
-    Player *createRandomRole(const std::string &name) {
-        switch (rand() % 6) {
+
+    /**
+     * each player will have a random role
+     * @param name player name
+     * @return role
+     */
+    Player *Game::createRandomRole(const std::string &name) {
+        static random_device rd; // true random seed source
+        static mt19937 gen(rd()); // better quality RNG
+        static uniform_int_distribution<> dist(0, 5); // uniform distribution between 0-5
+
+        switch (dist(gen)) {
             case 0: return new Governor(name);
             case 1: return new Spy(name);
             case 2: return new Baron(name);
             case 3: return new General(name);
             case 4: return new Judge(name);
             case 5: return new Merchant(name);
-            default: return new Player(name);
+            default: throw runtime_error("Random number generation failed");
         }
     }
+
 
     /**
      * Destructor
@@ -146,6 +129,8 @@ namespace coup {
      * swap to the next turn
      */
     void Game::nextTurn() {
+        Player *current = players.at(currentPlayerTurn);
+        current->removeDebuff();
         currentPlayerTurn = (getTurn() + 1) % getPlayers().size();
     }
 
@@ -298,7 +283,8 @@ namespace coup {
             try {
                 targetPlayer->passiveAbility(currentPlayer);
             } catch ([[maybe_unused]] const exception &e) {
-                cerr << "[Sanction] Judge retaliation: " << currentPlayer->getName() << " loses an additional coin." << endl;
+                cerr << "[Sanction] Judge retaliation: " << currentPlayer->getName() << " loses an additional coin." <<
+                        endl;
             }
         }
     }
@@ -337,7 +323,7 @@ namespace coup {
                     --currentPlayerTurn;
                 }
                 players.erase(players.begin() + i);
-                delete targetPlayer; // TODO check GUI for bugs
+                delete targetPlayer;
                 break;
             }
         }
@@ -363,7 +349,7 @@ namespace coup {
     }
 
 
-    int Game::choosePlayer(Player *currentPlayer, const string &action) {
+    int Game::choosePlayer(const string &action) {
         cout << "Choose player to " << action << ":\n";
         for (size_t i = 0; i < getPlayers().size(); ++i) {
             cout << i << ". " << getPlayers()[i]->getName() << endl;
@@ -404,16 +390,6 @@ namespace coup {
     }
 
 
-    /**
-     * check if current player's role is merchant and checks if has more than 2 coins to active passtive ability
-     * @param currentPlayer
-     */
-    void tryMerchantAbility(Player *currentPlayer) {
-        if (currentPlayer->getRole() == Role::Merchant && currentPlayer->getCoins() > 2) {
-            currentPlayer->passiveAbility();
-        }
-    }
-
     bool Game::isGameOver(const vector<Player *> &players) {
         if (players.size() == 1) {
             cout << "\n========= GAME OVER =========\n";
@@ -423,25 +399,52 @@ namespace coup {
         return false;
     }
 
+    bool Game::handleException(const exception &e) {
+        if (dynamic_cast<const MerchantError *>(&e))
+            cerr << "[Merchant Error] " << e.what() << endl;
+        else if (dynamic_cast<const CoinsError *>(&e))
+            cerr << "[Coins Error] " << e.what() << endl;
+        else if (dynamic_cast<const SelfError *>(&e))
+            cerr << "[Self Error] " << e.what() << endl;
+        else if (dynamic_cast<const GatherError *>(&e))
+            cerr << "[Gather Error] " << e.what() << endl;
+        else if (dynamic_cast<const TaxError *>(&e))
+            cerr << "[Tax Error] " << e.what() << endl;
+        else if (dynamic_cast<const ArrestError *>(&e))
+            cerr << "[Arrest Error] " << e.what() << endl;
+        else if (dynamic_cast<const ArrestTwiceInRow *>(&e))
+            cerr << "[Arrest Error] " << e.what() << endl;
+        else if (dynamic_cast<const JudgeBlockBribeError *>(&e))
+            cerr << "[Judge Block Bribe Error] " << e.what() << endl;
+        else if (dynamic_cast<const BribeError *>(&e))
+            cerr << "[Bribe Error] " << e.what() << endl;
+        else if (dynamic_cast<const CoupBlocked *>(&e))
+            cerr << "[Coup Error] " << e.what() << endl;
+        else {
+            cerr << "Unexpected Error: " << e.what() << "\nPlease try again.\n";
+            return false;
+        }
 
-    /**
-     * Game main logic
-     */
+        // Use dynamic_cast to decide if loop breaks
+        return dynamic_cast<const GatherError *>(&e) ||
+               dynamic_cast<const TaxError *>(&e) ||
+               dynamic_cast<const ArrestError *>(&e) ||
+               dynamic_cast<const ArrestTwiceInRow *>(&e) ||
+               dynamic_cast<const JudgeBlockBribeError *>(&e) ||
+               dynamic_cast<const CoupBlocked *>(&e);
+    }
+
+
     void Game::runGame() {
         while (getPlayers().size() > 1) {
             Player *current = getPlayers()[currentPlayerTurn];
-            current->resetPlayerTurn();
             while (true) {
                 try {
-                    tryMerchantAbility(current);
                     if (forcedToCoup(current)) {
-                        // check if player must to coup
                         current->printPlayerStats();
-                        const size_t targetIndex = choosePlayer(current, "coup");
+                        const size_t targetIndex = choosePlayer("coup");
                         coup(current, getPlayers().at(targetIndex));
-                        if (consumeExtraTurn(current)) {
-                            continue;
-                        }
+                        if (consumeExtraTurn(current)) continue;
                         break;
                     }
                     current->listOptions();
@@ -449,114 +452,42 @@ namespace coup {
                     int choice;
                     cin >> choice;
                     switch (choice) {
-                        case 1:
-                            gather(current);
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
+                        case 1: gather(current);
                             break;
-                        case 2:
-                            tax(current);
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
+                        case 2: tax(current);
                             break;
-
-                        case 3:
-                            bribe(current);
+                        case 3: bribe(current);
                             continue;
-
-                        case 4: {
-                            const size_t targetIndex = choosePlayer(current, "arrest");
-                            arrest(current, getPlayers().at(targetIndex));
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
+                        case 4: arrest(current, getPlayers().at(choosePlayer("arrest")));
                             break;
-                        }
-                        case 5: {
-                            const size_t targetIndex = choosePlayer(current, "sanction");
-                            sanction(current, getPlayers().at(targetIndex));
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
+                        case 5: sanction(current, getPlayers().at(choosePlayer("sanction")));
                             break;
-                        }
-                        case 6: {
-                            const size_t targetIndex = choosePlayer(current, "coup");
-                            coup(current, getPlayers().at(targetIndex));
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
+                        case 6: coup(current, getPlayers().at(choosePlayer("coup")));
                             break;
-                        }
                         case 7:
-                            if (current->getRole() == Role::Merchant) {
-                                throw MerchantError("Invaild input");
-                                continue;
-                            }
+                            if (current->getRole() == Role::Merchant) throw MerchantError("Invalid input");
                             current->useAbility(*this);
-                            if (consumeExtraTurn(current)) {
-                                continue;
-                            }
                             break;
                         case 0:
                             cout << current->getName() << " skip turn" << endl;
+                            current->playerUsedTurn();
                             break;
                         default:
                             cout << "Invalid choice. Try again." << endl;
                             cin.clear();
                             continue;
                     }
-                    // action succeeded
-                    break;
 
-
-                } catch (const MerchantError &e) {
-                    cerr << "[Merchant Error] " << e.what() << endl;
-                }
-                catch (const CoinsError &e) {
-                    cerr << "[Coins Error] " << e.what() << endl;
-                }
-                catch (const SelfError &e) {
-                    cerr << "[Self Error] " << e.what() << endl;
-                }
-                catch (const GatherError &e) {
-                    cerr << "[Gather Error] " << e.what() << endl;
+                    if (consumeExtraTurn(current)) continue;
                     break;
-                }
-                catch (const TaxError &e) {
-                    cerr << "[Tax Error] " << e.what() << endl;
+                } catch (const exception &e) {
+                    if (!handleException(e)) {
+                        continue;
+                    }
                     break;
-                }
-                catch (const ArrestError &e) {
-                    cerr << "[Arrest Error] " << e.what() << endl;
-                    break;
-                }
-                catch (const ArrestTwiceInRow &e) {
-                    cerr << "[Arrest Error] " << e.what() << endl;
-                    break;
-                }
-                catch (const JudgeBlockBribeError &e) {
-                    cerr << "[Judge Block Bribe Error] " << e.what() << endl;
-                    break;
-                }
-                catch (const BribeError &e) {
-                    cerr << "[Bribe Error] " << e.what() << endl;
-                }
-                catch (const CoupBlocked &e) {
-                    cerr << "[Coup Error] " << e.what() << endl;
-                    break;
-                }
-                catch (const exception &e) {
-                    cerr << "Unexpected Error: " << e.what() << "\nPlease try again.\n";
                 }
             }
-            // check if one player is left
-            if (isGameOver(getPlayers())) {
-                return;
-            }
-            current->removeDebuff();
+            if (isGameOver(getPlayers())) return;
             nextTurn();
         }
     }

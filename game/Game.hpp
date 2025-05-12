@@ -23,6 +23,7 @@ namespace coup {
         bool checkRoleBlock(Player* currentPlayer, Role role, const std::string& action);
         bool handleActionBlock(Player *currentPlayer, ActionType action);
         void coupKicker(const Player* targetPlayer);
+        Player *createRandomRole(const std::string &name);
 
     public:
         std::vector<Player*> players;
@@ -31,9 +32,12 @@ namespace coup {
         explicit Game(const std::vector<std::string>& names); // for test only
         ~Game();
 
-        int choosePlayer(Player* currentPlayer, const std::string& action);
+        int choosePlayer(const std::string &action);
         bool isGameOver(const std::vector<Player*>& players);
         void runGame();
+
+        bool handleException(const std::exception &e);
+
         std::string winner() const;
         std::string turn();
         void getRandomRole(std::vector<Player*>& players);

@@ -88,6 +88,9 @@ public:
 
     // Misc
     void removeDebuff();
+
+    void tryMerchantAbility();
+
     static std::string roleToString(Role role);
     void printPlayerStats() const;
 

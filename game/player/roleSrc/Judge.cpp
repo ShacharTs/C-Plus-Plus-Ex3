@@ -7,13 +7,6 @@ Judge::Judge(const std::string &name) : Player(name) {
 }
 
 
-void Judge::useAbility(coup::Game &game) {
-    const std::string blockBribe = "Block a player from using bribe";
-    size_t playerIndex = game.getTurn();
-    playerIndex = game.choosePlayer(this, blockBribe);
-    game.getPlayers().at(playerIndex)->canBribe = false;
-    playerUsedTurn();
-}
 
 void Judge::passiveAbility(Player *target) {
     target->removeCoins(1);
