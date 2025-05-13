@@ -90,7 +90,7 @@ void Player::addExtraTurn() {
     numberOfTurns +=1;
 }
 
-bool Player::hasExtraTurn() {
+bool Player::hasExtraTurn() const {
     return numberOfTurns > 0;
 }
 
@@ -192,12 +192,13 @@ void Player::removeCoins(const int amount) {
     }
     coins -= amount;
 }
+int Player::getNumOfTurns() {
+    return numberOfTurns;
+}
+
 
 void Player::removeDebuff() {
     canGather = true;
     canTax = true;
     canArrest = true;
 }
-
-
-

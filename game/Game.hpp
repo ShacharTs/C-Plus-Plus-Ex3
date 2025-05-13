@@ -1,10 +1,11 @@
 ﻿#pragma once
+
 #include <string>
 #include <vector>
 #include "player/Player.hpp"
 
-
 namespace coup {
+
     enum class ActionType {
         Tax,
         Bribe,
@@ -12,44 +13,44 @@ namespace coup {
         Sanction,
         Coup
     };
-    
 
     class Game {
     private:
         int currentPlayerTurn = 0;
+
+        // Internal helpers
         void addCoins(Player* targetPlayer, int amount);
         void removeCoins(Player* targetPlayer, int amount);
 
-        bool checkRoleBlock(Player* currentPlayer, Role role, const std::string& action);
-        bool handleActionBlock(Player* currentPlayer, ActionType action);
-        void coupKicker(const Player* targetPlayer);
-        Player* createRandomRole(const std::string& name);
-
     public:
+        // Players
+        std::vector<Player*> players;
+        const std::vector<Player*>& getPlayers() const;
         std::vector<Player*> getListOfTargetPlayers(const Player* current);
 
-        std::vector<Player*> players;
-        bool handleActionBlockGui(Player* currentPlayer, ActionType action, Player* blocker);
-        Game();
-        explicit Game(const std::vector<std::string>& names); // for test only
+        // Constructor & destructor
+        explicit Game(const std::vector<std::string>& names);
+
+        Player *createRandomRole(const std::string &name);
+
         ~Game();
-        
-        //Player* checkRoleBlockGui(Player* currentPlayer, Role blockerRole, const std::string& actionName, int cost = 0);
 
-
+        // Turn management
+        void advanceTurnIfNeeded();
         void skipTurn(Player* currentPlayer);
-        int choosePlayer(const std::string& action);
-        bool isGameOver(const std::vector<Player*>& players);
-        void runGame();
 
-        bool handleException(const std::exception& e);
+        bool currentPlayerHasTurn();
 
-        std::string winner() const;
-        std::string turn();
-        void getRandomRole(std::vector<Player*>& players);
-        int getTurn();
+
+
         void nextTurn();
-        const std::vector<Player*>& getPlayers() const;
+        int getTurn();
+        std::string turn();
+
+        // Game state
+        bool isGameOver(const std::vector<Player*>& players);
+        std::string winner() const;
+        bool handleException(const std::exception& e);
 
         // Self-actions
         void gather(Player* currentPlayer);
@@ -61,13 +62,12 @@ namespace coup {
         void sanction(Player* currentPlayer, Player* targetPlayer);
         void coup(Player* currentPlayer, Player* targetPlayer);
 
-        bool handleGuiBlock(Player* blocker,
-            bool    didBlock,
-            const std::string& actionName,
-            int     cost = 0);
+        // GUI-related logic
+        bool handleActionBlock(Player* currentPlayer, ActionType action, Player* blocker);
+        bool handleBlock(Player* blocker, bool didBlock, const std::string& actionName, int cost = 0);
 
-        
+        // Testing or role setup helper
+        void getRandomRole(std::vector<Player*>& players);
     };
 
-	
-}
+} // namespace coup

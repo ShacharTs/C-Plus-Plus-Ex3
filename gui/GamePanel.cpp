@@ -6,6 +6,8 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include "../game/player/roleHeader/Spy.hpp"
+#include <wx/stdpaths.h>
+#include <wx/filename.h>
 
 //------------------------------------------------------------------------------
 // Event table binding paint, click, erase, and motion events
@@ -30,31 +32,26 @@ GamePanel::GamePanel(wxFrame* parent, const std::vector<std::string>& names)
     // Enable double-buffered paint to prevent flicker
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
-    // Load custom font from 'assets/fonts'
-    wxString exePath = wxStandardPaths::Get().GetExecutablePath();
-    wxString fontDir = wxFileName(exePath).GetPath() + "/assets/fonts/";
-    wxString fontFile = fontDir + "SuezOne-Regular.ttf";
-    if (wxFileExists(fontFile))
-    {
-        wxFont::AddPrivateFont(fontFile);
-        customFont_ = wxFont(28, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL,
-            wxFONTWEIGHT_NORMAL, false, "Suez One");
-        if (!customFont_.IsOk())
-        {
-            // Fallback to a default Swiss font if loading fails
-            customFont_ = wxFont(28, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
-        }
-    }
-    else
-    {
-        // Font file not found: use fallback
-        customFont_ = wxFont(28, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
-    }
+#ifdef __WXMSW__
+    // Use system-safe font on Windows
+    customFont_ = wxFont(28, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL,
+                         wxFONTWEIGHT_BOLD, false, "Segoe UI");
+#else
+    // Use system-safe font on other platforms
+    customFont_ = wxFont(28, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL,
+                         wxFONTWEIGHT_BOLD, false, "Arial");
+#endif
+
+    wxLogStatus("Font in use: %s", customFont_.GetFaceName());
+
+
 
     // Initialize background image and button hitboxes
     UpdateRoleWindow();
     InitializeButtons();
 }
+
+
 
 //------------------------------------------------------------------------------
 // Suppress default erase to avoid white flicker
@@ -142,17 +139,18 @@ void GamePanel::InitializeButtons()
 //------------------------------------------------------------------------------
 // Advance turn if no extra turn and refresh UI
 //------------------------------------------------------------------------------
-void GamePanel::RefreshUI()
-{
+void GamePanel::RefreshUI() {
     Player* current = game.getPlayers()[game.getTurn()];
-    if (!current->hasExtraTurn())
-    {
-        game.nextTurn();
-        UpdateRoleWindow();
-        InitializeButtons();
+    if (!current->hasExtraTurn()) {
+        game.advanceTurnIfNeeded();
     }
+    UpdateRoleWindow();
+    InitializeButtons();
     Refresh();
 }
+
+
+
 
 //------------------------------------------------------------------------------
 // Paint handler: background, buttons, and custom text
@@ -193,15 +191,6 @@ void GamePanel::OnPaint(wxPaintEvent& WXUNUSED(evt))
     case Role::Baron:
         btns.push_back({ btnAbilityRect, "assets/buttons/Legal_investment_Button.png" });
         break;
-	case Role::General:
-		btns.push_back({ btnAbilityRect, "assets/buttons/button_empty.png" });
-		break;
-    case Role::Governor:
-        btns.push_back({ btnAbilityRect, "assets/buttons/button_empty.png" });
-        break;
-	case Role::Judge:
-		btns.push_back({ btnAbilityRect, "assets/buttons/button_empty.png" });
-		break;
     default:
         // no ability button for other roles
         break;
@@ -221,10 +210,15 @@ void GamePanel::OnPaint(wxPaintEvent& WXUNUSED(evt))
     wxString name = curr->getName() + "'s Turn";
     wxString roleS = "Role: " + curr->roleToString(curr->getRole());
     wxString coinsS = "Coins: " + wxString::Format("%d", curr->getCoins());
+    int visibleTurns = curr->getNumOfTurns();
+	wxString turnsS = "Turns Left: " + wxString::Format("%d", visibleTurns);
+
 
     gc->DrawText(name, 40, 20);
     gc->DrawText(roleS, 40, 52);
     gc->DrawText(coinsS, 40, 84);
+    gc->DrawText(turnsS, 40, 116);
+
 
     delete gc;
 }
@@ -265,8 +259,6 @@ Player* GamePanel::AskBlock(Role blockerRole,
 }
 
 
-
-
 //------------------------------------------------------------------------------
 // Mouse click handler: button detection and game actions
 //------------------------------------------------------------------------------
@@ -274,138 +266,128 @@ void GamePanel::OnClick(wxMouseEvent& evt)
 {
     // Prevent rapid repeated clicks
     auto now = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastClickTime).count()
-        < CLICK_INTERVAL_MS)
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastClickTime).count() < CLICK_INTERVAL_MS)
         return;
     lastClickTime = now;
+
+    UpdateRoleWindow();
+    InitializeButtons();
 
     wxPoint pt = evt.GetPosition();
     Player* cur = game.getPlayers()[game.getTurn()];
     Role role = cur->getRole();
 
-    try
-    {
-        // 1) Gather (no block)
-        if (btnGatherRect.Contains(pt))
-        {
+    try {
+        // 1) Gather
+        if (btnGatherRect.Contains(pt)) {
             game.gather(cur);
+            game.advanceTurnIfNeeded();
             RefreshUI();
             return;
         }
 
-        // 2) Tax (blockable by Governor)
-        if (btnTaxRect.Contains(pt)){
-            if (!AskBlock(Role::Governor, "tax"))
+        // 2) Tax
+        if (btnTaxRect.Contains(pt)) {
+            if (!AskBlock(Role::Governor, "tax")) {
                 game.tax(cur);
-			game.skipTurn(cur);
+            }
+            game.advanceTurnIfNeeded();
             RefreshUI();
             return;
         }
 
-        // 3) Bribe (blockable by Judge)
-        if (btnBribeRect.Contains(pt))
-        {
-            if (!AskBlock(Role::Judge, "bribe"))
-                game.bribe(cur);
-            game.skipTurn(cur);
+        // 3) Bribe
+        if (btnBribeRect.Contains(pt)) {
+            if (!AskBlock(Role::Judge, "bribe")) {
+                game.bribe(cur);  // Gives extra turns, do NOT advance turn
+            }
             RefreshUI();
             return;
         }
 
-        // 4) Skip turn
-        if (btnSkipRect.Contains(pt))
-        {
-            game.skipTurn(cur);
-            UpdateRoleWindow();
-            InitializeButtons();
-            RefreshUI();
-            return;
-        }
-
-        // 5) Role-based special ability button
+        // 4) Use Role Ability
         if (btnAbilityRect.Contains(pt)) {
             switch (role) {
-            case Role::Spy: {
-                Spy* spy = static_cast<Spy*>(cur);
-                wxString msg = spy->getCoinReport(game);
-                wxMessageDialog dlg(this, msg, "Coins Report", wxOK | wxICON_INFORMATION);
-                dlg.ShowModal();
-                break;
-            }
-            case Role::Baron: {
-                // Baron’s ability: for now just call useAbility
-                cur->useAbility(game);
-                break;
-            }
-            default:
-                // No ability for other roles
-                break;
+                case Role::Spy: {
+                    Spy* spy = static_cast<Spy*>(cur);
+                    wxString msg = spy->getCoinReport(game);
+                    wxMessageDialog dlg(this, msg, "Coins Report", wxOK | wxICON_INFORMATION);
+                    dlg.ShowModal();
+                    break;
+                }
+                case Role::Baron: {
+                    cur->useAbility(game);
+                    break;
+                }
+                default:
+                    break; // Other roles have no ability
             }
             RefreshUI();
             return;
         }
 
+        // 5) Skip Turn
+        if (btnSkipRect.Contains(pt)) {
+            game.skipTurn(cur);
+            game.advanceTurnIfNeeded();
+            RefreshUI();
+            return;
+        }
 
-        // 6) Targeted actions: Arrest, Sanction, Coup
-        if (btnArrestRect.Contains(pt) ||btnSanctionRect.Contains(pt) ||btnCoupRect.Contains(pt)){
-            // --- Step A: select target ---
+        // 6) Targeted Actions
+        if (btnArrestRect.Contains(pt) || btnSanctionRect.Contains(pt) || btnCoupRect.Contains(pt)) {
             wxArrayString names;
             std::vector<Player*> targets = game.getListOfTargetPlayers(cur);
             for (auto* p : game.getPlayers())
-                if (p != cur){
+                if (p != cur)
                     names.Add(p->getName());
-                }
 
             wxString title =
                 btnArrestRect.Contains(pt) ? "Choose target to arrest" :
                 btnSanctionRect.Contains(pt) ? "Choose target to sanction" :
-                "Choose target to coup";
+                                               "Choose target to coup";
 
             wxSingleChoiceDialog dlg(this, title, "Target", names);
             if (dlg.ShowModal() != wxID_OK)
                 return;
             Player* tgt = targets[dlg.GetSelection()];
 
-            // --- Step B: attempt & block ---
-            if (btnArrestRect.Contains(pt))
-            {
+            if (btnArrestRect.Contains(pt)) {
                 Player* blocker = AskBlock(Role::Spy, "arrest");
-                if (game.handleGuiBlock(blocker, blocker != nullptr, "arrest", 0)) {
+                if (game.handleBlock(blocker, blocker != nullptr, "arrest", 0)) {
                     RefreshUI();
                     return;
                 }
                 game.arrest(cur, tgt);
             }
-            else if (btnSanctionRect.Contains(pt))
-            {
-                Player* blocker = AskBlock(Role::Judge, "bribe");
-                if (game.handleGuiBlock(blocker, blocker != nullptr, "bribe", 0)) {
+            else if (btnSanctionRect.Contains(pt)) {
+                Player* blocker = AskBlock(Role::Judge, "sanction");
+                if (game.handleBlock(blocker, blocker != nullptr, "sanction", 0)) {
                     RefreshUI();
                     return;
                 }
                 game.sanction(cur, tgt);
             }
-            else
-            {
+            else { // Coup
                 Player* blocker = AskBlock(Role::General, "coup", 5);
-                if (game.handleGuiBlock(blocker, blocker != nullptr, "coup", 5)) {
+                if (game.handleBlock(blocker, blocker != nullptr, "coup", 5)) {
                     RefreshUI();
                     return;
                 }
                 game.coup(cur, tgt);
             }
 
-
-            // --- Step C: refresh/advance ---
+            game.advanceTurnIfNeeded();
             RefreshUI();
             return;
         }
     }
-    catch (const std::exception& ex)
-    {
+    catch (const std::exception& ex) {
         wxLogError(ex.what());
     }
 }
+
+
 
 
 
@@ -430,7 +412,7 @@ void GamePanel::OnMotion(wxMouseEvent& evt)
     Player* cur = game.getPlayers()[game.getTurn()];
     Role role = cur->getRole();
 
-    if (!hover &&(role == Role::Spy|| role == Role::Baron|| role == Role::General|| role == Role::Governor|| role == Role::Judge)){
+    if (!hover &&(role == Role::Spy|| role == Role::Baron)){
         hover = btnAbilityRect.Contains(pt);
     }
 

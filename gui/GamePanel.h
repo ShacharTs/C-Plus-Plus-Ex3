@@ -5,15 +5,17 @@
 #include <vector>
 #include "../game/Game.hpp"  // adjust include path for your Game class#
 
+
 class GamePanel : public wxPanel {
 public:
     GamePanel(wxFrame* parent, const std::vector<std::string>& names);
     void RefreshUI();
     //bool AskBlock(Role blockerRole, const wxString& actionName, int cost = 0);
     Player* AskBlock(Role blockerRole, const wxString& actionName, int cost = 0);
+	~GamePanel() = default;
 
 private:
-   
+
     // Core game instance
     coup::Game game;
     // Background image bitmap

@@ -59,6 +59,7 @@ public:
     std::string getName() const;
     Role getRole() const;
     int getCoins() const;
+    int getNumOfTurns();
     const Player *getLastArrestedPlayer() const;
 
     // Setters
@@ -72,7 +73,7 @@ public:
     void resetPlayerTurn();
     void playerUsedTurn();
     void addExtraTurn();
-    bool hasExtraTurn();
+    bool hasExtraTurn() const;
 
     // flag management
     bool isGatherAllow() const;

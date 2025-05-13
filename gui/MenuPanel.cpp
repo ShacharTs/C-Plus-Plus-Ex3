@@ -59,7 +59,7 @@ void MenuPanel::OnClick(wxMouseEvent& e)
     }
 
     new GameFrame(names);
-    GetParent()->Hide();  
+    GetParent()->Hide();
     GetParent()->Destroy();
 }
 
