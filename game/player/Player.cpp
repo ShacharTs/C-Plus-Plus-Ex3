@@ -178,6 +178,7 @@ bool Player::isCoupShieldActive() const { return coupShield; }
  */
 void Player::gather() {
     addCoins(1);
+    canGather = false;
     playerUsedTurn();
 }
 
@@ -186,6 +187,7 @@ void Player::gather() {
  */
 void Player::tax() {
     addCoins(2);
+    canTax = false;
     playerUsedTurn();
 }
 
