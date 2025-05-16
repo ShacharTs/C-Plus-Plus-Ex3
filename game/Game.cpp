@@ -292,6 +292,7 @@ void Game::bribe(Player *currentPlayer) {
     if (currentPlayer->getCoins() < BRIBE_COST) {
         throw CoinsError("Not enough coins for bribe.");
     }
+
     removeCoins(currentPlayer, BRIBE_COST);
     if (!currentPlayer->isBribeAllow()) {
         currentPlayer->canBribe = true;  // Flag for judge retaliation
@@ -310,6 +311,9 @@ void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getLastArrestedPlayer() == targetPlayer) {
         throw ArrestTwiceInRow("Cannot arrest the same player twice");
     }
+    if (currentPlayer == targetPlayer) {
+        throw SelfError("You can not arrest yourself");
+    }
     if (!currentPlayer->isArrestAllow()) {
         throw ArrestError("Arrest failed: blocked by spy");
     }
@@ -325,6 +329,9 @@ void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
 void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getCoins() < SANCTION_COST) {
         throw CoinsError("Sanction failed: not enough coins.");
+    }
+    if (currentPlayer == targetPlayer) {
+        throw SelfError("You can not sanction yourself");
     }
     currentPlayer->sanction(targetPlayer);
     // Handle judge retaliation
