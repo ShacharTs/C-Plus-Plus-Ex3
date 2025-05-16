@@ -15,6 +15,7 @@ using namespace std;
 static vector<string> names = {"Bob","Alice","Steven","Patrick","Cat","Shachar"};
 
 TEST_CASE("Initial roles assigned correctly via Game constructor") {
+    cout << "[TEST] Initial roles assigned correctly via Game constructor" << endl;
     Game game(names);
     auto players = game.getPlayers();
     REQUIRE(players.size() == names.size());
@@ -27,6 +28,7 @@ TEST_CASE("Initial roles assigned correctly via Game constructor") {
 }
 
 TEST_CASE("Gather and Tax increase coins and consume turn") {
+    cout << "[TEST] Gather and Tax increase coins and consume turn" << endl;
     Game game(names);
     auto p = game.getPlayers()[0];
     int before = p->getCoins();
@@ -43,6 +45,7 @@ TEST_CASE("Gather and Tax increase coins and consume turn") {
 }
 
 TEST_CASE("Bribe grants extra turn and cost deducted") {
+    cout << "[TEST] Bribe grants extra turn and cost deducted" << endl;
     Game game(names);
     auto p = game.getPlayers()[2]; // Baron
     p->addCoins(5);
@@ -52,17 +55,22 @@ TEST_CASE("Bribe grants extra turn and cost deducted") {
 }
 
 TEST_CASE("Arrest steals coin and records last arrested") {
+    cout << "[TEST] Arrest steals coin and records last arrested" << endl;
     Game game(names);
     auto p0 = game.getPlayers()[0];
     auto p1 = game.getPlayers()[1];
-    p0->addCoins(1);
+    p0->addCoins(1);          // Give arresting player coin to gain
+    p1->addCoins(1);          // Give target a coin to lose
     game.arrest(p0, p1);
-    // p0 gains 1, p1 loses 1
-    CHECK(p0->getCoins() == 1);
+    // After arrest: p0 gains 1, p1 loses 1
+    CHECK(p0->getCoins() == 2);
+    CHECK(p1->getCoins() == 0);
+    // Self-arrest should throw
     CHECK_THROWS_AS(game.arrest(p0, p0), SelfError);
 }
 
 TEST_CASE("Sanction deducts cost and disables target gather/tax") {
+    cout << "[TEST] Sanction deducts cost and disables target gather/tax" << endl;
     Game game(names);
     auto p0 = game.getPlayers()[0];
     auto p1 = game.getPlayers()[1];
@@ -74,6 +82,7 @@ TEST_CASE("Sanction deducts cost and disables target gather/tax") {
 }
 
 TEST_CASE("Coup removes target and costs coins") {
+    cout << "[TEST] Coup removes target and costs coins" << endl;
     Game game(names);
     auto p0 = game.getPlayers()[0];
     auto p1 = game.getPlayers()[1];
@@ -85,6 +94,7 @@ TEST_CASE("Coup removes target and costs coins") {
 }
 
 TEST_CASE("Role abilities execute without throwing") {
+    cout << "[TEST] Role abilities execute without throwing" << endl;
     Game game(names);
     auto baron = dynamic_cast<Baron*>(game.getPlayers()[2]);
     baron->addCoins(3);
@@ -100,6 +110,7 @@ TEST_CASE("Role abilities execute without throwing") {
 }
 
 TEST_CASE("Game over and winner detection") {
+    cout << "[TEST] Game over and winner detection" << endl;
     vector<string> two = {"A","B"};
     Game game(two);
     auto p0 = game.getPlayers()[0];
@@ -111,6 +122,7 @@ TEST_CASE("Game over and winner detection") {
 }
 
 TEST_CASE("Exception handling flags recoverable errors") {
+    cout << "[TEST] Exception handling flags recoverable errors" << endl;
     Game game(names);
     auto p = game.getPlayers()[0];
     // no exception type: gather twice
