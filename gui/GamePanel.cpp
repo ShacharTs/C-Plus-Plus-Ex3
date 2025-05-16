@@ -144,6 +144,7 @@ void GamePanel::RefreshUI() {
     if (!current->hasExtraTurn()) {
         game.advanceTurnIfNeeded();
     }
+
     UpdateRoleWindow();
     InitializeButtons();
     Refresh();
@@ -361,12 +362,14 @@ void GamePanel::OnClick(wxMouseEvent& evt)
                 game.arrest(cur, tgt);
             }
             else if (btnSanctionRect.Contains(pt)) {
-                Player* blocker = AskBlock(Role::Judge, "sanction");
-                if (game.handleBlock(blocker, blocker != nullptr, "sanction", 0)) {
-                    RefreshUI();
-                    return;
-                }
+                // Player* blocker = AskBlock(Role::Judge, "sanction");
+                // if (game.handleBlock(blocker, blocker != nullptr, "sanction", 0)) {
+                //     RefreshUI();
+                //     return;
+                // }
                 game.sanction(cur, tgt);
+                RefreshUI();
+                return;
             }
             else { // Coup
                 Player* blocker = AskBlock(Role::General, "coup", 5);
