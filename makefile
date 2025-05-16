@@ -33,7 +33,7 @@ TEST_SRC = test/test.cpp
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 TEST_BIN = test_runner
 
-.PHONY: all test valgrind-game valgrind-gui clean
+.PHONY: all test valgrind-test valgrind-gui clean
 
 # Default build
 all: $(TARGET)
@@ -56,10 +56,10 @@ $(TEST_BIN): $(TEST_OBJ) $(GAME_OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Valgrind on game logic
-valgrind-game: $(TEST_BIN)
+valgrind-test: $(TEST_BIN)
 	@echo "Running game logic tests under Valgrind..."
 	valgrind --leak-check=full --track-origins=yes \
-	         --log-file=valgrind-game.txt ./$(TEST_BIN)
+	         --log-file=valgrind-test.txt ./$(TEST_BIN)
 
 # Valgrind on GUI application
 valgrind-gui: $(TARGET)
