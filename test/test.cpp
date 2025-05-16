@@ -292,3 +292,44 @@ TEST_CASE("skipTurn consumes extra turn") {
     game.skipTurn(p0);
     CHECK(!p0->hasExtraTurn());
 }
+
+
+// Skipping a turn when the player has no extra turn should consume their default turn
+TEST_CASE("skipTurn without extra-turn consumes default turn") {
+    Game game(names);
+    auto p0 = game.getPlayers()[0];
+    // Player starts with one turn; skipping should exhaust it
+    game.skipTurn(p0);
+    CHECK(!game.currentPlayerHasTurn());
+}
+
+// advanceTurnIfNeeded should advance normally when no extra turn remains
+TEST_CASE("advanceTurnIfNeeded advances turn when no extra-turn") {
+    Game game(names);
+    int start = game.getTurn();
+    auto p0 = game.getPlayers()[0];
+    game.tax(p0);
+    game.advanceTurnIfNeeded();
+    CHECK(game.getTurn() == (start + 1) % names.size());
+}
+
+// advanceTurnIfNeeded should *not* advance when an extra turn is present
+TEST_CASE("advanceTurnIfNeeded with extra-turn does not advance") {
+    Game game(names);
+    auto p0 = game.getPlayers()[0];
+    p0->addExtraTurn();               // Grant an extra turn
+    int start = game.getTurn();
+    game.advanceTurnIfNeeded();
+    CHECK(game.getTurn() == start);
+}
+
+// Sanctioning a Judge should deduct the cost plus the judge’s retaliation penalty
+TEST_CASE("Sanction against Judge applies retaliation penalty") {
+    Game game(names);
+    auto p0    = game.getPlayers()[0];
+    auto judge = game.getPlayers()[4]; // Index 4 is Judge
+    p0->addCoins(6);                   // Enough for sanction + retaliation
+    game.sanction(p0, judge);
+    // p0 paid 3 for sanction, then lost 1 more to judge’s passiveAbility
+    CHECK(p0->getCoins() == 2);
+}
