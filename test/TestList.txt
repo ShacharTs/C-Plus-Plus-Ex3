@@ -1,0 +1,27 @@
+1. Initial roles assigned correctly via Game constructor
+2. Gather and Tax increase coins and consume turn
+3. Bribe grants extra turn and cost deducted
+4. Arrest steals coin and records last arrested
+5. Sanction deducts cost and disables target gather/tax
+6. Coup removes target and costs coins
+7. Role abilities execute without throwing
+8. Game over and winner detection
+9. Exception handling flags recoverable errors
+10. Spy ability grants extra turn
+11. Judge passive ability penalizes target
+12. Merchant passive ability gives extra coin each turn
+13. Self-sanction should throw
+14. Sanction with insufficient funds throws
+15. Self-coup should throw
+16. Coup with insufficient funds throws
+17. Double-tax not allowed
+18. handleBlock deducts cost & consumes turn
+19. handleBlock returns false if didBlock is false
+20. handleActionBlock blocks Tax by Governor
+21. handleActionBlock blocks Bribe by Judge
+22. handleActionBlock blocks Arrest by Spy
+23. handleActionBlock blocks Coup by General
+24. handleActionBlock returns false for wrong role
+25. getListOfTargetPlayers excludes current
+26. nextTurn resets gather/tax flags
+27. skipTurn consumes extra turn
