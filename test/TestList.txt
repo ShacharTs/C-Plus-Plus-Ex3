@@ -25,3 +25,8 @@
 25. getListOfTargetPlayers excludes current
 26. nextTurn resets gather/tax flags
 27. skipTurn consumes extra turn
+28.skipTurn without extra-turn consumes default turn
+29.advanceTurnIfNeeded advances turn when no extra-turn
+30.advanceTurnIfNeeded with extra-turn does not advance
+31.Sanction against Judge applies retaliation penalty
+32.

@@ -10,6 +10,7 @@ Governor::Governor(const std::string& name) :Player(name) {
 
 void Governor::tax() {
     addCoins(3);
+    canTax = false;
     playerUsedTurn();
 }
 

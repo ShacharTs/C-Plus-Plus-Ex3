@@ -265,6 +265,9 @@ bool Game::currentPlayerHasTurn() {
  * @throws GatherError on illegal gather
  */
 void Game::gather(Player *currentPlayer) {
+    if (players[currentPlayerTurn] != currentPlayer) {
+        throw TurnError("It's not your turn.");
+    }
     if (!currentPlayer->isGatherAllow()) {
         throw GatherError("Gather action failed.");
     }
@@ -277,9 +280,13 @@ void Game::gather(Player *currentPlayer) {
  * @throws TaxError on illegal tax
  */
 void Game::tax(Player *currentPlayer) {
+    if (players[currentPlayerTurn] != currentPlayer) {
+        throw TurnError("It's not your turn.");
+    }
     if (!currentPlayer->isTaxAllow()) {
         throw TaxError("Tax action failed.");
     }
+
     currentPlayer->tax();
 }
 

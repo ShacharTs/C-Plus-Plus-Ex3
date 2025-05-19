@@ -147,3 +147,53 @@ public:
     explicit MerchantError(const std::string& message)
         : std::runtime_error(message) {}
 };
+
+/**
+ * @class TurnError
+ * @brief Thrown when a player attempts an action outside of their turn.
+ */
+class TurnError : public std::runtime_error {
+public:
+    explicit TurnError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+/**
+ * @class ActionError
+ * @brief General-purpose exception for invalid or disallowed actions.
+ */
+class ActionError : public std::runtime_error {
+public:
+    explicit ActionError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+/**
+ * @class GameOverError
+ * @brief Thrown when a player attempts to act after the game has ended.
+ */
+class GameOverError : public std::runtime_error {
+public:
+    explicit GameOverError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+/**
+ * @class InitError
+ * @brief Thrown when the game fails to initialize due to bad input (e.g., too few or too many players).
+ */
+class InitError : public std::runtime_error {
+public:
+    explicit InitError(const std::string& message)
+        : std::runtime_error(message) {}
+};
+
+/**
+ * @class SanctionError
+ * @brief Thrown when an invalid sanction action is attempted.
+ */
+class SanctionError : public std::runtime_error {
+public:
+    explicit SanctionError(const std::string& message)
+        : std::runtime_error(message) {}
+};
