@@ -43,7 +43,7 @@ private:
 
     // Pre-loaded sounds map
     std::map<SoundEffect, wxSound> sounds_;
-
+    bool mustCoupAlerted_{false};
     // Helpers
     void UpdateRoleWindow();
     void InitializeButtons();
@@ -54,6 +54,14 @@ private:
     void OnClick(wxMouseEvent& evt);
     void OnMotion(wxMouseEvent& evt);
     void showWinner(const std::string& winner);
+
+    bool HandleMustCoup(const wxPoint& pt, Player* cur);
+    bool HandleGather(const wxPoint& pt, Player* cur);
+    bool HandleTax(const wxPoint& pt, Player* cur);
+    bool HandleBribe(const wxPoint& pt, Player* cur);
+    bool HandleAbility(const wxPoint& pt, Player* cur, Role role);
+    bool HandleSkip(const wxPoint& pt, Player* cur);
+    bool HandleTargeted(const wxPoint& pt, Player* cur);
 
     // Convert enum → filename
     static wxString EffectToFilename(SoundEffect effect) {

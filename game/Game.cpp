@@ -387,6 +387,17 @@ void Game::coup(Player *currentPlayer, Player *targetPlayer) {
     currentPlayer->playerUsedTurn();
 }
 
+    /**
+     * check if a player is forced to coup
+     * @param currentPlayer
+     */
+    bool Game::forcedToCoup(const Player *currentPlayer) {
+    if (currentPlayer->getCoins() >= FORCE_COUP) {
+        return true;
+    }
+    return false;
+}
+
 /**
  * @brief Get the name of the player whose turn it is.
  * @return Current player's name

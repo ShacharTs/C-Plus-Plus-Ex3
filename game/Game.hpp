@@ -190,6 +190,8 @@ namespace coup {
          */
         void coup(Player* currentPlayer, Player* targetPlayer);
 
+        bool forcedToCoup(const Player *currentPlayer);
+
         //------------------------------------------------------------------------
         // GUI-related logic and blocking
         //------------------------------------------------------------------------

@@ -125,11 +125,15 @@ void GamePanel::InitializeButtons()
         {&btnAbilityRect,  role == Role::Spy ? "assets/buttons/Watch_Coins_Button.png"
                           : role == Role::Baron ? "assets/buttons/Legal_investment_Button.png"
                                                 : "assets/buttons/button_empty.png"},
+
         {&btnArrestRect,   "assets/buttons/Arrest_Button.png"},
         {&btnSanctionRect, "assets/buttons/Sanction_Button.png"},
         {&btnCoupRect,     "assets/buttons/Coup_Button.png"},
         {&btnSkipRect,     "assets/buttons/Skip_Turn.png"}
     };
+    if (role == Role::Baron && current->getCoins() < 3) {
+        btnAbilityRect = wxRect(0,0,0,0);
+    }
 
     for (size_t i = 0; i < metas.size() && i < positions.size(); ++i)
     {
@@ -245,123 +249,223 @@ Player* GamePanel::AskBlock(Role blockerRole,
 //------------------------------------------------------------------------------
 void GamePanel::OnClick(wxMouseEvent& evt)
 {
+    // click‐throttle
     auto now = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::milliseconds>(
             now - lastClickTime).count() < CLICK_INTERVAL_MS)
         return;
     lastClickTime = now;
 
+    // refresh state
     UpdateRoleWindow();
     InitializeButtons();
 
     wxPoint pt = evt.GetPosition();
     Player* cur = game.getPlayers()[game.getTurn()];
-    Role role = cur->getRole();
+    Role    role = cur->getRole();
 
-    try {
-        // Gather
-        if (btnGatherRect.Contains(pt)) {
-            PlaySound(SoundEffect::GatherCoin);
-            game.gather(cur);
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-        // Tax
-        if (btnTaxRect.Contains(pt)) {
-            if (!AskBlock(Role::Governor, "tax")) {
-                PlaySound(SoundEffect::TaxCoin);
-                game.tax(cur);
-            }
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-        // Bribe
-        if (btnBribeRect.Contains(pt)) {
-            if (!AskBlock(Role::Judge, "bribe")) {
-                game.bribe(cur);
-            }
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-        // Use Role Ability
-        if (btnAbilityRect.Contains(pt)) {
-            switch (role) {
-            case Role::Spy: {
-                Spy* spy = static_cast<Spy*>(cur);
-                wxString msg = spy->getCoinReport(game);
-                wxMessageDialog dlg(this, msg, "Coins Report",
-                                    wxOK | wxICON_INFORMATION);
-                dlg.ShowModal();
-                break;
-            }
-            case Role::Baron:
-                cur->useAbility(game);
-                break;
-            default:
-                break;
-            }
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-        // Skip Turn - consume turn and advance
-        if (btnSkipRect.Contains(pt)) {
-            game.skipTurn(cur);
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-        // Targeted Actions
-        if (btnArrestRect.Contains(pt) || btnSanctionRect.Contains(pt) || btnCoupRect.Contains(pt)) {
-            wxArrayString names;
-            std::vector<Player*> targets = game.getListOfTargetPlayers(cur);
-            for (auto* p : targets)
-                names.Add(p->getName());
-
-            wxString title = btnArrestRect.Contains(pt) ? "Choose target to arrest"
-                              : btnSanctionRect.Contains(pt) ? "Choose target to sanction"
-                                                             : "Choose target to coup";
-
-            wxSingleChoiceDialog dlg(this, title, "Target", names);
-            if (dlg.ShowModal() != wxID_OK)
-                return;
-            Player* tgt = targets[dlg.GetSelection()];
-
-            if (btnArrestRect.Contains(pt)) {
-                Player* blocker = AskBlock(Role::Spy, "arrest");
-                if (game.handleBlock(blocker, blocker != nullptr, "arrest", 0)) {
-                    game.advanceTurnIfNeeded();
-                    RefreshUI();
-                    return;
-                }
-                game.arrest(cur, tgt);
-            }
-            else if (btnSanctionRect.Contains(pt)) {
-                game.sanction(cur, tgt);
-            }
-            else {
-                Player* blocker = AskBlock(Role::General, "coup", 5);
-                if (game.handleBlock(blocker, blocker != nullptr, "coup", 5)) {
-                    game.advanceTurnIfNeeded();
-                    RefreshUI();
-                    return;
-                }
-                PlaySound(SoundEffect::CoupKick);
-                game.coup(cur, tgt);
-            }
-
-            game.advanceTurnIfNeeded();
-            RefreshUI();
-            return;
-        }
-    }
-    catch (const std::exception& ex) {
-        wxLogError(ex.what());
-    }
+    // try each handler in turn; if one returns true, we’re done
+    if (HandleMustCoup(pt, cur))       return;
+    if (HandleGather(pt, cur))         return;
+    if (HandleTax(pt, cur))            return;
+    if (HandleBribe(pt, cur))          return;
+    if (HandleAbility(pt, cur, role))  return;
+    if (HandleSkip(pt, cur))           return;
+    if (HandleTargeted(pt, cur))       return;
 }
+
+//------------------------------------------------------------------------------
+// 1) Forced-to-coup: only Coup allowed
+//------------------------------------------------------------------------------
+bool GamePanel::HandleMustCoup(const wxPoint& pt, Player* cur)
+{
+    // Not forced? reset and bail out.
+    if (!game.forcedToCoup(cur)) {
+        mustCoupAlerted_ = false;
+        return false;
+    }
+
+    // 1) If they actually clicked the Coup button, jump straight into the coup flow:
+    if (btnCoupRect.Contains(pt)) {
+        wxArrayString names;
+        auto targets = game.getListOfTargetPlayers(cur);
+        for (auto* p : targets) names.Add(p->getName());
+
+        wxSingleChoiceDialog dlg(
+            this,
+            "Choose a target to coup",
+            "Forced Coup",
+            names
+        );
+        if (dlg.ShowModal() == wxID_OK) {
+            Player* tgt = targets[dlg.GetSelection()];
+            PlaySound(SoundEffect::CoupKick);
+            game.coup(cur, tgt);
+            game.advanceTurnIfNeeded();
+            RefreshUI();
+        }
+        // clear the alert flag for next time
+        mustCoupAlerted_ = false;
+        return true;
+    }
+
+    // 2) Any other click: show the popup once, then swallow all further clicks until they Coup
+    if (!mustCoupAlerted_) {
+        wxMessageBox(
+            "You have too many coins you must coup!",
+            "Forced Coup",
+            wxOK | wxICON_INFORMATION,
+            this
+        );
+        mustCoupAlerted_ = true;
+    }
+    // swallow the click (do nothing else)
+    return true;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// 2) Gather
+//------------------------------------------------------------------------------
+bool GamePanel::HandleGather(const wxPoint& pt, Player* cur)
+{
+    if (!btnGatherRect.Contains(pt)) return false;
+
+    PlaySound(SoundEffect::GatherCoin);
+    game.gather(cur);
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+// 3) Tax
+//------------------------------------------------------------------------------
+bool GamePanel::HandleTax(const wxPoint& pt, Player* cur)
+{
+    if (!btnTaxRect.Contains(pt)) return false;
+
+    if (!AskBlock(Role::Governor, "tax")) {
+        PlaySound(SoundEffect::TaxCoin);
+        game.tax(cur);
+    }
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+// 4) Bribe
+//------------------------------------------------------------------------------
+bool GamePanel::HandleBribe(const wxPoint& pt, Player* cur)
+{
+    if (!btnBribeRect.Contains(pt)) return false;
+
+    if (!AskBlock(Role::Judge, "bribe")) {
+        game.bribe(cur);
+    }
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+// 5) Ability (Spy/Baron)
+//------------------------------------------------------------------------------
+bool GamePanel::HandleAbility(const wxPoint& pt, Player* cur, Role role)
+{
+    if (!btnAbilityRect.Contains(pt)) return false;
+
+    if (role == Role::Baron && cur->getCoins() < 3) {
+        wxLogWarning("You need at least 3 coins to cough cough legal investment.");
+        return true;    // swallow the click instead of calling useAbility
+    }
+
+    switch (role) {
+    case Role::Spy: {
+        Spy* spy = static_cast<Spy*>(cur);
+        wxString msg = spy->getCoinReport(game);
+        wxMessageDialog dlg(this, msg, "Coins Report",
+                            wxOK | wxICON_INFORMATION);
+        dlg.ShowModal();
+        break;
+    }
+    case Role::Baron:
+        cur->useAbility(game);
+        break;
+    default:
+        return false;
+    }
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+// 6) Skip Turn
+//------------------------------------------------------------------------------
+bool GamePanel::HandleSkip(const wxPoint& pt, Player* cur)
+{
+    if (!btnSkipRect.Contains(pt)) return false;
+
+    game.skipTurn(cur);
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+// 7) Arrest / Sanction / Coup
+//------------------------------------------------------------------------------
+bool GamePanel::HandleTargeted(const wxPoint& pt, Player* cur)
+{
+    bool isArrest   = btnArrestRect.Contains(pt);
+    bool isSanction = btnSanctionRect.Contains(pt);
+    bool isCoup     = btnCoupRect.Contains(pt);
+    if (!(isArrest || isSanction || isCoup)) return false;
+
+    wxArrayString names;
+    auto targets = game.getListOfTargetPlayers(cur);
+    for (auto* p : targets) names.Add(p->getName());
+
+    wxString title = isArrest   ? "Choose target to arrest"
+                     : isSanction ? "Choose target to sanction"
+                                  : "Choose target to coup";
+
+    wxSingleChoiceDialog dlg(this, title, "Target", names);
+    if (dlg.ShowModal() != wxID_OK) return true;
+    Player* tgt = targets[dlg.GetSelection()];
+
+    if (isArrest) {
+        Player* blocker = AskBlock(Role::Spy, "arrest");
+        if (game.handleBlock(blocker, blocker != nullptr, "arrest", 0)) {
+            game.advanceTurnIfNeeded();
+            RefreshUI();
+            return true;
+        }
+        game.arrest(cur, tgt);
+    }
+    else if (isSanction) {
+        game.sanction(cur, tgt);
+    }
+    else { // Coup
+        Player* blocker = AskBlock(Role::General, "coup", 5);
+        if (game.handleBlock(blocker, blocker != nullptr, "coup", 5)) {
+            game.advanceTurnIfNeeded();
+            RefreshUI();
+            return true;
+        }
+        PlaySound(SoundEffect::CoupKick);
+        game.coup(cur, tgt);
+    }
+
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
 
 //------------------------------------------------------------------------------
 // Mouse motion handler: change cursor when hovering buttons
