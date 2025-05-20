@@ -59,7 +59,7 @@ Game::Game(const vector<string> &names) {
  * @brief Create a random role instance for a given player name.
  * Uses high-quality C++11 random facilities.
  * @param name Player name
- * @return Pointer to a new Player subclass of random type
+ * @return Pointer to a new Player subclass of a random type
  */
 Player *Game::createRandomRole(const std::string &name) {
     static random_device rd;                         // Seed source
@@ -111,7 +111,7 @@ void Game::getRandomRole(vector<Player *> &players) {
 }
 
 /**
- * @brief Get zero-based index of the current player's turn.
+ * @brief Get a zero-based index of the current player's turn.
  * @return Current player turn index
  */
 int Game::getTurn() {
@@ -147,7 +147,7 @@ void Game::advanceTurnIfNeeded() {
 
 /**
  * @brief Retrieve the list of active players.
- * @return Constant reference to players vector
+ * @return Constant reference to player vector
  */
 const vector<Player *> &Game::getPlayers() const {
     return players;
@@ -256,8 +256,8 @@ void Game::skipTurn(Player *currentPlayer) {
 }
 
 /**
- * @brief Check if current player has remaining turn.
- * @return True if extra turn flag is set
+ * @brief Check if the current player has remaining turn.
+ * @return True if the extra turn flag is set
  */
 bool Game::currentPlayerHasTurn() {
     return players.at(getTurn())->hasExtraTurn();
@@ -360,7 +360,7 @@ void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
  * @brief Coup action: eliminate a target player at high cost.
  * @param currentPlayer Acting player
  * @param targetPlayer Player to eliminate
- * @throws CoinsError, SelfError, or CoupBlocked on failure
+ * @throws CoinsError SelfError, or CoupBlocked on failure
  */
 void Game::coup(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getCoins() < COUP_COST) {
@@ -375,7 +375,7 @@ void Game::coup(Player *currentPlayer, Player *targetPlayer) {
         currentPlayer->playerUsedTurn();
         throw CoupBlocked("Coup blocked by shield.");
     }
-    // Remove target from players list
+    // Remove target from player's list
     for (size_t i = 0; i < players.size(); ++i) {
         if (players[i] == targetPlayer) {
             if (i < currentPlayerTurn) --currentPlayerTurn;
@@ -409,7 +409,7 @@ string Game::turn() {
 /**
  * @brief Determine the winner when only one player remains.
  * @return Winner's name
- * @throws logic_error if game is not over
+ * @throws logic_error if the game is not over
  */
 string Game::winner() const {
     if (players.size() == 1) {
@@ -433,9 +433,9 @@ bool consumeExtraTurn(Player *currentPlayer) {
 }
 
 /**
- * @brief Check if the game is over (one player left) and log outcome.
+ * @brief Check if the game is over (one player left) and log the outcome.
  * @param players Vector of active players
- * @return True if game ended
+ * @return True if the game ended
  */
 bool Game::isGameOver(const vector<Player *>& players) {
     if (players.size() == 1) {
