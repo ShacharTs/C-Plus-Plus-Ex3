@@ -132,6 +132,10 @@ void Game::nextTurn() {
  * @brief Continue turn if extra moves remain, else advance normally.
  */
 void Game::advanceTurnIfNeeded() {
+    if(isGameOver(players)) {
+        cout << "Game is over. No more turns." << endl;
+        return;
+    }
     Player *current = players.at(currentPlayerTurn);
     if (current->hasExtraTurn()) {
         //current->playerUsedTurn();  // line for test do not remove
@@ -400,7 +404,7 @@ string Game::winner() const {
     if (players.size() == 1) {
         return players.at(0)->getName();
     }
-    throw logic_error("Game not finished yet.");
+    throw GameOverError("Game not finished yet.");
 }
 
 /**

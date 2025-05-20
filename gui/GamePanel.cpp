@@ -7,6 +7,8 @@
 #include <wx/filename.h>
 #include "../game/player/roleHeader/Spy.hpp"
 
+
+
 //------------------------------------------------------------------------------
 // Event table binding paint, click, erase, and motion events
 //------------------------------------------------------------------------------
@@ -39,7 +41,31 @@ GamePanel::GamePanel(wxFrame* parent, const std::vector<std::string>& names)
 
     UpdateRoleWindow();
     InitializeButtons();
+
+    // ——————————————
+    // Pre-load all sounds into memory
+    // ——————————————
+    for (auto effect : { SoundEffect::GatherCoin,
+                         SoundEffect::TaxCoin,
+                         SoundEffect::Victory,
+                         SoundEffect::CoupKick })
+    {
+        // build "<exe-dir>/assets/sounds/<filename>"
+        wxFileName file(wxStandardPaths::Get().GetExecutablePath());
+        file.RemoveLastDir();
+        file.AppendDir("assets");
+        file.AppendDir("sounds");
+        file.SetFullName( EffectToFilename(effect) );
+
+        if ( file.FileExists() ) {
+            sounds_.try_emplace(effect, file.GetFullPath());
+        }
+        else {
+            wxLogError("Missing sound at startup: %s", file.GetFullPath());
+        }
+    }
 }
+
 
 //------------------------------------------------------------------------------
 // Suppress default erase to avoid white flicker
@@ -119,6 +145,10 @@ void GamePanel::InitializeButtons()
 // Refresh UI based solely on game state (no turn swapping)
 //------------------------------------------------------------------------------
 void GamePanel::RefreshUI() {
+    if(game.isGameOver(game.getPlayers())) {
+        showWinner(game.winner());
+        return;
+    }
     UpdateRoleWindow();
     InitializeButtons();
     Refresh();
@@ -231,6 +261,7 @@ void GamePanel::OnClick(wxMouseEvent& evt)
     try {
         // Gather
         if (btnGatherRect.Contains(pt)) {
+            PlaySound(SoundEffect::GatherCoin);
             game.gather(cur);
             game.advanceTurnIfNeeded();
             RefreshUI();
@@ -239,6 +270,7 @@ void GamePanel::OnClick(wxMouseEvent& evt)
         // Tax
         if (btnTaxRect.Contains(pt)) {
             if (!AskBlock(Role::Governor, "tax")) {
+                PlaySound(SoundEffect::TaxCoin);
                 game.tax(cur);
             }
             game.advanceTurnIfNeeded();
@@ -317,6 +349,7 @@ void GamePanel::OnClick(wxMouseEvent& evt)
                     RefreshUI();
                     return;
                 }
+                PlaySound(SoundEffect::CoupKick);
                 game.coup(cur, tgt);
             }
 
@@ -356,4 +389,21 @@ void GamePanel::OnMotion(wxMouseEvent& evt)
     }
 
     SetCursor(hover ? wxCursor(wxCURSOR_HAND) : wxCursor(wxCURSOR_ARROW));
+}
+
+void GamePanel::showWinner(const std::string& winner) {
+    wxMessageDialog dlg(this, "Winner: " + winner, "Game Over", wxOK | wxICON_INFORMATION);
+    PlaySound(SoundEffect::Victory);
+    dlg.ShowModal();
+    exit(0);
+}
+
+
+void GamePanel::PlaySound(SoundEffect effect) {
+    auto it = sounds_.find(effect);
+    if (it == sounds_.end() || !it->second.IsOk()) {
+        wxLogError("Sound not preloaded or invalid: %d", int(effect));
+        return;
+    }
+    it->second.Play(wxSOUND_ASYNC);
 }

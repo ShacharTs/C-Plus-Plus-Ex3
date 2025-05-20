@@ -1,72 +1,66 @@
-# Compiler and flags
-CXX      = g++
-CXXFLAGS = -std=c++17 $(shell wx-config --cxxflags)
-LDFLAGS  = $(shell wx-config --libs) -lsfml-audio
+# -----------------------------------------------------------------------------
+# Makefile for CoupGame
+# -----------------------------------------------------------------------------
 
-# Detect platform for libraries
+# Compiler and flags
+CXX        := g++
+CXXFLAGS   := -std=c++17 $(shell wx-config --cxxflags)
+LDFLAGS    := $(shell wx-config --libs) -lsfml-audio
+
+# Windows-specific libs
 UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Linux)
-    # No extra libs on Linux
-else
-    # Windows-specific libraries
+ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
     LDFLAGS += -lwinmm -lcomdlg32 -lole32 -luuid -lgdi32
+    TARGET_EXT := .exe
+else
+    TARGET_EXT :=
 endif
 
-# Source files for main application
-SRC      = \
+# Build directory
+BUILD_DIR    := build
+BIN          := $(BUILD_DIR)/CoupGame$(TARGET_EXT)
+
+# Source files
+SRC := \
   gui/App.cpp gui/GameFrame.cpp gui/GamePanel.cpp gui/MenuFrame.cpp \
-  gui/MenuPanel.cpp gui/RevealDialog.cpp  \
+  gui/MenuPanel.cpp gui/RevealDialog.cpp \
   game/Game.cpp game/player/Player.cpp \
   game/player/roleSrc/Baron.cpp game/player/roleSrc/General.cpp \
   game/player/roleSrc/Governor.cpp game/player/roleSrc/Judge.cpp \
   game/player/roleSrc/Merchant.cpp game/player/roleSrc/Spy.cpp
 
-# Object files for main application
-OBJ      = $(SRC:.cpp=.o)
-TARGET   = CoupGame
+# Object files (in build/obj)
+OBJ_DIR      := $(BUILD_DIR)/obj
+OBJ          := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-# Objects used for testing: exclude all GUI-related objects
-GAME_OBJ = $(filter-out gui/%.o, $(OBJ))
+# Assets: copy everything under assets/ into build/assets/
+ASSETS_SRC   := assets
+ASSETS_DST   := $(BUILD_DIR)/assets
 
-# Test sources (using doctest)
-TEST_SRC = test/test.cpp
-TEST_OBJ = $(TEST_SRC:.cpp=.o)
-TEST_BIN = test_runner
+.PHONY: all clean
 
-.PHONY: all test valgrind-test valgrind-gui clean
+# Default target: build exe + copy assets
+all: $(BIN) copy-assets
+	@echo "Build complete → $(BIN)"
 
-# Default build
-all: $(TARGET)
+# Link step
+$(BIN): $(OBJ)
+	@mkdir -p $(dir $@)
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
-# Build main executable
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
-
-# Build and run tests
-test: $(TEST_BIN)
-	@echo "Running tests..."
-	./$(TEST_BIN)
-
-# Link test runner without GUI files
-$(TEST_BIN): $(TEST_OBJ) $(GAME_OBJ)
-	$(CXX) $(CXXFLAGS) $(TEST_OBJ) $(GAME_OBJ) -o $@ $(LDFLAGS)
-
-# Compile rule for building object files
-%.o: %.cpp
+# Compile step
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Valgrind on game logic
-valgrind-test: $(TEST_BIN)
-	@echo "Running game logic tests under Valgrind..."
-	valgrind --leak-check=full --track-origins=yes \
-	         --log-file=valgrind-test.txt ./$(TEST_BIN)
+# Copy entire assets directory into build/
+copy-assets:
+	@rm -rf $(ASSETS_DST)
+	@mkdir -p $(ASSETS_DST)
+	@cp -r $(ASSETS_SRC)/* $(ASSETS_DST)/
+	@echo "Assets copied → $(ASSETS_DST)"
 
-# Valgrind on GUI application
-valgrind-gui: $(TARGET)
-	@echo "Running GUI application under Valgrind..."
-	valgrind --leak-check=full --track-origins=yes \
-	         --log-file=valgrind-gui.txt ./$(TARGET)
-
-# Clean up build artifacts
+# Clean artifacts
 clean:
-	rm -f $(OBJ) $(TARGET) $(TEST_OBJ) $(TEST_BIN) valgrind-game.txt valgrind-gui.txt
+	@rm -rf $(BUILD_DIR)
+	@echo "Cleaned build artifacts"

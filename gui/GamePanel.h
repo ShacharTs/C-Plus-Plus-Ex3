@@ -1,40 +1,48 @@
 // File: GamePanel.h
 #pragma once
+
 #include <wx/wx.h>
 #include <wx/graphics.h>
+#include <wx/sound.h>
+#include <map>
 #include <vector>
-#include "../game/Game.hpp"  // adjust include path for your Game class#
-
+#include "../game/Game.hpp"
 
 class GamePanel : public wxPanel {
 public:
+    enum class SoundEffect {
+        GatherCoin,
+        TaxCoin,
+        Victory,
+        CoupKick,
+        // …add more as needed
+    };
+
     GamePanel(wxFrame* parent, const std::vector<std::string>& names);
+    ~GamePanel() = default;
+
     void RefreshUI();
-    //bool AskBlock(Role blockerRole, const wxString& actionName, int cost = 0);
     Player* AskBlock(Role blockerRole, const wxString& actionName, int cost = 0);
-	~GamePanel() = default;
+
+    // Play one of the pre-loaded sounds
+    void PlaySound(SoundEffect effect);
 
 private:
-
     // Core game instance
     coup::Game game;
-    // Background image bitmap
-    wxBitmap bgBmp;
-    // Custom font
-    wxFont customFont_;
-    // Last choice dialog size and position
-    wxSize dialogSize_{0,0};  // stores last dialog size (width,height)
-    wxPoint dialogPos_{0,0};  // stores last dialog position (x,y)
-    wxString dialogTitle_;  // stores last dialog title
-    // Button hitboxes
-    wxRect btnGatherRect;
-    wxRect btnTaxRect;
-    wxRect btnBribeRect;
-    wxRect btnAbilityRect;
-    wxRect btnArrestRect;
-    wxRect btnSanctionRect;
-    wxRect btnCoupRect;
-    wxRect btnSkipRect;
+
+    // UI elements
+    wxBitmap      bgBmp;
+    wxFont        customFont_;
+    wxSize        dialogSize_{0,0};
+    wxPoint       dialogPos_{0,0};
+    wxString      dialogTitle_;
+    wxRect        btnGatherRect, btnTaxRect, btnBribeRect,
+                  btnAbilityRect, btnArrestRect,
+                  btnSanctionRect, btnCoupRect, btnSkipRect;
+
+    // Pre-loaded sounds map
+    std::map<SoundEffect, wxSound> sounds_;
 
     // Helpers
     void UpdateRoleWindow();
@@ -45,6 +53,18 @@ private:
     void OnEraseBackground(wxEraseEvent& evt);
     void OnClick(wxMouseEvent& evt);
     void OnMotion(wxMouseEvent& evt);
+    void showWinner(const std::string& winner);
+
+    // Convert enum → filename
+    static wxString EffectToFilename(SoundEffect effect) {
+        switch (effect) {
+            case SoundEffect::GatherCoin: return "gather_coin.wav";
+            case SoundEffect::TaxCoin:    return "tax_coin.wav";
+            case SoundEffect::Victory:    return "player_winner.wav";
+            case SoundEffect::CoupKick:   return "coup_kick.wav";
+            default:                      return "";
+        }
+    }
 
     wxDECLARE_EVENT_TABLE();
 };

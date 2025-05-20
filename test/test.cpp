@@ -373,7 +373,7 @@ TEST_CASE("Game over returns correct winner") {
 
 TEST_CASE("Calling winner() too early throws") {
     Game game({"A", "B", "C"});
-    CHECK_THROWS_AS(game.winner(), std::logic_error);
+    CHECK_THROWS_AS(game.winner(), GameOverError);
 }
 
 
