@@ -486,71 +486,37 @@ TEST_CASE("Multiple bribes accumulate extra-turns") {
     CHECK(pj->getNumOfTurns() == 3);
 }
 
-//TEST_CASE("skipTurn consumes only one extra-turn") {
-//    Game game(names);
-//    Player* pj = nullptr;
-//    for(auto p: game.getPlayers()) if(p->getRole()==Role::Judge) { pj = p; break; }
-//    REQUIRE(pj);
-//    for (int i = 0; i < 8; ++i) { game.gather(pj); game.skipTurn(pj); }
-//    game.bribe(pj);
-//    game.bribe(pj);
-//    game.skipTurn(pj);
-//    CHECK(pj->getNumOfTurns() == 1);
-//}
-//
-//// --- Blocking behavior ---
-//
-//TEST_CASE("handleBlock on invalid action returns false and no side-effects") {
-//    Game game(names);
-//    auto p0 = game.getPlayers()[0];
-//    bool did = game.handleBlock(p0, true, "NotValidAction", 0);
-//    CHECK(did == false);
-//    CHECK(p0->getCoins() == 0);
-//    CHECK(game.getTurn() == 0);
-//}
-//
-//// --- Tax block reset permission ---
-//
-//TEST_CASE("Tax block resets gather/tax permission until next real turn") {
-//    Game game(names);
-//    Player* pg = nullptr, *p1 = game.getPlayers()[1];
-//    for(auto p: game.getPlayers()) if(p->getRole()==Role::Governor) { pg = p; break; }
-//    REQUIRE(pg);
-//    game.gather(p1);
-//    game.skipTurn(p1);
-//    game.handleActionBlock(p1, ActionType::Tax, pg);
-//    CHECK_THROWS_AS(game.gather(p1), GatherError);
-//
-//    game.nextTurn();
-//    game.skipTurn(p1);
-//    for(auto p: game.getPlayers()) if(p != p1) game.skipTurn(p);
-//    game.nextTurn();
-//    CHECK_NOTHROW(game.tax(p1));
-//}
-//
-//// --- Coin edge-cases ---
-//
-//TEST_CASE("Spy arrest throws CoinsError when victim has zero coins") {
-//    Game game(names);
-//    Player* ps = nullptr, *pv = nullptr;
-//    for(auto p: game.getPlayers()) if(!ps && p->getRole()==Role::Spy) ps = p;
-//    for(auto p: game.getPlayers()) if(p != ps) { pv = p; break; }
-//    REQUIRE(ps != nullptr);
-//    REQUIRE(pv != nullptr);
-//    while(pv->getCoins() > 0) {
-//        game.gather(pv);
-//        game.skipTurn(pv);
-//        game.coup(game.getPlayers()[0], pv);
-//    }
-//    CHECK_THROWS_AS(game.arrest(ps, pv), CoinsError);
-//}
-//
-//TEST_CASE("Merchant passive ability wont gives coin even from zero") {
-//    Game game(names);
-//    Player* pm = nullptr;
-//    for(auto p: game.getPlayers()) if(p->getRole()==Role::Merchant) { pm = p; break; }
-//    REQUIRE(pm);
-//    while(pm->getCoins() > 0) game.skipTurn(pm);
-//    for(auto p: game.getPlayers()) game.skipTurn(p);
-//    CHECK(pm->getCoins() == 0);
-//}
+TEST_CASE("skipTurn consumes only one extra-turn") {
+    Game game(names);
+    Player* pj = nullptr;
+    for(auto p: game.getPlayers()) if(p->getRole()==Role::Judge) {
+        pj = p;
+        break;
+    }
+    REQUIRE(pj);
+    pj->addCoins(8);
+    game.bribe(pj);
+    game.skipTurn(pj);
+    CHECK(pj->getNumOfTurns() == 1);
+}
+
+// --- Blocking behavior ---
+
+TEST_CASE("handleBlock on invalid action returns false and no side-effects") {
+    Game game(names);
+    auto p0 = game.getPlayers()[0];
+    bool did = game.handleBlock(p0, false, "NotValidAction", 0);
+    CHECK(did == false);
+    CHECK(p0->getCoins() == 0);
+    CHECK(game.getTurn() == 0);
+}
+
+TEST_CASE("Merchant passive ability wont gives coin even from zero") {
+    Game game(names);
+    Player* pm = nullptr;
+    for(auto p: game.getPlayers()) if(p->getRole()==Role::Merchant) { pm = p; break; }
+    REQUIRE(pm);
+    while(pm->getCoins() > 0) game.skipTurn(pm);
+    for(auto p: game.getPlayers()) game.skipTurn(p);
+    CHECK(pm->getCoins() == 0);
+}

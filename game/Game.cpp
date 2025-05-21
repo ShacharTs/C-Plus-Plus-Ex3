@@ -151,17 +151,17 @@ const vector<Player *> &Game::getPlayers() const {
 }
 
 
-void Game::addCoins(Player *targetPlayer, const int amount) {
+void Game::addCoins(Player* targetPlayer, const int amount) {
     targetPlayer->addCoins(amount);
 }
 
 
-void Game::removeCoins(Player *targetPlayer, const int amount) {
+void Game::removeCoins(Player* targetPlayer, const int amount) {
     targetPlayer->removeCoins(amount);
 }
 
 
-bool Game::handleBlock(Player *blocker, bool didBlock, const std::string &actionName, int cost) {
+bool Game::handleBlock(Player* blocker, bool didBlock, const std::string &actionName, int cost) {
     if (!didBlock || !blocker) {
         return false;
     }
@@ -175,7 +175,7 @@ bool Game::handleBlock(Player *blocker, bool didBlock, const std::string &action
 }
 
 
-bool Game::handleActionBlock(Player *currentPlayer, ActionType action, Player *blocker) {
+bool Game::handleActionBlock(Player* currentPlayer, ActionType action, Player *blocker) {
     if (!blocker) return false;
     switch (action) {
         case ActionType::Tax:
