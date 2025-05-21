@@ -190,6 +190,11 @@ namespace coup {
          */
         void coup(Player* currentPlayer, Player* targetPlayer);
 
+        /**
+         * @brief Check if player has 10 coins, forcing a coup.
+         * @param currentPlayer Acting player
+         * @return True if the player must perform a coup
+         */
         bool forcedToCoup(const Player *currentPlayer);
 
         //------------------------------------------------------------------------
@@ -224,6 +229,12 @@ namespace coup {
          * @param players Vector of player pointers to update
          */
         void getRandomRole(std::vector<Player*>& players);
+
+        /**
+         * @brief When blocked, the player pays the cost, by the blocker's role and loses their turn.
+         * @param role player role
+         */
+        void playerPayAfterBlock(Role role);
     };
 
 } // namespace coup

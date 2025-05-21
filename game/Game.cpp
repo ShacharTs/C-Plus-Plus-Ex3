@@ -23,13 +23,7 @@ constexpr int BRIBE_COST     = 4;  ///< Coins required to perform a bribe
 constexpr int SANCTION_COST  = 3;  ///< Coins required to impose a sanction
 constexpr int FORCE_COUP     = 10; ///< Unused: threshold for forced coup
 
-/**
- * @brief Test-only factory: create a role instance by index.
- * @param index Role identifier (0..5)
- * @param name Player name for the new role
- * @return Pointer to a new Player subclass
- * @throws runtime_error if index is invalid
- */
+//----------------------------------------------------------------------------
 Player *createRoleByIndex(const size_t index, const string &name) {
     switch (index) {
         case 0: return new Governor(name);
@@ -43,10 +37,7 @@ Player *createRoleByIndex(const size_t index, const string &name) {
     }
 }
 
-/**
- * @brief Construct a Game with fixed roles assigned by index.
- * @param names Vector of player names
- */
+
 Game::Game(const vector<string> &names) {
     // Assign each player a specific role for testing
     for (size_t i = 0; i < names.size(); ++i) {
@@ -55,13 +46,8 @@ Game::Game(const vector<string> &names) {
     currentPlayerTurn = 0;  // Start with the first player
 }
 
-/**
- * @brief Create a random role instance for a given player name.
- * Uses high-quality C++11 random facilities.
- * @param name Player name
- * @return Pointer to a new Player subclass of a random type
- */
-Player *Game::createRandomRole(const std::string &name) {
+
+Player* Game::createRandomRole(const std::string &name) {
     static random_device rd;                         // Seed source
     static mt19937 gen(rd());                        // Mersenne Twister RNG
     static uniform_int_distribution<> dist(0, 5);    // Uniform distribution [0..5]
@@ -78,19 +64,14 @@ Player *Game::createRandomRole(const std::string &name) {
     }
 }
 
-/**
- * @brief Destructor: clean up all dynamically allocated players.
- */
+
 Game::~Game() {
     for (Player *&player : players) {
         delete player;
     }
 }
 
-/**
- * @brief Reassign random roles to an existing list of players.
- * @param players Vector of player pointers to update
- */
+
 void Game::getRandomRole(vector<Player *> &players) {
     srand(static_cast<unsigned>(time(nullptr)));
     for (Player *&p : players) {
@@ -110,17 +91,38 @@ void Game::getRandomRole(vector<Player *> &players) {
     }
 }
 
-/**
- * @brief Get a zero-based index of the current player's turn.
- * @return Current player turn index
- */
+void Game::playerPayAfterBlock(Role role) {
+    Player* current = players.at(currentPlayerTurn);
+   switch (role) {
+       case Role::Judge:
+           removeCoins(current,BRIBE_COST);
+           cout << "Judge blocked bribe" << endl;
+           nextTurn();
+           break;
+         case Role::Spy:
+           cout << "Spy blocked arrest" << endl;
+           nextTurn();
+           break;
+            case Role::General:
+           removeCoins(current,COUP_COST);
+           cout << "General blocked coup" << endl;
+           nextTurn();
+           break;
+         case Role::Governor:
+           cout << "Governor blocked tax" << endl;
+              nextTurn();
+           break;
+           default:
+           throw out_of_range("Invalid role: " + current->roleToString(role));
+   }
+}
+
+
 int Game::getTurn() {
     return currentPlayerTurn;
 }
 
-/**
- * @brief Advance to the next player's turn, resetting state flags.
- */
+
 void Game::nextTurn() {
     Player *current = players.at(currentPlayerTurn);
     current->resetPlayerTurn();   // Reset per-turn flags
@@ -128,9 +130,7 @@ void Game::nextTurn() {
     currentPlayerTurn = (getTurn() + 1) % players.size();
 }
 
-/**
- * @brief Continue turn if extra moves remain, else advance normally.
- */
+
 void Game::advanceTurnIfNeeded() {
     if(isGameOver(players)) {
         cout << "Game is over. No more turns." << endl;
@@ -145,40 +145,22 @@ void Game::advanceTurnIfNeeded() {
     }
 }
 
-/**
- * @brief Retrieve the list of active players.
- * @return Constant reference to player vector
- */
+
 const vector<Player *> &Game::getPlayers() const {
     return players;
 }
 
-/**
- * @brief Add coins to a specific player.
- * @param targetPlayer Player receiving coins
- * @param amount Number of coins to add
- */
+
 void Game::addCoins(Player *targetPlayer, const int amount) {
     targetPlayer->addCoins(amount);
 }
 
-/**
- * @brief Remove coins from a specific player.
- * @param targetPlayer Player losing coins
- * @param amount Number of coins to remove
- */
+
 void Game::removeCoins(Player *targetPlayer, const int amount) {
     targetPlayer->removeCoins(amount);
 }
 
-/**
- * @brief Handle a generic block, deducting cost and consuming turn.
- * @param blocker Player performing the block
- * @param didBlock Whether block condition is true
- * @param actionName Name of action for logging
- * @param cost Coin cost to block (default 0)
- * @return True if action was blocked
- */
+
 bool Game::handleBlock(Player *blocker, bool didBlock, const std::string &actionName, int cost) {
     if (!didBlock || !blocker) {
         return false;
@@ -192,13 +174,7 @@ bool Game::handleBlock(Player *blocker, bool didBlock, const std::string &action
     return true;
 }
 
-/**
- * @brief GUI-friendly block handler checking roles and costs.
- * @param currentPlayer Player performing the action
- * @param action Type of action to block
- * @param blocker Player attempting to block
- * @return True if block succeeded
- */
+
 bool Game::handleActionBlock(Player *currentPlayer, ActionType action, Player *blocker) {
     if (!blocker) return false;
     switch (action) {
@@ -234,11 +210,7 @@ bool Game::handleActionBlock(Player *currentPlayer, ActionType action, Player *b
     return false;
 }
 
-/**
- * @brief Get a list of valid target players (excluding current).
- * @param current Pointer to current player
- * @return Vector of pointers to other players
- */
+
 vector<Player *> Game::getListOfTargetPlayers(const Player *current) {
     vector<Player *> targets;
     for (Player *p : players) {
@@ -247,27 +219,17 @@ vector<Player *> Game::getListOfTargetPlayers(const Player *current) {
     return targets;
 }
 
-/**
- * @brief Force the current player to skip their turn.
- * @param currentPlayer Player to skip
- */
+
 void Game::skipTurn(Player *currentPlayer) {
     currentPlayer->playerUsedTurn();
 }
 
-/**
- * @brief Check if the current player has remaining turn.
- * @return True if the extra turn flag is set
- */
+
 bool Game::currentPlayerHasTurn() {
     return players.at(getTurn())->hasExtraTurn();
 }
 
-/**
- * @brief Gather action: collect default coins.
- * @param currentPlayer Acting player
- * @throws GatherError on illegal gather
- */
+
 void Game::gather(Player *currentPlayer) {
     if (players[currentPlayerTurn] != currentPlayer) {
         throw TurnError("It's not your turn.");
@@ -278,11 +240,7 @@ void Game::gather(Player *currentPlayer) {
     currentPlayer->gather();
 }
 
-/**
- * @brief Tax action: collect coins (role-specific amount).
- * @param currentPlayer Acting player
- * @throws TaxError on illegal tax
- */
+
 void Game::tax(Player *currentPlayer) {
     if (players[currentPlayerTurn] != currentPlayer) {
         throw TurnError("It's not your turn.");
@@ -294,11 +252,7 @@ void Game::tax(Player *currentPlayer) {
     currentPlayer->tax();
 }
 
-/**
- * @brief Bribe action: pay coins to gain an extra turn.
- * @param currentPlayer Acting player
- * @throws CoinsError or JudgeBlockBribeError on failure
- */
+
 void Game::bribe(Player *currentPlayer) {
     if (currentPlayer->getCoins() < BRIBE_COST) {
         throw CoinsError("Not enough coins for bribe.");
@@ -312,12 +266,7 @@ void Game::bribe(Player *currentPlayer) {
     currentPlayer->bribe();
 }
 
-/**
- * @brief Arrest action: steal a coin from a target player.
- * @param currentPlayer Acting player
- * @param targetPlayer Player to arrest
- * @throws ArrestTwiceInRow or ArrestError on invalid use
- */
+
 void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getLastArrestedPlayer() == targetPlayer) {
         throw ArrestTwiceInRow("Cannot arrest the same player twice");
@@ -331,12 +280,7 @@ void Game::arrest(Player *currentPlayer, Player *targetPlayer) {
     currentPlayer->arrest(targetPlayer);
 }
 
-/**
- * @brief Sanction action: impose a penalty on a target player.
- * @param currentPlayer Acting player
- * @param targetPlayer Player to sanction
- * @throws CoinsError if insufficient funds
- */
+
 void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getCoins() < SANCTION_COST) {
         throw CoinsError("Sanction failed: not enough coins.");
@@ -356,12 +300,7 @@ void Game::sanction(Player *currentPlayer, Player *targetPlayer) {
     }
 }
 
-/**
- * @brief Coup action: eliminate a target player at high cost.
- * @param currentPlayer Acting player
- * @param targetPlayer Player to eliminate
- * @throws CoinsError SelfError, or CoupBlocked on failure
- */
+
 void Game::coup(Player *currentPlayer, Player *targetPlayer) {
     if (currentPlayer->getCoins() < COUP_COST) {
         throw CoinsError("Coup failed: not enough coins.");
@@ -387,10 +326,6 @@ void Game::coup(Player *currentPlayer, Player *targetPlayer) {
     currentPlayer->playerUsedTurn();
 }
 
-    /**
-     * check if a player is forced to coup
-     * @param currentPlayer
-     */
     bool Game::forcedToCoup(const Player *currentPlayer) {
     if (currentPlayer->getCoins() >= FORCE_COUP) {
         return true;
@@ -398,19 +333,12 @@ void Game::coup(Player *currentPlayer, Player *targetPlayer) {
     return false;
 }
 
-/**
- * @brief Get the name of the player whose turn it is.
- * @return Current player's name
- */
+
 string Game::turn() {
     return players.at(getTurn())->getName();
 }
 
-/**
- * @brief Determine the winner when only one player remains.
- * @return Winner's name
- * @throws logic_error if the game is not over
- */
+
 string Game::winner() const {
     if (players.size() == 1) {
         return players.at(0)->getName();
@@ -418,11 +346,7 @@ string Game::winner() const {
     throw GameOverError("Game not finished yet.");
 }
 
-/**
- * @brief Check if a player had an extra turn and consume it.
- * @param currentPlayer Player to check
- * @return True if extra turn was consumed
- */
+
 bool consumeExtraTurn(Player *currentPlayer) {
     if (currentPlayer->hasExtraTurn()) {
         currentPlayer->playerUsedTurn();
@@ -432,11 +356,7 @@ bool consumeExtraTurn(Player *currentPlayer) {
     return false;
 }
 
-/**
- * @brief Check if the game is over (one player left) and log the outcome.
- * @param players Vector of active players
- * @return True if the game ended
- */
+
 bool Game::isGameOver(const vector<Player *>& players) {
     if (players.size() == 1) {
         cout << "\n========= GAME OVER =========\n";
@@ -446,11 +366,7 @@ bool Game::isGameOver(const vector<Player *>& players) {
     return false;
 }
 
-/**
- * @brief Handle various game exceptions and log appropriate errors.
- * @param e Exception reference
- * @return True if error is recoverable
- */
+
 bool Game::handleException(const exception &e) {
     if (dynamic_cast<const MerchantError*>(&e))
         cerr << "[Merchant Error] " << e.what() << endl;
