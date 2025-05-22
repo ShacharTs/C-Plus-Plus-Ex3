@@ -16,6 +16,9 @@ GameFrame::GameFrame(const std::vector<std::string>& names)
     // --- Game Tab ---
     auto* gamePanel = new GamePanel(notebook, names);
     gamePanel->SetMinSize(wxSize(864, 576));
+    gamePanel->SetMaxSize(wxSize(864, 576));
+    gamePanel->SetSize(wxSize(864, 576));
+
     notebook->AddPage(gamePanel, "Game");
 
     // --- How to Play Tab ---
@@ -48,6 +51,7 @@ GameFrame::GameFrame(const std::vector<std::string>& names)
     SetClientSize(864, 576);
     Centre();
     Show();
+
 
     notebook->ChangeSelection(1);
     Update();

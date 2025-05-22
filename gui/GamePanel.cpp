@@ -578,60 +578,6 @@ bool GamePanel::HandleCoup(const wxPoint &pt, Player *cur) {
     return true;
 }
 
-
-// //------------------------------------------------------------------------------
-// // 7) Arrest / Sanction / Coup
-// //------------------------------------------------------------------------------
-// bool GamePanel::HandleTargeted(const wxPoint &pt, Player *cur) {
-//     bool isArrest = btnArrestRect.Contains(pt);
-//     bool isSanction = btnSanctionRect.Contains(pt);
-//     bool isCoup = btnCoupRect.Contains(pt);
-//     if (!(isArrest || isSanction || isCoup)) return false;
-//
-//     wxArrayString names;
-//     auto targets = game.getListOfTargetPlayers(cur);
-//     for (auto *p: targets) names.Add(p->getName());
-//
-//     wxString title = isArrest
-//                          ? "Choose target to arrest"
-//                          : isSanction
-//                                ? "Choose target to sanction"
-//                                : "Choose target to coup";
-//
-//     wxSingleChoiceDialog dlg(this, title, "Target", names);
-//     if (dlg.ShowModal() != wxID_OK) return true;
-//     Player *tgt = targets[dlg.GetSelection()];
-//
-//     if (isArrest) {
-//         Player *blocker = AskBlock(Role::Spy, "arrest");
-//         if (game.handleBlock(blocker, blocker != nullptr, "arrest", 0)) {
-//             game.advanceTurnIfNeeded();
-//             RefreshUI();
-//             return true;
-//         }
-//         PlaySound(SoundEffect::Arrest);
-//         game.arrest(cur, tgt);
-//     } else if (isSanction) {
-//         PlaySound(SoundEffect::Sanction);
-//         game.sanction(cur, tgt);
-//     } else {
-//         // Coup
-//         Player *blocker = AskBlock(Role::General, "coup", 5);
-//         if (game.handleBlock(blocker, blocker != nullptr, "coup", 5)) {
-//             game.advanceTurnIfNeeded();
-//             RefreshUI();
-//             return true;
-//         }
-//         PlaySound(SoundEffect::CoupKick);
-//         game.coup(cur, tgt);
-//     }
-//
-//     game.advanceTurnIfNeeded();
-//     RefreshUI();
-//     return true;
-// }
-
-
 //------------------------------------------------------------------------------
 // Mouse motion handler: change cursor when hovering buttons
 //------------------------------------------------------------------------------
