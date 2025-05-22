@@ -11,8 +11,8 @@
 class GamePanel : public wxPanel {
 public:
     enum class SoundEffect {
-        GatherCoin,
-        TaxCoin,
+        //GatherCoin,
+       // TaxCoin,
         Victory,
         CoupKick,
         Skip,
@@ -89,8 +89,6 @@ private:
     // Convert enum → filename
     static wxString EffectToFilename(SoundEffect effect) {
         switch (effect) {
-            case SoundEffect::GatherCoin: return "gather_coin.wav";
-            case SoundEffect::TaxCoin: return "tax_coin.wav";
             case SoundEffect::Victory: return "player_winner.wav";
             case SoundEffect::CoupKick: return "coup_kick.wav";
             case SoundEffect::Arrest: return "arrest.wav";

@@ -50,8 +50,8 @@ GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names)
     // Pre-load all sounds into memory
     // ——————————————
     for (auto effect: {
-             SoundEffect::GatherCoin,
-             SoundEffect::TaxCoin,
+             // SoundEffect::GatherCoin,
+             // SoundEffect::TaxCoin,
              SoundEffect::Victory,
              SoundEffect::CoupKick,
              SoundEffect::Arrest,
@@ -364,7 +364,7 @@ bool GamePanel::HandleGather(const wxPoint &pt, Player *cur) {
     if (!btnGatherRect.Contains(pt)) return false;
 
     try {
-        PlaySound(SoundEffect::GatherCoin);
+        //PlaySound(SoundEffect::GatherCoin);
         game.gather(cur);
     }
     catch (const std::exception &e) {
@@ -388,14 +388,14 @@ bool GamePanel::HandleTax(const wxPoint &pt, Player *cur) {
 
         // Give the Governor a chance to block
         if (AskBlock(Role::Governor, "tax")) {
-            PlaySound(SoundEffect::TaxCoin);
+            //PlaySound(SoundEffect::TaxCoin);
             game.playerPayAfterBlock(Role::Governor);
             RefreshUI();
             return true;
         }
 
         // If not blocked, perform the tax as normal
-        PlaySound(SoundEffect::TaxCoin);
+        //PlaySound(SoundEffect::TaxCoin);
         game.tax(cur);
 
         game.advanceTurnIfNeeded();
@@ -417,7 +417,7 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     // First, give the Judge a chance to block
     if (AskBlock(Role::Judge, "bribe")) {
         // Blocked! Handle loss of coins and turn using your helper
-        //PlaySound(SoundEffect::Bribe);
+        PlaySound(SoundEffect::Bribe);
         game.playerPayAfterBlock(Role::Judge); // Removes coins, advances turn, prints, etc.
         RefreshUI();
         return true;
