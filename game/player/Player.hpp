@@ -1,4 +1,5 @@
 #pragma once
+#include "roleHeader/Role.hpp"
 
 #include <string>
 namespace coup {
@@ -9,15 +10,15 @@ namespace coup {
  * @enum Role
  * @brief Enumerates all possible roles a player may assume.
  */
-enum class Role {
-    Governor,  ///< Role specializing in taxation
-    Spy,       ///< Role specializing in blocking arrests
-    Baron,     ///< Role specializing in coin management
-    General,   ///< Role specializing in defense
-    Judge,     ///< Role specializing in blocking bribes
-    Merchant,  ///< Role specializing in trade
-    Unknown    ///< Default uninitialized role
-};
+// enum class Role {
+//     Governor,  ///< Role specializing in taxation
+//     Spy,       ///< Role specializing in blocking arrests
+//     Baron,     ///< Role specializing in coin management
+//     General,   ///< Role specializing in defense
+//     Judge,     ///< Role specializing in blocking bribes
+//     Merchant,  ///< Role specializing in trade
+//     Unknown    ///< Default uninitialized role
+// };
 
 /**
  * @class Player
@@ -50,6 +51,8 @@ public:
      * @param playerName Name identifier for the player
      */
     explicit Player(std::string playerName);
+
+    virtual Player* clone() const;
 
     /**
      * @brief Virtual destructor for proper cleanup in derived classes.

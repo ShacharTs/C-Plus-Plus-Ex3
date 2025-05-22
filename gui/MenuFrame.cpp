@@ -1,4 +1,5 @@
 #include "MenuFrame.h"
+#include "GameFrame.h"
 #include "MenuPanel.h"
 #include "GamePanel.h"
 
@@ -11,10 +12,12 @@ MenuFrame::MenuFrame()
     Show();
 }
 
+
 void MenuFrame::StartGame(const std::vector<std::string>& names) {
-    DestroyChildren();                  // remove MenuPanel
-    auto* panel = new GamePanel(this, names);
-    SetClientSize(864, 576);            // match panel size
-    SetTitle("Coup Game");
-    Centre();
+    // Remove the old panel and open the new game frame
+    auto* gameFrame = new GameFrame(names);
+    gameFrame->Show();
+
+    Close(); // or Destroy(); to close the menu window
 }
+

@@ -6,6 +6,10 @@
 Spy::Spy(const std::string &name) : Player(name) {
     role = Role::Spy;
 }
+Player* Spy::clone() const {
+    return new Spy(*this);
+}
+
 
 std::string Spy::getCoinReport(const coup::Game& game) {
     std::string output = "\n=== Players coins ===\n";

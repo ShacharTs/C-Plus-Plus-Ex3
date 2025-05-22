@@ -8,4 +8,6 @@ public:
     void passiveAbility() override;
 
     void listOptions() const override;
+    Player* clone() const override;
+
 };

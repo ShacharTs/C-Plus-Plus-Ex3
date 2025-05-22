@@ -22,7 +22,8 @@ public:
         // …add more as needed
     };
 
-    GamePanel(wxFrame *parent, const std::vector<std::string> &names);
+    //GamePanel(wxFrame *parent, const std::vector<std::string> &names);
+    GamePanel(wxWindow *parent, const std::vector<std::string> &names);
 
     ~GamePanel() = default;
 
@@ -100,5 +101,9 @@ private:
         }
     }
 
+public:
+    Player* getCurrentPlayer() {
+        return game.getPlayers()[game.getTurn()];
+    }
     wxDECLARE_EVENT_TABLE();
 };

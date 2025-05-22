@@ -6,6 +6,10 @@
 General::General(const std::string& name) :Player(name) {
     role = Role::General;
 }
+Player* General::clone() const {
+    return new General(*this);
+}
+
 
 void General::listOptions() const {
     printPlayerStats();

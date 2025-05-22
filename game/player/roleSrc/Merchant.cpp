@@ -5,6 +5,11 @@ Merchant::Merchant(const std::string &name) : Player(name) {
     role = Role::Merchant;
 }
 
+Player* Merchant::clone() const {
+    return new Merchant(*this);
+}
+
+
 void Merchant::passiveAbility() {
         addCoins(1);
 }

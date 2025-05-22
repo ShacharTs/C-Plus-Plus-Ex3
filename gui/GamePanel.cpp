@@ -5,6 +5,8 @@
 #include <map>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
+
+#include "GameFrame.h"
 #include "../game/player/roleHeader/Spy.hpp"
 
 
@@ -25,7 +27,10 @@ static std::chrono::steady_clock::time_point lastClickTime;
 //------------------------------------------------------------------------------
 // Constructor: sets up panel, loads font, background, and button positions
 //------------------------------------------------------------------------------
-GamePanel::GamePanel(wxFrame *parent, const std::vector<std::string> &names)
+// GamePanel::GamePanel(wxFrame *parent, const std::vector<std::string> &names)
+//     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(864, 576))
+//       , game(names) {
+GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(864, 576))
       , game(names) {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
@@ -67,6 +72,7 @@ GamePanel::GamePanel(wxFrame *parent, const std::vector<std::string> &names)
             wxLogError("Missing sound at startup: %s", file.GetFullPath());
         }
     }
+    RefreshUI();
 }
 
 
@@ -87,9 +93,9 @@ void GamePanel::UpdateRoleWindow() {
     switch (role) {
         case Role::Governor: path = "assets/roles/roles_stand/governor.png";
             break;
-        case Role::Spy: path = "assets/roles/roles_stand/spy.png";
+        case Role::Spy: path = "assets/roles/roles_stand/Spy.png";
             break;
-        case Role::Baron: path = "assets/roles/roles_stand/baron.png";
+        case Role::Baron: path = "assets/roles/roles_stand/Baron.png";
             break;
         case Role::General: path = "assets/roles/roles_stand/general.png";
             break;
@@ -171,6 +177,15 @@ void GamePanel::RefreshUI() {
     }
     UpdateRoleWindow();
     InitializeButtons();
+
+
+    GameFrame* frame = dynamic_cast<GameFrame*>(GetParent()->GetParent());
+    if (frame) {
+        Player* current = game.getPlayers()[game.getTurn()];
+        frame->UpdateHowToPlayImage(current->getRole());
+    }
+
+
     Refresh();
 }
 

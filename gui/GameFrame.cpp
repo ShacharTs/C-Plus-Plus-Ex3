@@ -1,18 +1,86 @@
 #include "GameFrame.h"
 #include "GamePanel.h"
+#include <wx/notebook.h>
+#include "../game/Game.hpp"
 
+// Constructor
 GameFrame::GameFrame(const std::vector<std::string>& names)
     : wxFrame(nullptr, wxID_ANY, "Coup Game",
               wxDefaultPosition, wxDefaultSize,
-              wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
+              wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
+      instructions_(nullptr)
+
 {
-    auto* panel = new GamePanel(this, names);
-    panel->SetMinSize(wxSize(864, 576));  // ensure layout respects panel size
-    auto* sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(panel, 1, wxEXPAND);
-    SetSizer(sizer);
+    wxNotebook* notebook = new wxNotebook(this, wxID_ANY);
+
+    // --- Game Tab ---
+    auto* gamePanel = new GamePanel(notebook, names);
+    gamePanel->SetMinSize(wxSize(864, 576));
+    notebook->AddPage(gamePanel, "Game");
+
+    // --- How to Play Tab ---
+    wxPanel* howToPanel = new wxPanel(notebook);
+    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+    // Use a default placeholder image for now
+    instructions_ = new wxStaticBitmap(
+        howToPanel, wxID_ANY, wxBitmap("assets/roles/Spy.png", wxBITMAP_TYPE_PNG)
+    );
+    sizer->Add(instructions_, 1, wxALL | wxEXPAND, 30);
+    howToPanel->SetSizer(sizer);
+    notebook->AddPage(howToPanel, "How to Play");
+
+    Player* player = gamePanel->getCurrentPlayer();
+
+    Role role = player->getRole();
+    // --- Immediately show the correct image for the first role ---
+    if (gamePanel && player) {
+        UpdateHowToPlayImage(role);
+        instructions_->Refresh();
+        instructions_->Update();
+        instructions_->GetParent()->Layout();
+    }
+
+    // --- Layout Notebook in Frame ---
+    auto* frameSizer = new wxBoxSizer(wxVERTICAL);
+    frameSizer->Add(notebook, 1, wxEXPAND);
+    SetSizer(frameSizer);
     SetClientSize(864, 576);
     Centre();
     Show();
+
+    notebook->ChangeSelection(1);
+    Update();
+    notebook->ChangeSelection(0);
 }
 
+// Update the "How to Play" image according to the role
+void GameFrame::UpdateHowToPlayImage(Role role) {
+    wxBitmap img;
+    switch (role) {
+        case Role::Spy:
+            img.LoadFile("assets/roles/Spy.png", wxBITMAP_TYPE_PNG); // add file later
+            break;
+        case Role::Baron:
+            img.LoadFile("assets/roles/Baron.png", wxBITMAP_TYPE_PNG);
+            break;
+        case Role::General:
+            img.LoadFile("assets/roles/General.png", wxBITMAP_TYPE_PNG);
+            break;
+        case Role::Governor:
+            img.LoadFile("assets/roles/Governor.png", wxBITMAP_TYPE_PNG);
+            break;
+        case Role::Judge:
+            img.LoadFile("assets/roles/Judge.png", wxBITMAP_TYPE_PNG);
+            break;
+        case Role::Merchant:
+            img.LoadFile("assets/roles/merchant.png", wxBITMAP_TYPE_PNG);
+            break;
+    }
+    if (instructions_ && img.IsOk()) {
+        instructions_->SetBitmap(img);
+        instructions_->Refresh();
+        instructions_->Update();
+        instructions_->GetParent()->Layout();
+    }
+}

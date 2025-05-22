@@ -6,6 +6,11 @@ Judge::Judge(const std::string &name) : Player(name) {
     role = Role::Judge;
 }
 
+Player* Judge::clone() const {
+    return new Judge(*this);
+}
+
+
 
 void Judge::passiveAbility(Player* target) {
     target->removeCoins(1);

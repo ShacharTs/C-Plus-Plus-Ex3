@@ -8,4 +8,6 @@ public:
     void tax() override;
 
     void listOptions() const override;
+    Player* clone() const override;
+
 };

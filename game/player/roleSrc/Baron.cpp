@@ -5,6 +5,11 @@ Baron::Baron(const std::string &name) : Player(name) {
     role = Role::Baron;
 }
 
+Player* Baron::clone() const {
+    return new Baron(*this);
+}
+
+
 
 void Baron::useAbility(coup::Game &game) {
     try {

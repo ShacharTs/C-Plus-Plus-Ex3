@@ -1,32 +1,46 @@
 1. Initial roles assigned correctly via Game constructor
-2. Gather and Tax increase coins and consume turn
-3. Bribe grants extra turn and cost deducted
-4. Arrest steals coin and records last arrested
-5. Sanction deducts cost and disables target gather/tax
-6. Coup removes target and costs coins
-7. Role abilities execute without throwing
-8. Game over and winner detection
-9. Exception handling flags recoverable errors
-10. Spy ability grants extra turn
-11. Judge passive ability penalizes target
-12. Merchant passive ability gives extra coin each turn
-13. Self-sanction should throw
-14. Sanction with insufficient funds throws
-15. Self-coup should throw
-16. Coup with insufficient funds throws
-17. Double-tax not allowed
-18. handleBlock deducts cost & consumes turn
-19. handleBlock returns false if didBlock is false
-20. handleActionBlock blocks Tax by Governor
-21. handleActionBlock blocks Bribe by Judge
-22. handleActionBlock blocks Arrest by Spy
-23. handleActionBlock blocks Coup by General
-24. handleActionBlock returns false for wrong role
-25. getListOfTargetPlayers excludes current
-26. nextTurn resets gather/tax flags
-27. skipTurn consumes extra turn
-28.skipTurn without extra-turn consumes default turn
-29.advanceTurnIfNeeded advances turn when no extra-turn
-30.advanceTurnIfNeeded with extra-turn does not advance
-31.Sanction against Judge applies retaliation penalty
-32.
+2. Gather increase coins and consume turn
+3. Tax increase coins and consume turn
+4. Bribe grants extra turn and cost deducted
+5. Arrest steals coin and records last arrested
+6. Sanction deducts cost and disables target gather/tax
+7. Coup removes target and costs coins
+8. Role abilities execute without throwing
+9. Game over and winner detection
+10. Exception handling flags recoverable errors
+11. Spy ability grants extra turn
+12. Judge passive ability penalizes target
+13. Merchant passive ability gives extra coin each turn
+14. Self-sanction should throw
+15. Sanction with insufficient funds throws
+16. Self-coup should throw
+17. Coup with insufficient funds throws
+18. Double-tax not allowed
+19. handleBlock deducts cost & consumes turn
+20. handleBlock returns false if didBlock is false
+21. handleActionBlock blocks Tax by Governor
+22. handleActionBlock blocks Bribe by Judge
+23. handleActionBlock blocks Arrest by Spy
+24. handleActionBlock blocks Coup by General
+25. handleActionBlock returns false for wrong role
+26. getListOfTargetPlayers excludes current
+27. nextTurn resets gather/tax flags
+28. skipTurn consumes extra turn
+29. skipTurn without extra-turn consumes default turn
+30. advanceTurnIfNeeded advances turn when no extra-turn
+31. advanceTurnIfNeeded with extra-turn does not advance
+32. Sanction against Judge applies retaliation penalty
+33. Action out of turn throws TaxError
+34. skipTurn without extra-turn consumes turn
+35. Game over returns correct winner
+36. Calling winner() too early throws
+37. Coup removes player and getListOfTargetPlayers skips victim; nextTurn wraps
+38. Double-sanction allowed, still effective
+39. Gather/tax blocked by sanction throws GatherError/TaxError
+40. Sanction lifts after next full cycle
+41. General's wont have discounted coup exactly 5 coins
+42. Baron's exchange respects bounds
+43. Multiple bribes accumulate extra-turns
+44. skipTurn consumes only one extra-turn
+45. handleBlock on invalid action returns false and no side-effects
+46. Merchant passive ability wont gives coin even from zero

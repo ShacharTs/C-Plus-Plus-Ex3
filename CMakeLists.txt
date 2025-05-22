@@ -36,6 +36,8 @@ set(SOURCES
         game/player/roleSrc/Baron.cpp game/player/roleSrc/General.cpp
         game/player/roleSrc/Governor.cpp game/player/roleSrc/Judge.cpp
         game/player/roleSrc/Merchant.cpp game/player/roleSrc/Spy.cpp
+        test/test.cpp
+        game/player/roleHeader/role.hpp
 )
 
 # Define the executable

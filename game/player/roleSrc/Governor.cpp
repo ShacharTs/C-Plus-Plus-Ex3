@@ -7,6 +7,10 @@ Governor::Governor(const std::string& name) :Player(name) {
     role = Role::Governor;
 }
 
+Player* Governor::clone() const {
+    return new Governor(*this);
+}
+
 
 void Governor::tax() {
     addCoins(3);

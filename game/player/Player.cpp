@@ -16,10 +16,15 @@ Player::Player(string playerName)
     : playerName(std::move(playerName)) {
 }
 
+Player * Player::clone() const {
+}
+
+
 /**
  * @brief Default virtual destructor for Player.
  */
-Player::~Player() = default;
+Player::~Player() {}
+
 
 //------------------------------------------------------------------------------
 // Role Abilities (to be overridden by subclasses)
