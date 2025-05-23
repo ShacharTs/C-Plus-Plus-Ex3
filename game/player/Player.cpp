@@ -28,33 +28,6 @@ Player::~Player() {
 
 
 //------------------------------------------------------------------------------
-// Role Abilities (to be overridden by subclasses)
-//------------------------------------------------------------------------------
-
-/**
- * @brief Execute the player's active role-specific ability.
- * @param game Reference to the current Game context.
- */
-// void Player::useAbility(coup::Game &game) {
-//     // Default: no-op (override in derived roles)
-// }
-
-/**
- * @brief Execute the player's passive ability without a target.
- */
-// void Player::passiveAbility() {
-//     // Default: no-op (override in derived roles)
-// }
-
-/**
- * @brief Execute the player's passive ability on a target.
- * @param target The player affected by passive ability.
- */
-// void Player::passiveAbility(Player *target) {
-//     // Default: no-op (override in derived roles)
-// }
-
-//------------------------------------------------------------------------------
 // Accessors
 //------------------------------------------------------------------------------
 
