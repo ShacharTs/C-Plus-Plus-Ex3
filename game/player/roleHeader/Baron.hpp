@@ -2,7 +2,7 @@
 
 #include "../Player.hpp"
 #include "../../Game.hpp"
-class Baron final : public Player {
+class Baron final : public virtual Player {
 public:
     explicit Baron(const std::string& name);
 

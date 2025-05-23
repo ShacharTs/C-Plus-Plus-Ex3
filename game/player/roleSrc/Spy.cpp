@@ -3,9 +3,10 @@
 #include <iostream>
 #include <stdexcept>
 
-Spy::Spy(const std::string &name) : Player(name) {
+Spy::Spy(const std::string &name): Player(name) {
     role = Role::Spy;
 }
+
 Player* Spy::clone() const {
     return new Spy(*this);
 }

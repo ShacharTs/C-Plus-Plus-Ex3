@@ -1,7 +1,7 @@
 #pragma once
 #include "../Player.hpp"
 
-class Merchant final :public Player {
+class Merchant final :public virtual Player {
 public:
     explicit Merchant(const std::string& name);
 

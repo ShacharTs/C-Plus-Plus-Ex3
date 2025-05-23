@@ -2,7 +2,7 @@
 #include "../Player.hpp"
 #include "../../Game.hpp"
 
-class Spy final : public Player {
+class Spy : public virtual Player {
 public:
     explicit  Spy(const std::string& name);
 

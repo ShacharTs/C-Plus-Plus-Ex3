@@ -496,7 +496,7 @@ bool GamePanel::HandleAbility(const wxPoint &pt, Player *cur, Role role) {
 
     switch (role) {
         case Role::Spy: {
-            Spy *spy = static_cast<Spy *>(cur);
+            Spy *spy = dynamic_cast<Spy *>(cur); // Down-casting to spy to get coin report
             wxString msg = spy->getCoinReport(game);
             wxMessageDialog dlg(this, msg, "Coins Report",
                                 wxOK | wxICON_INFORMATION);
