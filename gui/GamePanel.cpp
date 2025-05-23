@@ -416,27 +416,32 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
 
     // First, give the Judge a chance to block
     if (AskBlock(Role::Judge, "bribe")) {
-        // Blocked! Handle loss of coins and turn using your helper
-        PlaySound(SoundEffect::Bribe);
-        game.playerPayAfterBlock(Role::Judge); // Removes coins, advances turn, prints, etc.
+        try {
+            game.playerPayAfterBlock(Role::Judge);  // May throw!
+            //PlaySound(SoundEffect::Bribe);
+        } catch (const std::exception &e) {
+            wxLogWarning("Judge block failed: %s", e.what());
+            return true;
+        }
         RefreshUI();
         return true;
     }
 
+
     // If not blocked, try to perform the bribe as normal
     try {
-        PlaySound(SoundEffect::Bribe);
-        game.bribe(cur); // May throw CoinsError
-    }
-    catch (const std::exception &e) {
+        game.bribe(cur);  // <-- Attempt the action
+        PlaySound(SoundEffect::Bribe);  // <-- Play sound ONLY if no exception
+    } catch (const std::exception &e) {
         wxLogWarning("%s", e.what());
-        return true; // Swallow the click so user can try again
+        return true;
     }
 
     game.advanceTurnIfNeeded();
     RefreshUI();
     return true;
 }
+
 
 
 

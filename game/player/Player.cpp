@@ -16,14 +16,15 @@ Player::Player(string playerName)
     : playerName(std::move(playerName)) {
 }
 
-Player * Player::clone() const {
+Player *Player::clone() const {
 }
 
 
 /**
  * @brief Default virtual destructor for Player.
  */
-Player::~Player() {}
+Player::~Player() {
+}
 
 
 //------------------------------------------------------------------------------
@@ -93,13 +94,13 @@ void Player::resetPlayerTurn() {
  */
 string Player::roleToString(const Role role) {
     switch (role) {
-        case Role::Governor:  return "Governor";
-        case Role::Spy:       return "Spy";
-        case Role::Baron:     return "Baron";
-        case Role::General:   return "General";
-        case Role::Judge:     return "Judge";
-        case Role::Merchant:  return "Merchant";
-        default:              return "Unknown";
+        case Role::Governor: return "Governor";
+        case Role::Spy: return "Spy";
+        case Role::Baron: return "Baron";
+        case Role::General: return "General";
+        case Role::Judge: return "Judge";
+        case Role::Merchant: return "Merchant";
+        default: return "Unknown";
     }
 }
 
@@ -109,7 +110,7 @@ string Player::roleToString(const Role role) {
 void Player::printPlayerStats() const {
     cout << "\n--- Turn: " << getName() << " ---" << endl;
     cout << "Coins: " << getCoins() << endl;
-    cout << "Role: "  << roleToString(getRole()) << endl;
+    cout << "Role: " << roleToString(getRole()) << endl;
 }
 
 /**
@@ -118,15 +119,15 @@ void Player::printPlayerStats() const {
 void Player::listOptions() const {
     printPlayerStats();
     cout << "Choose an action:\n"
-         << "1. Gather\n"
-         << "2. Tax\n"
-         << "3. Bribe\n"
-         << "4. Arrest\n"
-         << "5. Sanction\n"
-         << "6. Coup\n"
-         << "7. Use Ability\n"
-         << "0. Skip Turn\n"
-         << "Enter choice: ";
+            << "1. Gather\n"
+            << "2. Tax\n"
+            << "3. Bribe\n"
+            << "4. Arrest\n"
+            << "5. Sanction\n"
+            << "6. Coup\n"
+            << "7. Use Ability\n"
+            << "0. Skip Turn\n"
+            << "Enter choice: ";
 }
 
 //------------------------------------------------------------------------------
@@ -167,11 +168,11 @@ bool Player::hasExtraTurn() const {
 // Ability Flag Queries
 //------------------------------------------------------------------------------
 
-bool Player::isGatherAllow() const  { return canGather; }
-bool Player::isTaxAllow() const     { return canTax; }
-bool Player::isBribeAllow() const   { return canBribe; }
-bool Player::isArrestAllow() const  { return canArrest; }
-bool Player::isCoupAllow() const    { return canCoup; }
+bool Player::isGatherAllow() const { return canGather; }
+bool Player::isTaxAllow() const { return canTax; }
+bool Player::isBribeAllow() const { return canBribe; }
+bool Player::isArrestAllow() const { return canArrest; }
+bool Player::isCoupAllow() const { return canCoup; }
 bool Player::isCoupShieldActive() const { return coupShield; }
 
 //------------------------------------------------------------------------------
@@ -216,14 +217,20 @@ void Player::arrest(Player *targetPlayer) {
     if (isTargetSelf(targetPlayer)) {
         throw SelfError("You cannot arrest yourself.");
     }
-    if (targetPlayer->getRole() == Role::General) {
-        playerUsedTurn();
-        setLastArrestedPlayer(targetPlayer);
-        throw ArrestError("Coin stole from General. Action cancelled.");
+    if (targetPlayer->getRole() == Role::Merchant) {
+        try {
+            targetPlayer->removeCoins(2);
+            playerUsedTurn();
+            setLastArrestedPlayer(targetPlayer);
+        } catch (const exception &e) {
+            throw ArrestError(string("Arrest failed: ") + e.what());
+        }
     }
     try {
         targetPlayer->removeCoins(1);
         addCoins(1);
+        playerUsedTurn();
+        setLastArrestedPlayer(targetPlayer);
     } catch (const exception &e) {
         throw ArrestError(string("Arrest failed: ") + e.what());
     }
@@ -241,7 +248,7 @@ void Player::sanction(Player *target) {
     }
     removeCoins(3);
     target->canGather = false;
-    target->canTax    = false;
+    target->canTax = false;
     playerUsedTurn();
 }
 
@@ -303,6 +310,6 @@ int Player::getNumOfTurns() {
  */
 void Player::removeDebuff() {
     canGather = true;
-    canTax    = true;
+    canTax = true;
     canArrest = true;
 }

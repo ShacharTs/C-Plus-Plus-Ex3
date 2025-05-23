@@ -27,9 +27,15 @@ GameFrame::GameFrame(const std::vector<std::string>& names)
 
     // Use a default placeholder image for now
     instructions_ = new wxStaticBitmap(
-        howToPanel, wxID_ANY, wxBitmap("assets/roles/Spy.png", wxBITMAP_TYPE_PNG)
-    );
-    sizer->Add(instructions_, 1, wxALL | wxEXPAND, 30);
+    howToPanel, wxID_ANY,
+    wxBitmap("assets/roles/Spy.png", wxBITMAP_TYPE_PNG),
+    wxDefaultPosition,
+    wxSize(864, 576) // enforce correct size
+);
+
+    // Center it in the panel without expansion
+    sizer->Add(instructions_, 0, wxALIGN_CENTER | wxALL, 0);
+
     howToPanel->SetSizer(sizer);
     notebook->AddPage(howToPanel, "How to Play");
 
@@ -63,22 +69,22 @@ void GameFrame::UpdateHowToPlayImage(Role role) {
     wxBitmap img;
     switch (role) {
         case Role::Spy:
-            img.LoadFile("assets/roles/Spy.png", wxBITMAP_TYPE_PNG); // add file later
+            img.LoadFile("assets/roles/roles_howToPlay/Spy_How_To_Play.png", wxBITMAP_TYPE_PNG); // add file later
             break;
         case Role::Baron:
-            img.LoadFile("assets/roles/Baron.png", wxBITMAP_TYPE_PNG);
+            img.LoadFile("assets/roles/roles_howToPlay/Baron_How_To_Play.png", wxBITMAP_TYPE_PNG);
             break;
         case Role::General:
-            img.LoadFile("assets/roles/General.png", wxBITMAP_TYPE_PNG);
+            img.LoadFile("assets/roles/roles_howToPlay/General_How_To_Play.png", wxBITMAP_TYPE_PNG);
             break;
         case Role::Governor:
-            img.LoadFile("assets/roles/Governor.png", wxBITMAP_TYPE_PNG);
+            img.LoadFile("assets/roles/roles_howToPlay/Governor_How_To_Play.png", wxBITMAP_TYPE_PNG);
             break;
         case Role::Judge:
-            img.LoadFile("assets/roles/Judge.png", wxBITMAP_TYPE_PNG);
+            img.LoadFile("assets/roles/roles_howToPlay/Judge_How_To_Play.png", wxBITMAP_TYPE_PNG);
             break;
         case Role::Merchant:
-            img.LoadFile("assets/roles/merchant.png", wxBITMAP_TYPE_PNG);
+            img.LoadFile("assets/roles/roles_howToPlay/Merchant_How_To_Play.png", wxBITMAP_TYPE_PNG);
             break;
     }
     if (instructions_ && img.IsOk()) {
