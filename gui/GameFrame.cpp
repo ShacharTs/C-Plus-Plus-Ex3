@@ -28,7 +28,7 @@ GameFrame::GameFrame(const std::vector<std::string>& names)
     // Use a default placeholder image for now
     instructions_ = new wxStaticBitmap(
     howToPanel, wxID_ANY,
-    wxBitmap("assets/roles/Spy.png", wxBITMAP_TYPE_PNG),
+    wxBitmap("assets/roles/roles_howToPlay/Spy_How_To_Play.png", wxBITMAP_TYPE_PNG),
     wxDefaultPosition,
     wxSize(864, 576) // enforce correct size
 );
