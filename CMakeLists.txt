@@ -38,7 +38,6 @@ set(SOURCES
         game/player/roleSrc/Merchant.cpp game/player/roleSrc/Spy.cpp
         test/test.cpp
         game/player/roleHeader/role.hpp
-        test/test.cpp
 )
 
 # Define the executable
@@ -49,5 +48,9 @@ target_include_directories(CoupGame PRIVATE ${WX_INCLUDE_DIRS})
 target_compile_options(CoupGame PRIVATE ${WX_CXXFLAGS_LIST})
 target_link_libraries(CoupGame ${WX_LIBS})
 
-find_package(SFML 2 REQUIRED COMPONENTS audio)
-target_link_libraries(CoupGame ${SFML_LIBRARIES})
+set(SFML_DIR "C:/msys64/mingw64/lib/cmake/SFML")
+find_package(SFML REQUIRED COMPONENTS graphics window system)
+target_link_libraries(CoupGame sfml-graphics sfml-window sfml-system)
+
+
+
