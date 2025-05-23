@@ -14,6 +14,15 @@ void Merchant::passiveAbility() {
         addCoins(1);
 }
 
+void Merchant::passiveAbility(Player *target) {
+}
+
+void Merchant::useAbility(coup::Game& game) {
+    // Example: gain 1 coin, or something unique
+    addCoins(1);
+    playerUsedTurn();
+}
+
 void Merchant::listOptions() const {
     printPlayerStats();
     std::cout << "Choose an action:\n"

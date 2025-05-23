@@ -11,6 +11,9 @@ Player* Spy::clone() const {
     return new Spy(*this);
 }
 
+void Spy::passiveAbility(Player *target) {
+}
+
 
 std::string Spy::getCoinReport(const coup::Game& game) {
     std::string output = "\n=== Players coins ===\n";
@@ -25,6 +28,10 @@ std::string Spy::getCoinReport(const coup::Game& game) {
     output += "=====================\n";
     return output;
 }
+void Spy::passiveAbility() {
+    // Add logic or leave empty
+}
+
 
 void Spy::useAbility(coup::Game& game) {
     std::cout << "\n=== Players coins ===" << std::endl;

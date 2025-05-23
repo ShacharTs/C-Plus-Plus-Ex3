@@ -8,6 +8,7 @@ public:
 
     void useAbility(coup::Game &game) override;
     void passiveAbility() override;
+    void passiveAbility(Player* target) override;
     void listOptions() const override;
     Player* clone() const override;
 

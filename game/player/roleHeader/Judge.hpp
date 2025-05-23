@@ -6,6 +6,9 @@ class Judge final : public virtual Player {
 public:
     explicit Judge(const std::string& name);
     void passiveAbility(Player *target) override;
+
+    void passiveAbility() override;
+
     void listOptions() const override;
     void useAbility(coup::Game& game) override;
     Player* clone() const override;

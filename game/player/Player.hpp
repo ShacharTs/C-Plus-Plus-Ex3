@@ -52,7 +52,8 @@ public:
      */
     explicit Player(std::string playerName);
 
-    virtual Player* clone() const;
+    //virtual Player* clone() const;
+    virtual Player *clone() const = 0;
 
     /**
      * @brief Virtual destructor for proper cleanup in derived classes.
@@ -113,18 +114,22 @@ public:
      * @brief Execute the role-specific special ability.
      * @param game Reference to the game engine
      */
-    virtual void useAbility(coup::Game& game);
+    //virtual void useAbility(coup::Game& game);
+    virtual void useAbility(coup::Game& game) = 0;
 
     /**
      * @brief Execute passive ability without target.
      */
-    virtual void passiveAbility();
+    //virtual void passiveAbility();
+    virtual void passiveAbility() = 0;
 
     /**
      * @brief Execute passive ability affecting a target.
      * @param target Player affected by passive ability
      */
-    virtual void passiveAbility(Player* target);
+    //virtual void passiveAbility(Player* target);
+    virtual void passiveAbility(Player *target) = 0;
+
 
     //------------------------------------------------------------------------
     // Accessors

@@ -16,6 +16,10 @@ void Judge::passiveAbility(Player* target) {
     target->removeCoins(1);
 
 }
+void Judge::passiveAbility() {
+    // Optional: define passive Judge effect if needed
+}
+
 
 void Judge::useAbility(coup::Game& game) {
     /*const std::string blockBribe = "Block a player from using bribe";

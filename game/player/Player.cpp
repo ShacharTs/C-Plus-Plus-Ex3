@@ -16,8 +16,8 @@ Player::Player(string playerName)
     : playerName(std::move(playerName)) {
 }
 
-Player *Player::clone() const {
-}
+// Player *Player::clone() const {
+// }
 
 
 /**
@@ -35,24 +35,24 @@ Player::~Player() {
  * @brief Execute the player's active role-specific ability.
  * @param game Reference to the current Game context.
  */
-void Player::useAbility(coup::Game &game) {
-    // Default: no-op (override in derived roles)
-}
+// void Player::useAbility(coup::Game &game) {
+//     // Default: no-op (override in derived roles)
+// }
 
 /**
  * @brief Execute the player's passive ability without a target.
  */
-void Player::passiveAbility() {
-    // Default: no-op (override in derived roles)
-}
+// void Player::passiveAbility() {
+//     // Default: no-op (override in derived roles)
+// }
 
 /**
  * @brief Execute the player's passive ability on a target.
  * @param target The player affected by passive ability.
  */
-void Player::passiveAbility(Player *target) {
-    // Default: no-op (override in derived roles)
-}
+// void Player::passiveAbility(Player *target) {
+//     // Default: no-op (override in derived roles)
+// }
 
 //------------------------------------------------------------------------------
 // Accessors
@@ -247,6 +247,9 @@ void Player::sanction(Player *target) {
         throw SelfError("You cannot sanction yourself.");
     }
     removeCoins(3);
+    if (target->getRole() == Role::Baron) {
+        target->addCoins(1);
+    }
     target->canGather = false;
     target->canTax = false;
     playerUsedTurn();

@@ -25,6 +25,8 @@ void Baron::passiveAbility() {
     addCoins(1);
 }
 
+void Baron::passiveAbility(Player *target) {
+}
 
 
 void Baron::listOptions() const {

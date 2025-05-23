@@ -18,6 +18,19 @@ void Governor::tax() {
     playerUsedTurn();
 }
 
+void Governor::passiveAbility(Player *target) {
+}
+
+void Governor::useAbility(coup::Game& game) {
+    // Example logic (customize if needed)
+    playerUsedTurn();
+}
+
+void Governor::passiveAbility() {
+    // Optional logic
+}
+
+
 void Governor::listOptions() const {
     printPlayerStats();
     std::cout << "Choose an action:\n"

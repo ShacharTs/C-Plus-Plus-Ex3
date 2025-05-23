@@ -10,6 +10,17 @@ Player* General::clone() const {
     return new General(*this);
 }
 
+void General::passiveAbility(Player *target) {
+}
+void General::useAbility(coup::Game &game) {
+    // Implement General's ability logic here
+}
+
+void General::passiveAbility() {
+    // Optional: define any passive bonus
+}
+
+
 
 void General::listOptions() const {
     printPlayerStats();
