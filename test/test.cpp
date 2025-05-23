@@ -442,7 +442,10 @@ TEST_CASE("Sanction lifts after next full cycle") {
 TEST_CASE("General's wont have discounted coup exactly 5 coins") {
     Game game(names);
     Player* pg = nullptr;
-    for(auto p: game.getPlayers()) if(p->getRole()==Role::General) { pg = p; break; }
+    for(auto p: game.getPlayers()) if(p->getRole()==Role::General) {
+        pg = p; break;
+      }
+    CHECK(pg->getRole() == Role::General);
     REQUIRE(pg);
     pg->addCoins(5);
     auto victim = game.getListOfTargetPlayers(pg).front();
@@ -499,6 +502,49 @@ TEST_CASE("skipTurn consumes only one extra-turn") {
     game.skipTurn(pj);
     CHECK(pj->getNumOfTurns() == 1);
 }
+
+TEST_CASE("Game copy constructor clones players correctly") {
+    Game game1(names);
+    Game game2 = game1;  // Copy
+
+    CHECK(game2.getPlayers().size() == game1.getPlayers().size());
+    for (size_t i = 0; i < names.size(); ++i) {
+        CHECK(game2.getPlayers()[i] != game1.getPlayers()[i]);  // Deep copy
+        CHECK(game2.getPlayers()[i]->getName() == game1.getPlayers()[i]->getName());
+    }
+}
+
+TEST_CASE("clone() returns correct dynamic type") {
+    Spy original("SpyMan");
+    Player* copy = original.clone();
+    CHECK(dynamic_cast<Spy*>(copy) != nullptr);
+    delete copy;
+}
+
+TEST_CASE("Turn advances after player removed via coup") {
+    Game game(names);
+    auto p0 = game.getPlayers()[0];
+    auto p1 = game.getPlayers()[1];
+    p0->addCoins(7);
+    game.coup(p0, p1);
+    game.advanceTurnIfNeeded();  // Ensure p1 is skipped
+    CHECK(game.turn() != p1->getName());
+}
+
+TEST_CASE("Baron useAbility updates coin count correctly") {
+    Game game(names);
+    auto baron = dynamic_cast<Baron*>(game.getPlayers()[2]);
+    CHECK(baron->getCoins() == 0);
+    baron->addCoins(3);
+    CHECK(baron->getCoins() == 3);
+    int before = baron->getCoins();
+    baron->useAbility(game);
+    CHECK(baron->getCoins() == before - 3 + 6);
+}
+
+
+
+
 
 // --- Blocking behavior ---
 
