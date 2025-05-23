@@ -8,7 +8,7 @@
 
 #include "GameFrame.h"
 #include "../game/player/roleHeader/Spy.hpp"
-
+#include "../game/GameExceptions.hpp"
 
 //------------------------------------------------------------------------------
 // Event table binding paint, click, erase, and motion events
@@ -312,49 +312,87 @@ void GamePanel::OnClick(wxMouseEvent &evt) {
 // 1) Forced-to-coup: only Coup allowed
 //------------------------------------------------------------------------------
 bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
-    // Not forced? reset and bail out.
     if (!game.forcedToCoup(cur)) {
         mustCoupAlerted_ = false;
         return false;
     }
 
-    // 1) If they actually clicked the Coup button, jump straight into the coup flow:
     if (btnCoupRect.Contains(pt)) {
         wxArrayString names;
         auto targets = game.getListOfTargetPlayers(cur);
         for (auto *p: targets) names.Add(p->getName());
 
-        wxSingleChoiceDialog dlg(
-            this,
-            "Choose a target to coup",
-            "Forced Coup",
-            names
-        );
-        if (dlg.ShowModal() == wxID_OK) {
-            Player *tgt = targets[dlg.GetSelection()];
-            PlaySound(SoundEffect::CoupKick);
-            game.coup(cur, tgt);
-            game.advanceTurnIfNeeded();
-            RefreshUI();
+        wxSingleChoiceDialog dlg(this, "Choose a target to coup", "Forced Coup", names);
+        if (dlg.ShowModal() != wxID_OK) return true;
+
+        Player *tgt = targets[dlg.GetSelection()];
+
+        // Check for a General who has enough coins to block
+        Player* general = nullptr;
+        for (auto* p : game.getPlayers()) {
+            if (p != cur && p->getRole() == Role::General && p->getCoins() >= 5) {
+                general = p;
+                break;
+            }
         }
-        // clear the alert flag for next time
+
+        bool blocked = false;
+        Player* isGeneral = AskBlock(Role::General,"coup", 5);
+        if (general && (isGeneral != nullptr)) {
+            try {
+                game.playerPayAfterBlock(isGeneral, Role::General); // 💥 May throw CoinsError
+                PlaySound(SoundEffect::CoupKick);
+                blocked = true;
+
+            } catch (const std::exception& e) {
+                wxLogWarning("General block failed: %s", e.what());
+                wxMessageBox("General failed to block (not enough coins). Proceeding with coup.",
+                             "Block Failed", wxOK | wxICON_WARNING, this);
+                // Continue to coup
+            }
+        }
+
+        // If not blocked, perform the coup
+        if (!blocked) {
+            try {
+                game.coup(cur, tgt);  // 💥 May throw CoinsError, SelfError, CoupBlocked
+                PlaySound(SoundEffect::CoupKick);
+            } catch (const CoinsError &e) {
+                wxMessageBox("Coup failed: You don't have enough coins.", "Coup Failed",
+                             wxOK | wxICON_WARNING, this);
+                return true;
+            } catch (const SelfError &e) {
+                wxMessageBox("You cannot coup yourself.", "Coup Failed",
+                             wxOK | wxICON_WARNING, this);
+                return true;
+            } catch (const CoupBlocked &e) {
+                wxMessageBox("Coup was blocked by a shield!", "Blocked",
+                             wxOK | wxICON_INFORMATION, this);
+                return true;
+            } catch (const std::exception &e) {
+                wxLogWarning("Unexpected error: %s", e.what());
+                wxMessageBox(e.what(), "Coup Failed", wxOK | wxICON_ERROR, this);
+                return true;
+            }
+        }
+
+        game.advanceTurnIfNeeded();
+        RefreshUI();
         mustCoupAlerted_ = false;
         return true;
     }
 
-    // 2) Any other click: show the popup once, then swallow all further clicks until they Coup
     if (!mustCoupAlerted_) {
-        wxMessageBox(
-            "You have too many coins you must coup!",
-            "Forced Coup",
-            wxOK | wxICON_INFORMATION,
-            this
-        );
+        wxMessageBox("You have too many coins — you must coup!",
+                     "Forced Coup", wxOK | wxICON_INFORMATION, this);
         mustCoupAlerted_ = true;
     }
-    // swallow the click (do nothing else)
+
     return true;
 }
+
+
+
 
 
 //------------------------------------------------------------------------------
@@ -389,7 +427,7 @@ bool GamePanel::HandleTax(const wxPoint &pt, Player *cur) {
         // Give the Governor a chance to block
         if (AskBlock(Role::Governor, "tax")) {
             //PlaySound(SoundEffect::TaxCoin);
-            game.playerPayAfterBlock(Role::Governor);
+            game.playerPayAfterBlock(nullptr, Role::Governor);
             RefreshUI();
             return true;
         }
@@ -417,7 +455,7 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     // First, give the Judge a chance to block
     if (AskBlock(Role::Judge, "bribe")) {
         try {
-            game.playerPayAfterBlock(Role::Judge);  // May throw!
+            game.playerPayAfterBlock(nullptr, Role::Judge);  // May throw!
             //PlaySound(SoundEffect::Bribe);
         } catch (const std::exception &e) {
             wxLogWarning("Judge block failed: %s", e.what());
@@ -504,7 +542,7 @@ bool GamePanel::HandleArrest(const wxPoint &pt, Player *cur) {
     // Block logic: Spy can block arrest
     if (AskBlock(Role::Spy, "arrest")) {
         PlaySound(SoundEffect::Arrest);
-        game.playerPayAfterBlock(Role::Spy);
+        game.playerPayAfterBlock(nullptr, Role::Spy);
         RefreshUI();
         return true;
     }
@@ -559,29 +597,54 @@ bool GamePanel::HandleCoup(const wxPoint &pt, Player *cur) {
 
     wxSingleChoiceDialog dlg(this, "Choose target to coup", "Target", names);
     if (dlg.ShowModal() != wxID_OK) return true;
+
     Player *tgt = targets[dlg.GetSelection()];
 
-    // Block logic: General can block coup
-    if (AskBlock(Role::General, "coup", 5)) {
-        PlaySound(SoundEffect::CoupKick);
-        game.playerPayAfterBlock(Role::General);
-        RefreshUI();
-        return true;
+    // Ask for General block and get the actual blocker if one accepts
+    Player* blocker = AskBlock(Role::General, "coup", 5);
+    bool blocked = false;
+
+    if (blocker) {
+        try {
+            game.playerPayAfterBlock(blocker, Role::General);  // May throw CoinsError
+            PlaySound(SoundEffect::CoupKick);
+            blocked = true;  // Block was successful
+        } catch (const std::exception& e) {
+            wxLogWarning("General block failed: %s", e.what());
+            wxMessageBox("Block failed: General didn't have enough coins. Proceeding with coup.",
+                         "Block Failed", wxOK | wxICON_WARNING, this);
+            // Proceed to coup
+        }
     }
 
-    try {
-        PlaySound(SoundEffect::CoupKick);
-        game.coup(cur, tgt);
-    }
-    catch (const std::exception &e) {
-        wxLogWarning("%s", e.what());
-        return true;
+    if (!blocked) {
+        try {
+            game.coup(cur, tgt);  // May throw CoinsError, SelfError, CoupBlocked
+            PlaySound(SoundEffect::CoupKick);
+        } catch (const CoinsError &e) {
+            wxMessageBox("Coup failed: You don't have enough coins.", "Coup Failed",
+                         wxOK | wxICON_WARNING, this);
+            return true;
+        } catch (const SelfError &e) {
+            wxMessageBox("You cannot coup yourself.", "Coup Failed",
+                         wxOK | wxICON_WARNING, this);
+            return true;
+        } catch (const CoupBlocked &e) {
+            wxMessageBox("Coup was blocked by a shield!", "Blocked",
+                         wxOK | wxICON_INFORMATION, this);
+            return true;
+        } catch (const std::exception &e) {
+            wxLogWarning("Unexpected coup error: %s", e.what());
+            wxMessageBox(e.what(), "Coup Failed", wxOK | wxICON_ERROR, this);
+            return true;
+        }
     }
 
     game.advanceTurnIfNeeded();
     RefreshUI();
     return true;
 }
+
 
 //------------------------------------------------------------------------------
 // Mouse motion handler: change cursor when hovering buttons

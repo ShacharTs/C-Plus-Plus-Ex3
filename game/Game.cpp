@@ -141,31 +141,35 @@ namespace coup {
         }
     }
 
-    void Game::playerPayAfterBlock(Role role) {
-        Player *current = players.at(currentPlayerTurn);
-        switch (role) {
-            case Role::Judge:
-                removeCoins(current, BRIBE_COST);
-                cout << "Judge blocked bribe" << endl;
-                nextTurn();
-                break;
-            case Role::Spy:
-                cout << "Spy blocked arrest" << endl;
-                nextTurn();
-                break;
-            case Role::General:
-                removeCoins(current, COUP_COST);
-                cout << "General blocked coup" << endl;
-                nextTurn();
-                break;
-            case Role::Governor:
-                cout << "Governor blocked tax" << endl;
-                nextTurn();
-                break;
-            default:
-                throw out_of_range("Invalid role: " + current->roleToString(role));
+    void Game::playerPayAfterBlock(Player* blocker, Role role) {
+        try {
+            switch (role) {
+                case Role::Judge:
+                    removeCoins(blocker, BRIBE_COST);
+                    std::cout << "Judge blocked bribe" << std::endl;
+                    nextTurn();
+                    break;
+                case Role::Spy:
+                    std::cout << "Spy blocked arrest" << std::endl;
+                    nextTurn();
+                    break;
+                case Role::General:
+                    removeCoins(blocker, 5);
+                    std::cout << "General blocked coup" << std::endl;
+                    nextTurn();
+                    break;
+                case Role::Governor:
+                    std::cout << "Governor blocked tax" << std::endl;
+                    nextTurn();
+                    break;
+                default:
+                    throw std::out_of_range("Invalid role: " + blocker->roleToString(role));
+            }
+        } catch (const std::exception &e) {
+            throw CoinsError(std::string("Block failed: ") + e.what());
         }
     }
+
 
 
     int Game::getTurn() {

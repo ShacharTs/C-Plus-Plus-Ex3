@@ -236,9 +236,10 @@ namespace coup {
 
         /**
          * @brief When blocked, the player pays the cost, by the blocker's role and loses their turn.
+         * @param blocker
          * @param role player role
          */
-        void playerPayAfterBlock(Role role);
+        void playerPayAfterBlock(Player *blocker, Role role);
     };
 
 } // namespace coup
