@@ -46,7 +46,7 @@ namespace coup {
     }
 
 
-    Player *Game::createRandomRole(const std::string &name) {
+    Player *Game::createRandomRole(const string &name) {
         static random_device rd; // Seed source
         static mt19937 gen(rd()); // Mersenne Twister RNG
         static uniform_int_distribution<> dist(0, 5); // Uniform distribution [0..5]
@@ -141,32 +141,38 @@ namespace coup {
         }
     }
 
-    void Game::playerPayAfterBlock(Player* blocker, Role role) {
+    /**
+     * checks if there is a role to block the action
+     * @param target can be current player  or can be blocker player
+     * @param role the role that is blocking the action
+     */
+    void Game::playerPayAfterBlock(Player* target, Role role) {
         try {
             switch (role) {
                 case Role::Judge:
-                    removeCoins(blocker, BRIBE_COST);
-                    std::cout << "Judge blocked bribe" << std::endl;
+                    target = getPlayers().at(getTurn()); // target here is the current player and not the judge
+                    removeCoins(target, BRIBE_COST);
+                    cout << "Judge blocked bribe" << endl;
                     nextTurn();
                     break;
                 case Role::Spy:
-                    std::cout << "Spy blocked arrest" << std::endl;
+                    cout << "Spy blocked arrest" << endl;
                     nextTurn();
                     break;
                 case Role::General:
-                    removeCoins(blocker, 5);
-                    std::cout << "General blocked coup" << std::endl;
+                    removeCoins(target, 5); // target is the general who blocks the coup
+                    cout << "General blocked coup" << endl;
                     nextTurn();
                     break;
                 case Role::Governor:
-                    std::cout << "Governor blocked tax" << std::endl;
+                    cout << "Governor blocked tax" << endl;
                     nextTurn();
                     break;
                 default:
-                    throw std::out_of_range("Invalid role: " + blocker->roleToString(role));
+                    throw out_of_range("Invalid role: " + target->roleToString(role));
             }
-        } catch (const std::exception &e) {
-            throw CoinsError(std::string("Block failed: ") + e.what());
+        } catch (const exception &e) {
+            throw CoinsError(string("Block failed: ") + e.what());
         }
     }
 
@@ -212,7 +218,7 @@ namespace coup {
     }
 
 
-    bool Game::handleBlock(Player *blocker, bool didBlock, const std::string &actionName, int cost) {
+    bool Game::handleBlock(Player *blocker, bool didBlock, const string &actionName, int cost) {
         if (!didBlock || !blocker) {
             return false;
         }

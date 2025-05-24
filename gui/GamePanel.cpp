@@ -455,6 +455,7 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     // First, give the Judge a chance to block
     if (AskBlock(Role::Judge, "bribe")) {
         try {
+
             game.playerPayAfterBlock(nullptr, Role::Judge);  // May throw!
             //PlaySound(SoundEffect::Bribe);
         } catch (const std::exception &e) {
