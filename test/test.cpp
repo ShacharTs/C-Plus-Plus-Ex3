@@ -603,7 +603,7 @@ TEST_CASE("Game copy assignment operator performs deep copy") {
         auto* p1 = players1[i];
         auto* p2 = players2[i];
 
-        // Ensure they are deep copied (not same pointer)
+        // Ensure they are deep copied (not the same pointer)
         CHECK(p1 != p2);
 
         // Validate key data copied
@@ -646,7 +646,7 @@ TEST_CASE("Gather increase coins and consume turn") {
     int before = p->getCoins();
     game.gather(p);
     CHECK(p->getCoins() == before + 1);
-    // gather not allowed twice
+    // gather hasn't allowed twice
     CHECK_THROWS_AS(game.gather(p), TurnError);
 }
 

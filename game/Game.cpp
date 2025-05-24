@@ -382,7 +382,7 @@ namespace coup {
         return false;
     }
 
-
+    // FOR TEST ONLY: Handle exceptions and print error messages
     bool Game::handleException(const exception &e) {
         if (dynamic_cast<const MerchantError *>(&e))
             cerr << "[Merchant Error] " << e.what() << endl;
