@@ -27,6 +27,36 @@ TEST_CASE("Initial roles assigned correctly via Game constructor") {
     CHECK(players[5]->getRole() == Role::Merchant);
 }
 
+TEST_CASE("Game copy assignment operator performs deep copy") {
+    Game game1(names);
+    Game game2 = game1;
+
+    // Validate scalar data
+    CHECK(game2.getTurn() == game1.getTurn());
+
+    const auto& players1 = game1.getPlayers();
+    const auto& players2 = game2.getPlayers();
+    CHECK(players1.size() == players2.size());
+
+    for (size_t i = 0; i < players1.size(); ++i) {
+        auto* p1 = players1[i];
+        auto* p2 = players2[i];
+
+        // Ensure they are deep copied (not same pointer)
+        CHECK(p1 != p2);
+
+        // Validate key data copied
+        CHECK(p1->getName() == p2->getName());
+        CHECK(p1->getRole() == p2->getRole());
+        CHECK(p1->getCoins() == p2->getCoins());
+
+        // Modify original, check no side effect
+        p1->addCoins(10);
+        CHECK(p1->getCoins() != p2->getCoins());
+    }
+}
+
+
 TEST_CASE("Gather increase coins and consume turn") {
     cout << "[TEST] Gather increase coins and consume turn" << endl;
     Game game(names);
@@ -56,7 +86,7 @@ TEST_CASE("Bribe grants extra turn and cost deducted") {
     p->addCoins(5);
     game.bribe(p);
     CHECK(p->getNumOfTurns() == 2);
-    CHECK(p->getCoins() == 5 - 4);
+    CHECK(p->getCoins() == 1);
 }
 
 TEST_CASE("Arrest steals coin and records last arrested") {
@@ -541,10 +571,6 @@ TEST_CASE("Baron useAbility updates coin count correctly") {
     baron->useAbility(game);
     CHECK(baron->getCoins() == before - 3 + 6);
 }
-
-
-
-
 
 // --- Blocking behavior ---
 

@@ -49,29 +49,29 @@ GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names)
     // ——————————————
     // Pre-load all sounds into memory
     // ——————————————
-    for (auto effect: {
-             // SoundEffect::GatherCoin,
-             // SoundEffect::TaxCoin,
-             SoundEffect::Victory,
-             SoundEffect::CoupKick,
-             SoundEffect::Arrest,
-             SoundEffect::Sanction,
-             SoundEffect::Skip,
-             SoundEffect::Bribe
-         }) {
-        // build "<exe-dir>/assets/sounds/<filename>"
-        wxFileName file(wxStandardPaths::Get().GetExecutablePath());
-        file.RemoveLastDir();
-        file.AppendDir("assets");
-        file.AppendDir("sounds");
-        file.SetFullName(EffectToFilename(effect));
-
-        if (file.FileExists()) {
-            sounds_.try_emplace(effect, file.GetFullPath());
-        } else {
-            wxLogError("Missing sound at startup: %s", file.GetFullPath());
-        }
-    }
+    // for (auto effect: {
+    //          // SoundEffect::GatherCoin,
+    //          // SoundEffect::TaxCoin,
+    //          SoundEffect::Victory,
+    //          SoundEffect::CoupKick,
+    //          SoundEffect::Arrest,
+    //          SoundEffect::Sanction,
+    //          SoundEffect::Skip,
+    //          SoundEffect::Bribe
+    //      }) {
+    //     // build "<exe-dir>/assets/sounds/<filename>"
+    //     wxFileName file(wxStandardPaths::Get().GetExecutablePath());
+    //     file.RemoveLastDir();
+    //     file.AppendDir("assets");
+    //     file.AppendDir("sounds");
+    //     file.SetFullName(EffectToFilename(effect));
+    //
+    //     if (file.FileExists()) {
+    //         sounds_.try_emplace(effect, file.GetFullPath());
+    //     } else {
+    //         wxLogError("Missing sound at startup: %s", file.GetFullPath());
+    //     }
+    // }
     RefreshUI();
 }
 
@@ -341,7 +341,7 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
         if (general && (isGeneral != nullptr)) {
             try {
                 game.playerPayAfterBlock(isGeneral, Role::General); // 💥 May throw CoinsError
-                PlaySound(SoundEffect::CoupKick);
+                //PlaySound(SoundEffect::CoupKick);
                 blocked = true;
 
             } catch (const std::exception& e) {
@@ -356,7 +356,7 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
         if (!blocked) {
             try {
                 game.coup(cur, tgt);  // 💥 May throw CoinsError, SelfError, CoupBlocked
-                PlaySound(SoundEffect::CoupKick);
+                //PlaySound(SoundEffect::CoupKick);
             } catch (const CoinsError &e) {
                 wxMessageBox("Coup failed: You don't have enough coins.", "Coup Failed",
                              wxOK | wxICON_WARNING, this);
@@ -469,7 +469,7 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     // If not blocked, try to perform the bribe as normal
     try {
         game.bribe(cur);  // <-- Attempt the action
-        PlaySound(SoundEffect::Bribe);  // <-- Play sound ONLY if no exception
+        //PlaySound(SoundEffect::Bribe);  // <-- Play sound ONLY if no exception
     } catch (const std::exception &e) {
         wxLogWarning("%s", e.what());
         return true;
@@ -519,7 +519,7 @@ bool GamePanel::HandleAbility(const wxPoint &pt, Player *cur, Role role) {
 //------------------------------------------------------------------------------
 bool GamePanel::HandleSkip(const wxPoint &pt, Player *cur) {
     if (!btnSkipRect.Contains(pt)) return false;
-    PlaySound(SoundEffect::Skip);
+    //PlaySound(SoundEffect::Skip);
     game.skipTurn(cur);
     game.advanceTurnIfNeeded();
     RefreshUI();
@@ -541,14 +541,14 @@ bool GamePanel::HandleArrest(const wxPoint &pt, Player *cur) {
 
     // Block logic: Spy can block arrest
     if (AskBlock(Role::Spy, "arrest")) {
-        PlaySound(SoundEffect::Arrest);
+        //PlaySound(SoundEffect::Arrest);
         game.playerPayAfterBlock(nullptr, Role::Spy);
         RefreshUI();
         return true;
     }
 
     try {
-        PlaySound(SoundEffect::Arrest);
+        //PlaySound(SoundEffect::Arrest);
         game.arrest(cur, tgt);
     }
     catch (const std::exception &e) {
@@ -574,7 +574,7 @@ bool GamePanel::HandleSanction(const wxPoint &pt, Player *cur) {
     Player *tgt = targets[dlg.GetSelection()];
 
     try {
-        PlaySound(SoundEffect::Sanction);
+        //PlaySound(SoundEffect::Sanction);
         game.sanction(cur, tgt);
     }
     catch (const std::exception &e) {
@@ -607,7 +607,7 @@ bool GamePanel::HandleCoup(const wxPoint &pt, Player *cur) {
     if (blocker) {
         try {
             game.playerPayAfterBlock(blocker, Role::General);  // May throw CoinsError
-            PlaySound(SoundEffect::CoupKick);
+            //PlaySound(SoundEffect::CoupKick);
             blocked = true;  // Block was successful
         } catch (const std::exception& e) {
             wxLogWarning("General block failed: %s", e.what());
@@ -620,7 +620,7 @@ bool GamePanel::HandleCoup(const wxPoint &pt, Player *cur) {
     if (!blocked) {
         try {
             game.coup(cur, tgt);  // May throw CoinsError, SelfError, CoupBlocked
-            PlaySound(SoundEffect::CoupKick);
+            //PlaySound(SoundEffect::CoupKick);
         } catch (const CoinsError &e) {
             wxMessageBox("Coup failed: You don't have enough coins.", "Coup Failed",
                          wxOK | wxICON_WARNING, this);
@@ -675,17 +675,17 @@ void GamePanel::OnMotion(wxMouseEvent &evt) {
 
 void GamePanel::showWinner(const std::string &winner) {
     wxMessageDialog dlg(this, "Winner: " + winner, "Game Over", wxOK | wxICON_INFORMATION);
-    PlaySound(SoundEffect::Victory);
+    //PlaySound(SoundEffect::Victory);
     dlg.ShowModal();
     exit(0);
 }
 
-
-void GamePanel::PlaySound(SoundEffect effect) {
-    auto it = sounds_.find(effect);
-    if (it == sounds_.end() || !it->second.IsOk()) {
-        wxLogError("Sound not preloaded or invalid: %d", int(effect));
-        return;
-    }
-    it->second.Play(wxSOUND_ASYNC);
-}
+//
+// void GamePanel::PlaySound(SoundEffect effect) {
+//     auto it = sounds_.find(effect);
+//     if (it == sounds_.end() || !it->second.IsOk()) {
+//         wxLogError("Sound not preloaded or invalid: %d", int(effect));
+//         return;
+//     }
+//     it->second.Play(wxSOUND_ASYNC);
+// }
