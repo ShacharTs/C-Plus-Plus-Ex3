@@ -205,14 +205,14 @@ namespace coup {
         // GUI-related logic and blocking
         //------------------------------------------------------------------------
 
-        /**
-         * @brief Check and apply blocking for a specific action.
-         * @param currentPlayer Acting player
-         * @param action The action type to block
-         * @param blocker Player attempting the block
-         * @return True if the action was blocked
-         */
-        bool handleActionBlock(Player* currentPlayer, ActionType action, Player* blocker);
+        // /**
+        //  * @brief Check and apply blocking for a specific action.
+        //  * @param currentPlayer Acting player
+        //  * @param action The action type to block
+        //  * @param blocker Player attempting the block
+        //  * @return True if the action was blocked
+        //  */
+        // bool handleActionBlock(Player* currentPlayer, ActionType action, Player* blocker);
 
         /**
          * @brief Generic block handler that deducts cost and consumes turn.

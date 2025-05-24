@@ -121,8 +121,8 @@ namespace coup {
         for (Player *&p: players) {
             const string name = p->getName();
             delete p; // Remove old role
-            int roll = rand() % 6 + 1; // Random number 1..6
-            switch (roll) {
+            //const int roll = rand() % 6 + 1; // Random number 1..6
+            switch (const int roll = rand() % 6 + 1) {
                 case 1: p = new Governor(name);
                     break;
                 case 2: p = new Spy(name);
@@ -141,33 +141,31 @@ namespace coup {
         }
     }
 
-    /**
-     * checks if there is a role to block the action
-     * @param target can be current player  or can be blocker player
-     * @param role the role that is blocking the action
-     */
-    void Game::playerPayAfterBlock(Player* target, Role role) {
+    void Game::playerPayAfterBlock(Player *target, Role role) {
+        Player *current = getPlayers().at(getTurn());
         try {
             switch (role) {
                 case Role::Judge:
-                    target = getPlayers().at(getTurn()); // target here is the current player and not the judge
                     removeCoins(target, BRIBE_COST);
                     cout << "Judge blocked bribe" << endl;
-                    nextTurn();
                     break;
+
                 case Role::Spy:
+                    target->canArrest = false;
                     cout << "Spy blocked arrest" << endl;
-                    nextTurn();
                     break;
+
                 case Role::General:
-                    removeCoins(target, 5); // target is the general who blocks the coup
+                    removeCoins(target, 5); // General pays 5
+                    removeCoins(current, COUP_COST); // Current player pays coup cost
                     cout << "General blocked coup" << endl;
-                    nextTurn();
                     break;
+
                 case Role::Governor:
+                    target->canTax = false;
                     cout << "Governor blocked tax" << endl;
-                    nextTurn();
                     break;
+
                 default:
                     throw out_of_range("Invalid role: " + target->roleToString(role));
             }
@@ -175,8 +173,6 @@ namespace coup {
             throw CoinsError(string("Block failed: ") + e.what());
         }
     }
-
-
 
     int Game::getTurn() {
         return currentPlayerTurn;
@@ -230,43 +226,6 @@ namespace coup {
         cout << actionName << " was blocked by " << blocker->getName() << endl;
         return true;
     }
-
-
-    bool Game::handleActionBlock(Player *currentPlayer, ActionType action, Player *blocker) {
-        if (!blocker) return false;
-        switch (action) {
-            case ActionType::Tax:
-                if (blocker->getRole() == Role::Governor) {
-                    currentPlayer->playerUsedTurn();
-                    return true;
-                }
-                break;
-            case ActionType::Bribe:
-                if (blocker->getRole() == Role::Judge) {
-                    currentPlayer->playerUsedTurn();
-                    return true;
-                }
-                break;
-            case ActionType::Arrest:
-                if (blocker->getRole() == Role::Spy) {
-                    currentPlayer->playerUsedTurn();
-                    return true;
-                }
-                break;
-            case ActionType::Coup:
-                if (blocker->getRole() == Role::General && blocker->getCoins() >= 5) {
-                    blocker->removeCoins(5);
-                    currentPlayer->playerUsedTurn();
-                    cout << "Coup was blocked by " << blocker->getName() << ".\n";
-                    return true;
-                }
-                break;
-            default:
-                break;
-        }
-        return false;
-    }
-
 
     vector<Player *> Game::getListOfTargetPlayers(const Player *current) {
         vector<Player *> targets;
@@ -356,7 +315,7 @@ namespace coup {
         if (targetPlayer->getRole() == Role::Judge) {
             try {
                 targetPlayer->passiveAbility(currentPlayer);
-            } catch (const exception &e) {
+            } catch (const exception) {
                 cerr << "[Sanction] Judge retaliation: " << currentPlayer->getName()
                         << " loses an additional coin." << endl;
             }

@@ -252,49 +252,58 @@ TEST_CASE("handleBlock returns false if didBlock is false") {
     CHECK_FALSE(game.handleBlock(p1, false, "Nope", 3));
 }
 
-TEST_CASE("handleActionBlock blocks Tax by Governor") {
+TEST_CASE("Governor blocks Tax - disables tax ability") {
     Game game(names);
     auto gov = dynamic_cast<Governor*>(game.getPlayers()[0]);
-    auto p1  = game.getPlayers()[0];
-    int start = game.getTurn();
-    bool blocked = game.handleActionBlock(p1, ActionType::Tax, gov);
-    CHECK(blocked);
-    CHECK(game.getTurn() == (start)%names.size());
+    REQUIRE(gov != nullptr);
+
+    // Ensure canTax is true before
+    gov->canTax = true;
+    game.playerPayAfterBlock(gov, Role::Governor);
+    CHECK_FALSE(gov->canTax); // Tax ability should now be disabled
 }
 
-TEST_CASE("handleActionBlock blocks Bribe by Judge") {
+TEST_CASE("Judge blocks Bribe - deducts bribe cost") {
     Game game(names);
     auto judge = dynamic_cast<Judge*>(game.getPlayers()[4]);
-    auto p2 = game.getPlayers()[2];
-    bool blocked = game.handleActionBlock(p2, ActionType::Bribe, judge);
-    CHECK(blocked);
+    REQUIRE(judge != nullptr);
+
+    judge->addCoins(5); // Ensure Judge has enough coins
+    int before = judge->getCoins();
+
+    game.playerPayAfterBlock(judge, Role::Judge);
+    CHECK(judge->getCoins() == before - 4); // BRIBE_COST = 4
 }
 
-TEST_CASE("handleActionBlock blocks Arrest by Spy") {
+TEST_CASE("Spy blocks Arrest - disables arrest ability") {
     Game game(names);
     auto spy = dynamic_cast<Spy*>(game.getPlayers()[1]);
-    auto p3  = game.getPlayers()[3];
-    bool blocked = game.handleActionBlock(p3, ActionType::Arrest, spy);
-    CHECK(blocked);
+    REQUIRE(spy != nullptr);
+
+    spy->canArrest = true;
+    game.playerPayAfterBlock(spy, Role::Spy);
+    CHECK_FALSE(spy->canArrest);
 }
 
-TEST_CASE("handleActionBlock blocks Coup by General") {
+TEST_CASE("General blocks Coup - pays 5 coins") {
     Game game(names);
     auto gen = dynamic_cast<General*>(game.getPlayers()[3]);
-    auto p4  = game.getPlayers()[4];
+    REQUIRE(gen != nullptr);
     gen->addCoins(6);
-    bool blocked = game.handleActionBlock(p4, ActionType::Coup, gen);
-    CHECK(blocked);
-    // cost of 5 deducted
+    Player* current = game.getPlayers()[game.getTurn()];
+    current->addCoins(7);
+    game.playerPayAfterBlock(gen, Role::General);
     CHECK(gen->getCoins() == 1);
 }
 
-TEST_CASE("handleActionBlock returns false for wrong role") {
+TEST_CASE("Invalid block role throws error") {
     Game game(names);
     auto baron = dynamic_cast<Baron*>(game.getPlayers()[2]);
-    auto p0    = game.getPlayers()[0];
-    CHECK_FALSE(game.handleActionBlock(p0, ActionType::Tax, baron));
+    REQUIRE(baron != nullptr);
+
+    CHECK_THROWS_AS(game.playerPayAfterBlock(baron, Role::Baron), CoinsError);
 }
+
 
 TEST_CASE("getListOfTargetPlayers excludes current") {
     Game game(names);
