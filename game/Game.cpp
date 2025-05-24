@@ -32,7 +32,7 @@ namespace coup {
             case 4: return new Judge(name);
             case 5: return new Merchant(name);
             default:
-                throw runtime_error("Error: invalid role index");
+                throw out_of_range("Error: invalid role index");
         }
     }
 
