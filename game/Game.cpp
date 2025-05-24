@@ -285,6 +285,9 @@ namespace coup {
         if (players[currentPlayerTurn] != currentPlayer) {
             throw TurnError("It's not your turn.");
         }
+        if (currentPlayer->getNumOfTurns() == 0) {
+            throw TurnError("You have no turns left.");
+        }
         if (!currentPlayer->isGatherAllow()) {
             throw GatherError("Gather action failed.");
         }
@@ -295,6 +298,9 @@ namespace coup {
     void Game::tax(Player *currentPlayer) {
         if (players[currentPlayerTurn] != currentPlayer) {
             throw TurnError("It's not your turn.");
+        }
+        if (currentPlayer->getNumOfTurns() == 0) {
+            throw TurnError("You have no turns left.");
         }
         if (!currentPlayer->isTaxAllow()) {
             throw TaxError("Tax action failed.");

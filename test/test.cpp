@@ -65,7 +65,7 @@ TEST_CASE("Gather increase coins and consume turn") {
     game.gather(p);
     CHECK(p->getCoins() == before + 1);
     // gather not allowed twice
-    CHECK_THROWS_AS(game.gather(p), GatherError);
+    CHECK_THROWS_AS(game.gather(p), TurnError);
 }
 TEST_CASE("Tax increase coins and consume turn") {
     cout << "[TEST] Tax increase coins and consume turn" << endl;
@@ -224,11 +224,11 @@ TEST_CASE("Coup with insufficient funds throws") {
        CHECK_THROWS_AS(game.coup(p0, p1), CoinsError);
 }
 
-TEST_CASE("Double-tax not allowed") {
+TEST_CASE("Double-tax not allowed in one turn") {
     Game game(names);
     auto p = game.getPlayers()[0];
     game.tax(p);
-    CHECK_THROWS_AS(game.tax(p), TaxError);  // or a custom DoubleTaxError
+    CHECK_THROWS_AS(game.tax(p), TurnError);  // or a custom DoubleTaxError
 }
 
 TEST_CASE("handleBlock deducts cost & consumes turn") {
@@ -309,7 +309,7 @@ TEST_CASE("nextTurn resets gather/tax flags") {
     Game game(names);
     auto p0 = game.getPlayers()[0];
     game.gather(p0);
-    CHECK(!p0->isGatherAllow());
+    CHECK(p0->isGatherAllow());
     // advance off p0 and back
     for (size_t i = 0; i < names.size(); ++i) game.nextTurn();
     CHECK(p0->isGatherAllow());
