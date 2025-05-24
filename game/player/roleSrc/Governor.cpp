@@ -1,5 +1,5 @@
 #include "../roleHeader/Governor.hpp"
-
+#include "../../GameExceptions.hpp"
 #include <iostream>
 using namespace std;
 
@@ -13,9 +13,13 @@ Player* Governor::clone() const {
 
 
 void Governor::tax() {
-    addCoins(3);
-    //canTax = false;
-    playerUsedTurn();
+    if (isTaxAllow()) {
+        addCoins(3);
+        playerUsedTurn();
+    }else {
+        throw TaxError("Tax action is not allowed.");
+    }
+
 }
 
 void Governor::passiveAbility(Player *target) {

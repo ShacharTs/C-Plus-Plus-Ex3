@@ -14,14 +14,6 @@
 using namespace std;
 
 namespace coup {
-    //------------------------------------------------------------------------------
-    // Game action cost constants
-    //------------------------------------------------------------------------------
-    constexpr int COUP_COST = 7; ///< Coins required to perform a coup
-    constexpr int BRIBE_COST = 4; ///< Coins required to perform a bribe
-    constexpr int SANCTION_COST = 3; ///< Coins required to impose a sanction
-    constexpr int FORCE_COUP = 10; ///< Coins required to force a coup
-
     //----------------------------------------------------------------------------
     Player *createRoleByIndex(const size_t index, const string &name) {
         switch (index) {
@@ -237,7 +229,9 @@ namespace coup {
 
 
     void Game::skipTurn(Player *currentPlayer) {
+        currentPlayer->removeDebuff();
         currentPlayer->playerUsedTurn();
+
     }
 
 

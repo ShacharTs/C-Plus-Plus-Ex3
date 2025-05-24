@@ -6,6 +6,8 @@
 
 namespace coup {
 
+
+
     /**
      * @brief Types of actions a player can perform during their turn.
      */
@@ -46,6 +48,15 @@ namespace coup {
         void removeCoins(Player* targetPlayer, int amount);
 
     public:
+
+        //------------------------------------------------------------------------------
+        // Game action cost constants
+        //------------------------------------------------------------------------------
+       static  constexpr int COUP_COST = 7; ///< Coins required to perform a coup
+       static  constexpr int BRIBE_COST = 4; ///< Coins required to perform a bribe
+       static  constexpr int SANCTION_COST = 3; ///< Coins required to impose a sanction
+       static  constexpr int FORCE_COUP = 10; ///< Coins required to force a coup
+
         //------------------------------------------------------------------------
         // Players list access
         //------------------------------------------------------------------------

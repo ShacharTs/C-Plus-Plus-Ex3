@@ -120,6 +120,7 @@ int Player::getCoins() const {
 void Player::playerUsedTurn() {
     if (numberOfTurns > 0) {
         --numberOfTurns;
+        removeDebuff();
     }
 }
 
@@ -156,18 +157,25 @@ bool Player::isCoupShieldActive() const { return coupShield; }
  * @brief Gather action: add one coin and consume a turn.
  */
 void Player::gather() {
-    addCoins(1);
-    //canGather = false;
-    playerUsedTurn();
+    if (isGatherAllow()) {
+        addCoins(1);
+        playerUsedTurn();
+    }else {
+        throw GatherError("Gather action is not allowed.");
+    }
 }
 
 /**
  * @brief Tax action: add two coins and consume a turn.
  */
 void Player::tax() {
-    addCoins(2);
-    //canTax = false;
-    playerUsedTurn();
+    if (isTaxAllow()) {
+        addCoins(2);
+        playerUsedTurn();
+    }else {
+        throw TaxError("Tax action is not allowed.");
+    }
+
 }
 
 /**
@@ -254,6 +262,9 @@ const Player *Player::getLastArrestedPlayer() const {
  * @brief Add specified coins to balance.
  */
 void Player::addCoins(const int amount) {
+    if (amount < 0) {
+        throw CoinsError("Cannot add negative coins.");
+    }
     coins += amount;
 }
 
@@ -262,8 +273,11 @@ void Player::addCoins(const int amount) {
  * @throws CoinsError
  */
 void Player::removeCoins(const int amount) {
-    if (coins < amount) {
-        throw CoinsError("Not enough coins.");
+    if (amount < 0) {
+        throw CoinsError("Negative coins.");
+    }
+    if (amount > coins) {
+        throw CoinsError("Not enough coins to remove.");
     }
     coins -= amount;
 }

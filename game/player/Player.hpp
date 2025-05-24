@@ -1,24 +1,11 @@
 #pragma once
 #include "roleHeader/Role.hpp"
-
 #include <string>
-namespace coup {
-    class Game;  ///< Forward declaration of Game class
-}
 
-/**
- * @enum Role
- * @brief Enumerates all possible roles a player may assume.
- */
-// enum class Role {
-//     Governor,  ///< Role specializing in taxation
-//     Spy,       ///< Role specializing in blocking arrests
-//     Baron,     ///< Role specializing in coin management
-//     General,   ///< Role specializing in defense
-//     Judge,     ///< Role specializing in blocking bribes
-//     Merchant,  ///< Role specializing in trade
-//     Unknown    ///< Default uninitialized role
-// };
+// for coup kick
+namespace coup {
+    class Game;
+}
 
 /**
  * @class Player
