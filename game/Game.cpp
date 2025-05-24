@@ -20,7 +20,7 @@ namespace coup {
     constexpr int COUP_COST = 7; ///< Coins required to perform a coup
     constexpr int BRIBE_COST = 4; ///< Coins required to perform a bribe
     constexpr int SANCTION_COST = 3; ///< Coins required to impose a sanction
-    constexpr int FORCE_COUP = 10; ///< Unused: threshold for forced coup
+    constexpr int FORCE_COUP = 10; ///< Coins required to force a coup
 
     //----------------------------------------------------------------------------
     Player *createRoleByIndex(const size_t index, const string &name) {
