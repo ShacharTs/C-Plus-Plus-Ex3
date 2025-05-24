@@ -14,7 +14,7 @@ Player* Governor::clone() const {
 
 void Governor::tax() {
     addCoins(3);
-    canTax = false;
+    //canTax = false;
     playerUsedTurn();
 }
 

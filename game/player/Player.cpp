@@ -127,7 +127,7 @@ void Player::playerUsedTurn() {
  * @brief Grant an extra turn to the player.
  */
 void Player::addExtraTurn() {
-    ++numberOfTurns;
+    numberOfTurns += 1;
 }
 
 /**
@@ -157,7 +157,7 @@ bool Player::isCoupShieldActive() const { return coupShield; }
  */
 void Player::gather() {
     addCoins(1);
-    canGather = false;
+    //canGather = false;
     playerUsedTurn();
 }
 
@@ -166,7 +166,7 @@ void Player::gather() {
  */
 void Player::tax() {
     addCoins(2);
-    canTax = false;
+    //canTax = false;
     playerUsedTurn();
 }
 
@@ -207,8 +207,6 @@ void Player::arrest(Player *targetPlayer) {
     } catch (const exception &e) {
         throw ArrestError(string("Arrest failed: ") + e.what());
     }
-    playerUsedTurn();
-    setLastArrestedPlayer(targetPlayer);
 }
 
 /**

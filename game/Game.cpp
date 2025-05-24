@@ -178,7 +178,7 @@ namespace coup {
 
 
     void Game::nextTurn() {
-        Player *current = players.at(currentPlayerTurn);
+        Player *current = getPlayers().at(currentPlayerTurn);
         current->resetPlayerTurn(); // Reset per-turn flags
         current->removeDebuff(); // Clear status effects
         currentPlayerTurn = (getTurn() + 1) % players.size();
@@ -186,15 +186,12 @@ namespace coup {
 
 
     void Game::advanceTurnIfNeeded() {
-        if (isGameOver(players)) {
+        if (isGameOver(getPlayers())) {
             cout << "Game is over. No more turns." << endl;
             return;
         }
         Player *current = players.at(currentPlayerTurn);
-        if (current->hasExtraTurn()) {
-            //current->playerUsedTurn();  // line for test do not remove
-            current->removeDebuff(); // player used turn
-        } else {
+        if (!current->hasExtraTurn()) {
             nextTurn();
         }
     }
