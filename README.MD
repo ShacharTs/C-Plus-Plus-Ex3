@@ -1,5 +1,4 @@
 #  Coup
-
 A full-featured modern C++ version of the classic bluffing and deduction game, **Coup** — now with a GUI and unique role mechanics.
 
 ---
@@ -48,7 +47,7 @@ Below are the custom roles featured in the game, each with a unique ability.
 ## 👥 Meet the Crew
 
 | <img src="assets/roles/Spy.png" alt="Spy" width="96"/><br/>Spy | <img src="assets/roles/Baron.png" alt="Baron" width="96"/><br/>Baron | <img src="assets/roles/General.png" alt="General" width="96"/><br/>General | <img src="assets/roles/Governor.png" alt="Governor" width="96"/><br/>Governor | <img src="assets/roles/Judge.png" alt="Judge" width="96"/><br/>Judge | <img src="assets/roles/Merchant.png" alt="Merchant" width="96"/><br/>Merchant |
-| -------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+|----------------------------------------------------------------|----------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
 
 
 
@@ -58,7 +57,7 @@ Below are the custom roles featured in the game, each with a unique ability.
 ###  Actions
 
 | Action   | Description                                                                         |
-| -------- |-------------------------------------------------------------------------------------|
+|----------|-------------------------------------------------------------------------------------|
 | Gather   | Collect 1 coin                                                                      |
 | Tax      | Collect 2 coins (3 if you're the **Governor**)                                      |
 | Bribe    | Cost 4 coins:  Gain an extra turn this turn                                         |
@@ -115,7 +114,7 @@ g++ -std=c++17 App.cpp GameFrame.cpp GamePanel.cpp MenuFrame.cpp MenuPanel.cpp \
 ---
 
 | Folder/File          | Purpose                                      |
-| -------------------- |----------------------------------------------|
+|----------------------|----------------------------------------------|
 | `game/`              | Game logic and role mechanics                |
 | `player/`            | Role-specific player classes                 |
 | `App.h/.cpp`         | wxWidgets app entry point (main of the game) |
@@ -123,15 +122,3 @@ g++ -std=c++17 App.cpp GameFrame.cpp GamePanel.cpp MenuFrame.cpp MenuPanel.cpp \
 | `MenuFrame`, `Panel` | Main menu interface                          |
 
 ---
-
-##  Final Notes
-
-> "There's someone reaching for the fight when the thunder calls!"
-
-Yes, we’re **holding out for a hero** — and this game might just make you feel like one.
-
----
-
-##  Contributing
-
-PRs welcome. Smoke bombs optional. Just don’t forget to `#include <fun>`.
