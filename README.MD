@@ -39,12 +39,13 @@ make valgrind-gui
 ###  Objective
 
 Be the last player standing by eliminating all others through strategic moves and deception.
+More details are in the game — see "How to Play."
 
 ###  Roles
 
 Below are the custom roles featured in the game, each with a unique ability.
 
-## 👥 Meet the Crew
+## Meet the Crew
 
 | <img src="assets/roles/Spy.png" alt="Spy" width="96"/><br/>Spy | <img src="assets/roles/Baron.png" alt="Baron" width="96"/><br/>Baron | <img src="assets/roles/General.png" alt="General" width="96"/><br/>General | <img src="assets/roles/Governor.png" alt="Governor" width="96"/><br/>Governor | <img src="assets/roles/Judge.png" alt="Judge" width="96"/><br/>Judge | <img src="assets/roles/Merchant.png" alt="Merchant" width="96"/><br/>Merchant |
 |----------------------------------------------------------------|----------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
