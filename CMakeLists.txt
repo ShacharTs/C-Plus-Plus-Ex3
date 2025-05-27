@@ -31,7 +31,7 @@ endforeach()
 # Source files
 set(SOURCES
         gui/App.cpp gui/GameFrame.cpp gui/GamePanel.cpp gui/MenuFrame.cpp
-        gui/MenuPanel.cpp gui/RevealDialog.cpp
+        gui/MenuPanel.cpp
         game/Game.cpp game/player/Player.cpp
         game/player/roleSrc/Baron.cpp game/player/roleSrc/General.cpp
         game/player/roleSrc/Governor.cpp game/player/roleSrc/Judge.cpp

@@ -1,6 +1,6 @@
 #include "MenuPanel.h"
 #include "MenuFrame.h"
-#include "RevealDialog.h"
+
 #include <wx/numdlg.h>
 #include <wx/textdlg.h>
 #include <wx/dcbuffer.h>   // for wxAutoBufferedPaintDC

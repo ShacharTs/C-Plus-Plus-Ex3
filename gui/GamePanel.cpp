@@ -354,11 +354,11 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
         return true;
     }
 
-    if (!mustCoupAlerted_) {
-        wxMessageBox("You have too many coins — you must coup!",
+
+        wxMessageBox("You have too many coins\nYou must coup!",
                      "Forced Coup", wxOK | wxICON_INFORMATION, this);
-        mustCoupAlerted_ = true;
-    }
+        //mustCoupAlerted_ = true;
+
 
     return true;
 }
