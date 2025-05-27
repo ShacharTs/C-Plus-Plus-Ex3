@@ -63,8 +63,7 @@ More details are in the game — see "How to Play."
 | Sanction | Impose a temporary penalty on a player’s action or coin income for one turn         |
 | Coup     | Pay 7 coins to eliminate a player from the game (mandatory if player has 10+ coins) |
 
-* Some actions can be **challenged** or **blocked** based on roles.
-* Failed blocks or false claims may result in loss of a role.
+* Some actions can be **blocked** based on roles.
  
 ###  Coins & Forced Coup
 
