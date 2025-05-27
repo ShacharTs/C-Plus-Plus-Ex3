@@ -43,7 +43,7 @@ Be the last player standing by eliminating all others through strategic moves an
 
 ### 🎭 Roles
 
-Below are the custom roles featured in the game, each with a unique ability. Icons and illustrations are pulled from the `assets/roles/` folder to visually reinforce each character.
+Below are the custom roles featured in the game, each with a unique ability.
 
 ## 🧑‍🤝‍🧑 Meet the Crew
 | Role                                                                      | Ability Description                                                   | Icon |
