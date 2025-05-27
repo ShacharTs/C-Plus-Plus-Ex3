@@ -300,9 +300,9 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
 
         Player *tgt = targets[dlg.GetSelection()];
 
-        // Check for a General who has enough coins to block
+        // Check if a General is present with enough coins to block
         Player *general = nullptr;
-        for (auto *p: game.getPlayers()) {
+        for (auto *p : game.getPlayers()) {
             if (p != cur && p->getRole() == Role::General && p->getCoins() >= 5) {
                 general = p;
                 break;
@@ -311,10 +311,12 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
 
         bool blocked = false;
         Player *isGeneral = AskBlock(Role::General, "coup", 5);
-        if (general && (isGeneral != nullptr)) {
+        if (general && isGeneral) {
             try {
                 game.playerPayAfterBlock(isGeneral, Role::General);
-                //PlaySound(SoundEffect::CoupKick);
+                wxLogWarning("General blocked the coup.");
+                wxMessageBox("Your coup was blocked by the General!",
+                             "Coup Blocked", wxOK | wxICON_INFORMATION, this);
                 blocked = true;
             } catch (const std::exception &e) {
                 wxLogWarning("General block failed: %s", e.what());
@@ -354,14 +356,11 @@ bool GamePanel::HandleMustCoup(const wxPoint &pt, Player *cur) {
         return true;
     }
 
-
-        wxMessageBox("You have too many coins\nYou must coup!",
-                     "Forced Coup", wxOK | wxICON_INFORMATION, this);
-        //mustCoupAlerted_ = true;
-
-
+    wxMessageBox("You have too many coins\nYou must coup!",
+                 "Forced Coup", wxOK | wxICON_INFORMATION, this);
     return true;
 }
+
 
 
 //------------------------------------------------------------------------------
