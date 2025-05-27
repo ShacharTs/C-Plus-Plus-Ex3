@@ -48,14 +48,14 @@ Below are the custom roles featured in the game, each with a unique ability. Ico
 
 ### 🌀 Actions
 
-| Action   | Description                                                           |
-| -------- | --------------------------------------------------------------------- |
-| Gather   | Take 2 coins (3 if you're the **Governor**)                           |
-| Tax      | Collect 3 coins (requires specific role like **Baron**)               |
-| Bribe    | Pay coins to take an extra turn                                       |
-| Arrest   | Steal coins from another player                                       |
-| Sanction | Impose a temporary penalty on a player’s action or coin income        |
-| Coup     | Pay 7 coins to eliminate a player (mandatory if player has 10+ coins) |
+| Action   | Description                                                                         |
+| -------- |-------------------------------------------------------------------------------------|
+| Gather   | Collect 1 coin                                                                      |
+| Tax      | Collect 2 coins (3 if you're the **Governor**)                                      |
+| Bribe    | Cost 4 coins:  Gain an extra turn this turn                                         |
+| Arrest   | Steal coins from another player, cannot steal from the same player twice in row     |
+| Sanction | Impose a temporary penalty on a player’s action or coin income for one turn         |
+| Coup     | Pay 7 coins to eliminate a player from the game (mandatory if player has 10+ coins) |
 
 * Some actions can be **challenged** or **blocked** based on roles.
 * Failed blocks or false claims may result in loss of a role.
