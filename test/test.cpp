@@ -16,7 +16,7 @@ static const vector<string> names = {"Bob","Alice","Steven","Patrick","Cat","Sha
 
 TEST_CASE("Game initialization and copying") {
     SUBCASE("Initial roles assigned correctly") {
-        Game game(names,true);
+        Game game(names);
         auto players = game.getPlayers();
         REQUIRE(players.size() == names.size());
         CHECK(players[0]->getRole() == Role::Governor);
@@ -28,7 +28,7 @@ TEST_CASE("Game initialization and copying") {
     }
 
     SUBCASE("Copy assignment operator deep copies") {
-        Game game1(names,true);
+        Game game1(names);
         Game game2 = game1;
         CHECK(game2.getTurn() == game1.getTurn());
         const auto& p1 = game1.getPlayers();
@@ -44,7 +44,7 @@ TEST_CASE("Game initialization and copying") {
         }
     }
     SUBCASE("Copy constructor clones players correctly") {
-        Game game1(names,true);
+        Game game1(names);
         Game game2(game1);
         const auto& p1 = game1.getPlayers();
         const auto& p2 = game2.getPlayers();
@@ -590,7 +590,7 @@ TEST_CASE("Exception handling flags recoverable errors") {
 }
 
 TEST_CASE("Game copy assignment operator performs deep copy") {
-    Game game1(names,true);
+    Game game1(names);
     Game game2 = game1;
 
     // Validate scalar data
@@ -619,7 +619,7 @@ TEST_CASE("Game copy assignment operator performs deep copy") {
 }
 
 TEST_CASE("Game copy constructor clones players correctly") {
-    Game game1(names,true);
+    Game game1(names);
     Game game2 = game1;  // Copy
 
     CHECK(game2.getPlayers().size() == game1.getPlayers().size());

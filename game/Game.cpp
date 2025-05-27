@@ -29,13 +29,13 @@ namespace coup {
     }
 
 
-    // Game::Game(const vector<string> &names) {
-    //     // Assign each player a specific role for testing
-    //     for (size_t i = 0; i < names.size(); ++i) {
-    //         players.push_back(createRoleByIndex(i, names[i]));
-    //     }
-    //     currentPlayerTurn = 0; // Start with the first player
-    // }
+    Game::Game(const vector<string> &names) {
+        // Assign each player a specific role for testing
+        for (size_t i = 0; i < names.size(); ++i) {
+            players.push_back(createRoleByIndex(i, names[i]));
+        }
+        currentPlayerTurn = 0; // Start with the first player
+    }
 
     Game::Game(const std::vector<std::string>& names, bool useRandomRoles) {
         for (const auto& name : names) {
