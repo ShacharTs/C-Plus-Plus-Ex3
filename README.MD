@@ -41,9 +41,6 @@ make valgrind-gui
 Be the last player standing by eliminating all others through strategic moves and deception.
 More details are in the game — see "How to Play."
 
-###  Roles
-
-Below are the custom roles featured in the game, each with a unique ability.
 
 ## Meet the Crew
 
