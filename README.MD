@@ -45,7 +45,7 @@ Below are the custom roles featured in the game, each with a unique ability. Ico
 | <img src="assets/roles/Governor.png" alt="Governor" width="48"/> Governor | Gains bonus from specific actions                                     | 🏛️  |
 | <img src="assets/roles/Judge.png" alt="Judge" width="48"/> Judge          | Can impose sanctions, possibly blocking or penalizing                 | ⚖️   |
 | <img src="assets/roles/Merchant.png" alt="Merchant" width="48"/> Merchant | Gains passive coin bonus over time                                    | 💰   |
-
+ 
 ### 🌀 Actions
 
 | Action   | Description                                                                         |
