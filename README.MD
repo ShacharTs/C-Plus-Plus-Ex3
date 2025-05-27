@@ -1,10 +1,10 @@
-# 🕵️ Coup
+#  Coup
 
 A full-featured modern C++ version of the classic bluffing and deduction game, **Coup** — now with a GUI and unique role mechanics.
 
 ---
 
-## 🚀 Features
+##  Features
 
 * Full gameplay logic with 6 custom roles
 * Interactive GUI built using **wxWidgets**
@@ -14,48 +14,48 @@ A full-featured modern C++ version of the classic bluffing and deduction game, *
 ---
 
 
-### 🛠 Build the Project
+###  Build the Project
 ```bash
 make
 ```
 
-### ✅ Run the Unit Test Suite
+###  Run the Unit Test Suite
 ```bash
 make test
 ```
 
-### 🧠 Run Tests with Valgrind (Memory Checking)
+###  Run Tests with Valgrind (Memory Checking)
 ```bash
 make valgrind-test
 ```
 
-### 🖥 Launch the GUI with Valgrind (Memory Leak Detection)
+### Launch the GUI with Valgrind (Memory Leak Detection)
 ```bash
 make valgrind-gui
 ```
 
 
-## 🧾 Game Rules
+##  Game Rules
 
-### 🎯 Objective
+###  Objective
 
 Be the last player standing by eliminating all others through strategic moves and deception.
 
-### 🎭 Roles
+###  Roles
 
 Below are the custom roles featured in the game, each with a unique ability.
 
-## 🧑‍🤝‍🧑 Meet the Crew
-| Role                                                                      | Ability Description                                                   | Icon |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---- |
-| <img src="assets/roles/Spy.png" alt="Spy" width="48"/> Spy                | Can observe or interfere with another player's ability (smoke-themed) | 🕵️  |
-| <img src="assets/roles/Baron.png" alt="Baron" width="48"/> Baron          | Influences tax income or redistributes coins                          | 👑   |
-| <img src="assets/roles/General.png" alt="General" width="48"/> General    | Can block certain actions (like coups)                                | 🎖️  |
-| <img src="assets/roles/Governor.png" alt="Governor" width="48"/> Governor | Gains bonus from specific actions                                     | 🏛️  |
-| <img src="assets/roles/Judge.png" alt="Judge" width="48"/> Judge          | Can impose sanctions, possibly blocking or penalizing                 | ⚖️   |
-| <img src="assets/roles/Merchant.png" alt="Merchant" width="48"/> Merchant | Gains passive coin bonus over time                                    | 💰   |
+## 👥 Meet the Crew
+
+| <img src="assets/roles/Spy.png" alt="Spy" width="96"/><br/>Spy | <img src="assets/roles/Baron.png" alt="Baron" width="96"/><br/>Baron | <img src="assets/roles/General.png" alt="General" width="96"/><br/>General | <img src="assets/roles/Governor.png" alt="Governor" width="96"/><br/>Governor | <img src="assets/roles/Judge.png" alt="Judge" width="96"/><br/>Judge | <img src="assets/roles/Merchant.png" alt="Merchant" width="96"/><br/>Merchant |
+| -------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+
+
+
+
+
  
-### 🌀 Actions
+###  Actions
 
 | Action   | Description                                                                         |
 | -------- |-------------------------------------------------------------------------------------|
@@ -69,14 +69,14 @@ Below are the custom roles featured in the game, each with a unique ability.
 * Some actions can be **challenged** or **blocked** based on roles.
 * Failed blocks or false claims may result in loss of a role.
  
-### 💰 Coins & Forced Coup
+###  Coins & Forced Coup
 
 * Players earn 1–3 coins per turn based on action.
 * 10 or more coins? You **must** perform a coup.
 
 ---
 
-## 🖥️ GUI Overview
+##  GUI Overview
 
 The GUI is implemented using **wxWidgets**, featuring:
 
@@ -85,7 +85,7 @@ The GUI is implemented using **wxWidgets**, featuring:
 * Image-based buttons and custom background rendering
 * Hover effects, click zones for actions, and modal prompts
 
-### 🛠 Dependencies
+###  Dependencies
 
 To build and run the GUI version:
 
@@ -124,7 +124,7 @@ g++ -std=c++17 App.cpp GameFrame.cpp GamePanel.cpp MenuFrame.cpp MenuPanel.cpp \
 
 ---
 
-## 🤘 Final Notes
+##  Final Notes
 
 > "There's someone reaching for the fight when the thunder calls!"
 
@@ -132,6 +132,6 @@ Yes, we’re **holding out for a hero** — and this game might just make you fe
 
 ---
 
-## 📩 Contributing
+##  Contributing
 
 PRs welcome. Smoke bombs optional. Just don’t forget to `#include <fun>`.
