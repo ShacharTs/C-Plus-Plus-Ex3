@@ -183,12 +183,21 @@ namespace coup {
         return currentPlayerTurn;
     }
 
+    void Game::isMerchantTurn(Player *current) {
+        if (current->getRole() == Role::Merchant) {
+            if (current->getCoins() >= 3) {
+                current->passiveAbility();
+            }
+        }
+    }
 
     void Game::nextTurn() {
         Player *current = getPlayers().at(currentPlayerTurn);
         current->resetPlayerTurn(); // Reset per-turn flags
         current->removeDebuff(); // Clear status effects
         currentPlayerTurn = (getTurn() + 1) % players.size();
+        isMerchantTurn(current); // check if current player is Merchant to use passive
+
     }
 
 

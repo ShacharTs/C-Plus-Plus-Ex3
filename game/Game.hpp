@@ -5,9 +5,6 @@
 #include "player/Player.hpp"
 
 namespace coup {
-
-
-
     /**
      * @brief Types of actions a player can perform during their turn.
      */
@@ -135,6 +132,8 @@ namespace coup {
          * @return Index of the player whose turn it currently is.
          */
         int getTurn();
+
+        void isMerchantTurn(Player *current);
 
         /**
          * @return Name of the player whose turn it currently is.

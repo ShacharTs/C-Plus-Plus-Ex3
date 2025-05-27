@@ -1,4 +1,4 @@
-# 🕵️ Coup++
+# 🕵️ Coup
 
 A full-featured modern C++ version of the classic bluffing and deduction game, **Coup** — now with a GUI and unique role mechanics.
 
@@ -9,9 +9,21 @@ A full-featured modern C++ version of the classic bluffing and deduction game, *
 * Full gameplay logic with 6 custom roles
 * Interactive GUI built using **wxWidgets**
 * Role-based abilities and action blocking
-* Sound-ready (commented for future implementation)
 * Clean architecture for easy extension
 
+---
+
+# Build the project
+make
+
+# Run the unit test suite
+make test
+
+# Run tests through Valgrind for memory checking
+make valgrind-test
+
+# Launch the GUI through Valgrind to detect memory issues
+make valgrind-gui
 ---
 
 ## 🧾 Game Rules
@@ -20,25 +32,29 @@ A full-featured modern C++ version of the classic bluffing and deduction game, *
 
 Be the last player standing by eliminating all others through strategic moves and deception.
 
-### 🎭 Roles (max 2 per role)
+### 🎭 Roles
 
-| Role     | Ability Description                                                   |
-| -------- | --------------------------------------------------------------------- |
-| Spy      | Can observe or interfere with another player's ability (smoke-themed) |
-| Baron    | Influences tax income or redistributes coins                          |
-| General  | Can block certain actions (like coups)                                |
-| Governor | Gains bonus from specific actions                                     |
-| Judge    | Can impose sanctions, possibly blocking or penalizing                 |
-| Merchant | Gains passive coin bonus over time                                    |
+Below are the custom roles featured in the game, each with a unique ability. Icons and illustrations are pulled from the `assets/roles/` folder to visually reinforce each character.
+
+## 🧑‍🤝‍🧑 Meet the Crew
+| Role                                                                      | Ability Description                                                   | Icon |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---- |
+| <img src="assets/roles/Spy.png" alt="Spy" width="48"/> Spy                | Can observe or interfere with another player's ability (smoke-themed) | 🕵️  |
+| <img src="assets/roles/Baron.png" alt="Baron" width="48"/> Baron          | Influences tax income or redistributes coins                          | 👑   |
+| <img src="assets/roles/General.png" alt="General" width="48"/> General    | Can block certain actions (like coups)                                | 🎖️  |
+| <img src="assets/roles/Governor.png" alt="Governor" width="48"/> Governor | Gains bonus from specific actions                                     | 🏛️  |
+| <img src="assets/roles/Judge.png" alt="Judge" width="48"/> Judge          | Can impose sanctions, possibly blocking or penalizing                 | ⚖️   |
+| <img src="assets/roles/Merchant.png" alt="Merchant" width="48"/> Merchant | Gains passive coin bonus over time                                    | 💰   |
 
 ### 🌀 Actions
 
 | Action   | Description                                                           |
 | -------- | --------------------------------------------------------------------- |
-| Tax      | Collect extra coins (usually 3) if role allows                        |
+| Gather   | Take 2 coins (3 if you're the **Governor**)                           |
+| Tax      | Collect 3 coins (requires specific role like **Baron**)               |
 | Bribe    | Pay coins to take an extra turn                                       |
 | Arrest   | Steal coins from another player                                       |
-| Sanction | Impose a temporary penalty on a player’s action/coins                 |
+| Sanction | Impose a temporary penalty on a player’s action or coin income        |
 | Coup     | Pay 7 coins to eliminate a player (mandatory if player has 10+ coins) |
 
 * Some actions can be **challenged** or **blocked** based on roles.
@@ -83,21 +99,19 @@ sudo apt install libwxgtk3.0-gtk3-dev
 #### Build Command (example)
 
 ```bash
-g++ -std=c++20 App.cpp GameFrame.cpp GamePanel.cpp MenuFrame.cpp MenuPanel.cpp \
+g++ -std=c++17 App.cpp GameFrame.cpp GamePanel.cpp MenuFrame.cpp MenuPanel.cpp \
     ../game/Game.cpp ../game/player/Player.cpp -o coup_gui `wx-config --cxxflags --libs`
 ```
 
 ---
 
-## 🧠 Project Structure
-
-| Folder/File          | Purpose                           |
-| -------------------- | --------------------------------- |
-| `game/`              | Game logic and role mechanics     |
-| `player/`            | Role-specific player classes      |
-| `App.h/.cpp`         | wxWidgets app entry point         |
-| `GameFrame`, `Panel` | GUI windows and interaction zones |
-| `MenuFrame`, `Panel` | Main menu interface               |
+| Folder/File          | Purpose                                      |
+| -------------------- |----------------------------------------------|
+| `game/`              | Game logic and role mechanics                |
+| `player/`            | Role-specific player classes                 |
+| `App.h/.cpp`         | wxWidgets app entry point (main of the game) |
+| `GameFrame`, `Panel` | GUI windows and interaction zones            |
+| `MenuFrame`, `Panel` | Main menu interface                          |
 
 ---
 

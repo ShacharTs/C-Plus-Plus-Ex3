@@ -693,7 +693,7 @@ TEST_CASE("Role abilities execute without throwing") {
     auto judge = dynamic_cast<Judge*>(game.getPlayers()[4]);
     CHECK_NOTHROW(judge->useAbility(game));
     auto merchant = dynamic_cast<Merchant*>(game.getPlayers()[5]);
-    CHECK_NOTHROW(merchant->useAbility(game));
+    CHECK_NOTHROW(merchant->passiveAbility());
 }
 
 TEST_CASE("Sanction against Judge applies retaliation penalty") {

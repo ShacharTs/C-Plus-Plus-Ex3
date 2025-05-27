@@ -490,7 +490,6 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     //------------------------------------------------------------------------------
     bool GamePanel::HandleSkip(const wxPoint &pt, Player *cur) {
         if (!btnSkipRect.Contains(pt)) return false;
-        //PlaySound(SoundEffect::Skip);
         game.skipTurn(cur);
         game.advanceTurnIfNeeded();
         RefreshUI();
@@ -498,37 +497,48 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
     }
 
 
-    bool GamePanel::HandleArrest(const wxPoint &pt, Player *cur) {
-        if (!btnArrestRect.Contains(pt)) return false;
+bool GamePanel::HandleArrest(const wxPoint &pt, Player *cur) {
+    if (!btnArrestRect.Contains(pt)) return false;
 
-        // Choose target dialog
-        wxArrayString names;
-        auto targets = game.getListOfTargetPlayers(cur);
-        for (auto *p: targets) names.Add(p->getName());
+    // Choose target dialog
+    wxArrayString names;
+    auto targets = game.getListOfTargetPlayers(cur);
+    for (auto *p: targets) names.Add(p->getName());
 
-        wxSingleChoiceDialog dlg(this, "Choose target to arrest", "Target", names);
-        if (dlg.ShowModal() != wxID_OK) return true;
-        Player *tgt = targets[dlg.GetSelection()];
+    wxSingleChoiceDialog dlg(this, "Choose target to arrest", "Target", names);
+    if (dlg.ShowModal() != wxID_OK) return true;
 
-        // Block logic: Spy can block arrest
-        if (AskBlock(Role::Spy, "arrest")) {
+    Player *tgt = targets[dlg.GetSelection()];
 
-            game.playerPayAfterBlock(nullptr, Role::Spy);
-            RefreshUI();
-            return true;
-        }
+    // Spy can block Arrest
+    Player* blocker = AskBlock(Role::Spy, "arrest");
+    if (blocker) {
         try {
-
-            game.arrest(cur, tgt);
+            game.playerPayAfterBlock(cur, Role::Spy);  // cur pays cost for failed action
+            wxLogWarning("Spy blocked arrest action.");
         } catch (const std::exception &e) {
-            wxLogWarning("%s", e.what());
-            return true;
+            wxLogWarning("Spy block failed: %s", e.what());
+            return true; // swallow the click regardless
         }
 
-        game.advanceTurnIfNeeded();
         RefreshUI();
         return true;
     }
+
+    // If not blocked, try to perform arrest
+    try {
+        game.arrest(cur, tgt);
+    } catch (const std::exception &e) {
+        wxLogWarning("%s", e.what());
+        return true;
+    }
+
+    game.advanceTurnIfNeeded();
+    RefreshUI();
+    return true;
+}
+
+
 
     bool GamePanel::HandleSanction(const wxPoint &pt, Player *cur) {
         if (!btnSanctionRect.Contains(pt)) return false;
@@ -543,7 +553,6 @@ bool GamePanel::HandleBribe(const wxPoint &pt, Player *cur) {
         Player *tgt = targets[dlg.GetSelection()];
 
         try {
-            //PlaySound(SoundEffect::Sanction);
             game.sanction(cur, tgt);
         } catch (const std::exception &e) {
             wxLogWarning("%s", e.what());
