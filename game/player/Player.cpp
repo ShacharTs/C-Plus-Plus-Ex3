@@ -198,11 +198,21 @@ void Player::arrest(Player *targetPlayer) {
     if (isTargetSelf(targetPlayer)) {
         throw SelfError("You cannot arrest yourself.");
     }
+    if (targetPlayer->getRole() == Role::General) {
+       try {
+           playerUsedTurn();
+           setLastArrestedPlayer(targetPlayer);
+           return;
+       } catch (const exception &e) {
+           throw ArrestError(string("Arrest failed: ") + e.what());
+       }
+    }
     if (targetPlayer->getRole() == Role::Merchant) {
         try {
             targetPlayer->removeCoins(2);
             playerUsedTurn();
             setLastArrestedPlayer(targetPlayer);
+            return;
         } catch (const exception &e) {
             throw ArrestError(string("Arrest failed: ") + e.what());
         }
