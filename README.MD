@@ -13,18 +13,27 @@ A full-featured modern C++ version of the classic bluffing and deduction game, *
 
 ---
 
-# Build the project
+
+### 🛠 Build the Project
+```bash
 make
+```
 
-# Run the unit test suite
+### ✅ Run the Unit Test Suite
+```bash
 make test
+```
 
-# Run tests through Valgrind for memory checking
+### 🧠 Run Tests with Valgrind (Memory Checking)
+```bash
 make valgrind-test
+```
 
-# Launch the GUI through Valgrind to detect memory issues
+### 🖥 Launch the GUI with Valgrind (Memory Leak Detection)
+```bash
 make valgrind-gui
----
+```
+
 
 ## 🧾 Game Rules
 
