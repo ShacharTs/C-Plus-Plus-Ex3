@@ -59,7 +59,7 @@ Below are the custom roles featured in the game, each with a unique ability. Ico
 
 * Some actions can be **challenged** or **blocked** based on roles.
 * Failed blocks or false claims may result in loss of a role.
-
+ 
 ### 💰 Coins & Forced Coup
 
 * Players earn 1–3 coins per turn based on action.
