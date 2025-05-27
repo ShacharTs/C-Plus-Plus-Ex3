@@ -29,14 +29,24 @@ namespace coup {
     }
 
 
-    Game::Game(const vector<string> &names) {
-        // Assign each player a specific role for testing
-        for (size_t i = 0; i < names.size(); ++i) {
-            //players.push_back(createRoleByIndex(i, names[i]));
-            players.push_back(createRandomRole(names[i]));
+    // Game::Game(const vector<string> &names) {
+    //     // Assign each player a specific role for testing
+    //     for (size_t i = 0; i < names.size(); ++i) {
+    //         players.push_back(createRoleByIndex(i, names[i]));
+    //     }
+    //     currentPlayerTurn = 0; // Start with the first player
+    // }
+
+    Game::Game(const std::vector<std::string>& names, bool useRandomRoles) {
+        for (const auto& name : names) {
+            if (useRandomRoles)
+                players.push_back(createRandomRole(name)); // random role
+            else
+                players.push_back(createRoleByIndex(players.size(), name)); // fixed order
         }
-        currentPlayerTurn = 0; // Start with the first player
+        currentPlayerTurn = 0;
     }
+
 
 
     Player *Game::createRandomRole(const string &name) {
@@ -55,6 +65,8 @@ namespace coup {
                 throw runtime_error("Random number generation failed");
         }
     }
+
+
 
 
     Game::~Game() {

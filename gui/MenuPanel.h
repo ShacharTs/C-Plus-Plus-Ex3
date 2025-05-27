@@ -9,6 +9,7 @@ public:
 private:
     wxBitmap bgBmp, btnBmp;
     wxRect   btnRect;
+    wxCheckBox* randomCheckBox = nullptr;
 
     void OnPaint(wxPaintEvent& e);
     void OnClick(wxMouseEvent& e);

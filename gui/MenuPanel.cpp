@@ -22,6 +22,10 @@ MenuPanel::MenuPanel(wxFrame* parent)
     int bx = (1024 - btnBmp.GetWidth()) / 2;
     int by = 576 - btnBmp.GetHeight() - 60;
     btnRect = wxRect(bx, by, btnBmp.GetWidth(), btnBmp.GetHeight());
+    randomCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Random Roles",
+                                wxPoint(btnRect.x, btnRect.y + btnRect.height + 10));
+    randomCheckBox->SetValue(false);
+
 }
 
 void MenuPanel::OnPaint(wxPaintEvent&)
@@ -57,8 +61,8 @@ void MenuPanel::OnClick(wxMouseEvent& e)
         if (nameDlg.ShowModal() != wxID_OK) return;
         names.push_back(nameDlg.GetValue().ToStdString());
     }
-
-    new GameFrame(names);
+    bool useRandom = randomCheckBox && randomCheckBox->GetValue();
+    new GameFrame(names, useRandom);
     GetParent()->Hide();
     GetParent()->Destroy();
 }

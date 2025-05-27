@@ -8,7 +8,9 @@
 
 class GameFrame : public wxFrame {
 public:
-    GameFrame(const std::vector<std::string>& names);
+    //GameFrame(const std::vector<std::string>& names);
+    GameFrame(const std::vector<std::string>& names, bool useRandomRoles = false);
+
 
     void UpdateHowToPlayImage(Role role);
 

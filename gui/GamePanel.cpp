@@ -30,9 +30,9 @@ static std::chrono::steady_clock::time_point lastClickTime;
 // GamePanel::GamePanel(wxFrame *parent, const std::vector<std::string> &names)
 //     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(864, 576))
 //       , game(names) {
-GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names)
+GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names,bool useRandomRoles)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(864, 576))
-      , game(names) {
+      , game(names,useRandomRoles) {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 
 #ifdef __WXMSW__

@@ -4,7 +4,7 @@
 #include "../game/Game.hpp"
 
 // Constructor
-GameFrame::GameFrame(const std::vector<std::string>& names)
+GameFrame::GameFrame(const std::vector<std::string>& names, bool useRandomRoles)
     : wxFrame(nullptr, wxID_ANY, "Coup Game",
               wxDefaultPosition, wxDefaultSize,
               wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
@@ -14,7 +14,9 @@ GameFrame::GameFrame(const std::vector<std::string>& names)
     wxNotebook* notebook = new wxNotebook(this, wxID_ANY);
 
     // --- Game Tab ---
-    auto* gamePanel = new GamePanel(notebook, names);
+    //auto* gamePanel = new GamePanel(notebook, names);
+    auto* gamePanel = new GamePanel(notebook, names, useRandomRoles);
+
     gamePanel->SetMinSize(wxSize(864, 576));
     gamePanel->SetMaxSize(wxSize(864, 576));
     gamePanel->SetSize(wxSize(864, 576));

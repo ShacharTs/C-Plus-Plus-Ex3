@@ -84,8 +84,11 @@ namespace coup {
          * @brief Initialize a new game with a list of player names.
          * Roles are assigned in order based on the names vector.
          * @param names List of player names
+         * @param useRandomRoles true for random roles
          */
-        explicit Game(const std::vector<std::string>& names);
+        //explicit Game(const std::vector<std::string>& names);
+
+        explicit Game(const std::vector<std::string> &names, bool useRandomRoles);
 
         /**
          * @brief Randomly assign a role to a player by name.
