@@ -2,6 +2,10 @@
 #include "GamePanel.h"
 #include <wx/notebook.h>
 #include "../game/Game.hpp"
+#include <wx/event.h>
+#include <wx/utils.h>
+#include <wx/timer.h>
+
 
 // Constructor
 GameFrame::GameFrame(const std::vector<std::string>& names, bool useRandomRoles)
@@ -64,7 +68,10 @@ GameFrame::GameFrame(const std::vector<std::string>& names, bool useRandomRoles)
     notebook->ChangeSelection(1);
     Update();
     notebook->ChangeSelection(0);
+
+
 }
+
 
 // Update the "How to Play" image according to the role
 void GameFrame::UpdateHowToPlayImage(Role role) {

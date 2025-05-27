@@ -97,10 +97,17 @@ valgrind-test: $(TEST_BIN)
 # Valgrind on GUI app
 valgrind-gui: $(BIN)
 	@echo "Running GUI application under Valgrind..."
-	valgrind --leak-check=full --track-origins=yes \
-	         --log-file=$(BUILD_DIR)/valgrind-gui.txt \
-	         ./$(BIN)
+	valgrind --leak-check=full \
+		--track-origins=yes \
+		--errors-for-leak-kinds=definite \
+		--error-exitcode=1 \
+		--log-file=$(BUILD_DIR)/valgrind-gui.txt \
+		./$(BIN)
 	@echo "Valgrind report → $(BUILD_DIR)/valgrind-gui.txt"
+
+
+
+
 
 # Clean everything
 clean:

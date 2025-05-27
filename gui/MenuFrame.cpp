@@ -12,12 +12,22 @@ MenuFrame::MenuFrame()
     Show();
 }
 
-
-void MenuFrame::StartGame(const std::vector<std::string>& names) {
-    // Remove the old panel and open the new game frame
-    auto* gameFrame = new GameFrame(names);
+void MenuFrame::StartGame(const std::vector<std::string>& names, bool useRandom)
+{
+    auto* gameFrame = new GameFrame(names, useRandom);
+    wxTheApp->SetTopWindow(gameFrame);
     gameFrame->Show();
-
-    Close(); // or Destroy(); to close the menu window
+    Destroy();
 }
+
+
+// void MenuFrame::StartGame(const std::vector<std::string>& names) {
+//     // Create and hand off lifetime to wxWidgets
+//     auto* gameFrame = new GameFrame(names);
+//     wxTheApp->SetTopWindow(gameFrame);  // Let wxWidgets manage the window
+//     gameFrame->Show();
+//
+//     Destroy(); // Properly destroy this frame
+// }
+
 

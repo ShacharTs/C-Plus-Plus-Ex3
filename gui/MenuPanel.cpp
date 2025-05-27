@@ -62,9 +62,11 @@ void MenuPanel::OnClick(wxMouseEvent& e)
         names.push_back(nameDlg.GetValue().ToStdString());
     }
     bool useRandom = randomCheckBox && randomCheckBox->GetValue();
-    new GameFrame(names, useRandom);
-    GetParent()->Hide();
-    GetParent()->Destroy();
+    auto* menuFrame = dynamic_cast<MenuFrame*>(GetParent());
+    if (menuFrame) {
+        menuFrame->StartGame(names, useRandom);
+    }
+
 }
 
 void MenuPanel::OnMotion(wxMouseEvent& e)

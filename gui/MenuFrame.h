@@ -6,5 +6,7 @@
 class MenuFrame : public wxFrame {
 public:
     MenuFrame();
-    void StartGame(const std::vector<std::string>& names);
+    //void StartGame(const std::vector<std::string>& names);
+    void StartGame(const std::vector<std::string>& names, bool useRandom);
+
 };
