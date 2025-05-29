@@ -27,7 +27,7 @@ MenuPanel::MenuPanel(wxFrame* parent)
     int by = bgBmp.GetHeight() - btnBmp.GetHeight() - 60;
     btnRect = wxRect(bx, by, btnBmp.GetWidth(), btnBmp.GetHeight());
 
-    randomCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Random Roles",
+    randomCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Debug Roles",
         wxPoint(btnRect.x, btnRect.y + btnRect.height + 10));
     randomCheckBox->SetValue(false);
 }

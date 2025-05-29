@@ -37,12 +37,14 @@ namespace coup {
         currentPlayerTurn = 0; // Start with the first player
     }
 
-    Game::Game(const std::vector<std::string>& names, bool useRandomRoles) {
+    Game::Game(const std::vector<std::string>& names, bool debugRole) {
         for (const auto& name : names) {
-            if (useRandomRoles)
-                players.push_back(createRandomRole(name)); // random role
-            else
+            if (debugRole) {
                 players.push_back(createRoleByIndex(players.size(), name)); // fixed order
+            }else {
+                players.push_back(createRandomRole(name)); // random role
+            }
+
         }
         currentPlayerTurn = 0;
     }
