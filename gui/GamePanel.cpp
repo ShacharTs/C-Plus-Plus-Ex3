@@ -49,6 +49,8 @@ GamePanel::GamePanel(wxWindow *parent, const std::vector<std::string> &names,boo
 }
 
 
+
+
 //------------------------------------------------------------------------------
 // Suppress default erase to avoid white flicker
 //------------------------------------------------------------------------------

@@ -22,14 +22,9 @@ void MenuFrame::StartGame(const std::vector<std::string>& names, bool useRandom)
     Destroy();
 }
 
+MenuFrame::~MenuFrame() {
+    // Currently nothing to clean up
+}
 
-// void MenuFrame::StartGame(const std::vector<std::string>& names) {
-//     // Create and hand off lifetime to wxWidgets
-//     auto* gameFrame = new GameFrame(names);
-//     wxTheApp->SetTopWindow(gameFrame);  // Let wxWidgets manage the window
-//     gameFrame->Show();
-//
-//     Destroy(); // Properly destroy this frame
-// }
 
 

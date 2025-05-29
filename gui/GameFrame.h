@@ -10,6 +10,7 @@ class GameFrame : public wxFrame {
 public:
     //GameFrame(const std::vector<std::string>& names);
     GameFrame(const std::vector<std::string>& names, bool debugRole = false);
+    ~GameFrame();
 
 
     void UpdateHowToPlayImage(Role role);

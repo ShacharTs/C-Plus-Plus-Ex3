@@ -16,14 +16,13 @@ public:
 
     ~GamePanel() = default;
 
+    coup::Game* getGame();
     void RefreshUI();
 
     Player *AskBlock(Role blockerRole, const wxString &actionName, int cost = 0);
 
 private:
-    // Core game instance
     coup::Game game;
-
     // UI elements
     wxBitmap bgBmp;
     wxFont customFont_;

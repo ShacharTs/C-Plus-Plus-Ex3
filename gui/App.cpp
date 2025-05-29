@@ -4,7 +4,9 @@
 bool App::OnInit() {
     wxInitAllImageHandlers();
     SetExitOnFrameDelete(true);
-    new MenuFrame();
+    MenuFrame* frame = new MenuFrame();
+    frame->Show();
+
     return true;
 }
 

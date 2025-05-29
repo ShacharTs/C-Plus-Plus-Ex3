@@ -4,7 +4,7 @@
 
 # Compiler and flags
 CXX        := g++
-CXXFLAGS   := -std=c++17 $(shell wx-config --cxxflags)
+CXXFLAGS   := -std=c++17 -g -O0 $(shell wx-config --cxxflags)
 LDFLAGS    := $(shell wx-config --libs) -lsfml-audio
 
 # Windows-specific libs

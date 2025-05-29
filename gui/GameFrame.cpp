@@ -72,6 +72,9 @@ GameFrame::GameFrame(const std::vector<std::string>& names, bool debugRole)
 
 }
 
+GameFrame::~GameFrame() {
+}
+
 
 // Update the "How to Play" image according to the role
 void GameFrame::UpdateHowToPlayImage(Role role) {
