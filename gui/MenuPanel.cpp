@@ -14,19 +14,24 @@ EVT_MOTION(MenuPanel::OnMotion)
 wxEND_EVENT_TABLE()
 
 MenuPanel::MenuPanel(wxFrame* parent)
-    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(1024, 576))
+    : wxPanel(parent, wxID_ANY)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-    bgBmp = wxBitmap(wxImage("assets/menu/game_menu.png", wxBITMAP_TYPE_PNG));
-    btnBmp = wxBitmap(wxImage("assets/buttons/Start_Game_Button.png", wxBITMAP_TYPE_PNG));
-    int bx = (1024 - btnBmp.GetWidth()) / 2;
-    int by = 576 - btnBmp.GetHeight() - 60;
-    btnRect = wxRect(bx, by, btnBmp.GetWidth(), btnBmp.GetHeight());
-    randomCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Random Roles",
-                                wxPoint(btnRect.x, btnRect.y + btnRect.height + 10));
-    randomCheckBox->SetValue(false);
 
+    wxImage bgImg("assets/menu/game_menu.png", wxBITMAP_TYPE_PNG);
+    bgBmp = wxBitmap(bgImg);
+    SetSize(bgBmp.GetWidth(), bgBmp.GetHeight());
+
+    btnBmp = wxBitmap(wxImage("assets/buttons/Start_Game_Button.png", wxBITMAP_TYPE_PNG));
+    int bx = (bgBmp.GetWidth() - btnBmp.GetWidth()) / 2;
+    int by = bgBmp.GetHeight() - btnBmp.GetHeight() - 60;
+    btnRect = wxRect(bx, by, btnBmp.GetWidth(), btnBmp.GetHeight());
+
+    randomCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Random Roles",
+        wxPoint(btnRect.x, btnRect.y + btnRect.height + 10));
+    randomCheckBox->SetValue(false);
 }
+
 
 void MenuPanel::OnPaint(wxPaintEvent&)
 {
