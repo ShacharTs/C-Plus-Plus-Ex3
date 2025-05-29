@@ -26,6 +26,40 @@ Player::Player(string playerName)
 Player::~Player() {
 }
 
+// Copy constructor
+Player::Player(const Player& other)
+    : playerName(other.playerName),
+      role(other.role),
+      coins(other.coins),
+      numberOfTurns(other.numberOfTurns),
+      canGather(other.canGather),
+      canTax(other.canTax),
+      canBribe(other.canBribe),
+      canArrest(other.canArrest),
+      canCoup(other.canCoup),
+      coupShield(other.coupShield),
+      lastArrestedBy(other.lastArrestedBy) {
+}
+
+// Copy assignment operator
+Player& Player::operator=(const Player& other) {
+    if (this != &other) {
+        playerName = other.playerName;
+        role = other.role;
+        coins = other.coins;
+        numberOfTurns = other.numberOfTurns;
+        canGather = other.canGather;
+        canTax = other.canTax;
+        canBribe = other.canBribe;
+        canArrest = other.canArrest;
+        canCoup = other.canCoup;
+        coupShield = other.coupShield;
+        lastArrestedBy = other.lastArrestedBy;
+    }
+    return *this;
+}
+
+
 
 //------------------------------------------------------------------------------
 // Accessors

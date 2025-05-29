@@ -47,6 +47,25 @@ public:
      */
     virtual ~Player();
 
+    /**
+     * @brief Copy constructor for Player.
+     * Creates a new Player as a copy of another.
+     * Performs a shallow copy, including pointer to lastArrestedBy.
+     *
+     * @param other The Player instance to copy from.
+     */
+    Player(const Player& other);
+
+    /**
+     * @brief Copy assignment operator for Player.
+     * Performs shallow copy of all fields, including lastArrestedBy pointer.
+     *
+     * @param other The Player instance to assign from.
+     * @return Reference to this Player.
+     */
+    Player& operator=(const Player& other);
+
+
     //------------------------------------------------------------------------
     // Core abilities (self-targeted)
     //------------------------------------------------------------------------

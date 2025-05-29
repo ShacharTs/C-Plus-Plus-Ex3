@@ -832,3 +832,144 @@ TEST_CASE("skipTurn without extra-turn consumes turn") {
     game.skipTurn(p0);
     CHECK(!game.currentPlayerHasTurn());
 }
+
+TEST_CASE("Player copy constructor creates independent copy") {
+    Governor original("Original");
+    original.addCoins(5);
+    Governor copy = original;  // Calls copy constructor
+
+    CHECK(copy.getName() == original.getName());
+    CHECK(copy.getRole() == original.getRole());
+    CHECK(copy.getCoins() == original.getCoins());
+
+    original.addCoins(1);
+    CHECK(copy.getCoins() != original.getCoins());
+}
+
+TEST_CASE("Player copy assignment creates independent copy") {
+    Spy p1("Spy1");
+    p1.addCoins(3);
+
+    Spy p2("Spy2");
+    p2 = p1;  // Calls assignment operator
+
+    CHECK(p2.getName() == p1.getName());
+    CHECK(p2.getRole() == p1.getRole());
+    CHECK(p2.getCoins() == p1.getCoins());
+
+    p1.addCoins(2);
+    CHECK(p2.getCoins() != p1.getCoins());
+}
+
+TEST_CASE("Player copy preserves action flags") {
+    Governor original("GovernorX");
+    original.canGather = false;
+    original.canTax = false;
+    original.canArrest = false;
+
+    Governor copy = original;
+
+    CHECK_FALSE(copy.isGatherAllow());
+    CHECK_FALSE(copy.isTaxAllow());
+    CHECK_FALSE(copy.isArrestAllow());
+}
+
+TEST_CASE("Player copy preserves lastArrestedBy pointer") {
+    Spy a("A");
+    Governor b("B");
+
+    a.setLastArrestedPlayer(&b);
+    Spy a_copy = a;
+
+    CHECK(a_copy.getLastArrestedPlayer() == &b);
+}
+
+TEST_CASE("Player self-assignment is safe") {
+    Governor p("Selfie");
+    p.addCoins(10);
+    p = p;
+    CHECK(p.getCoins() == 10);
+    CHECK(p.getName() == "Selfie");
+}
+TEST_CASE("Polymorphic copy of different Player types") {
+    vector<Player*> players;
+    players.push_back(new Governor("Gov"));
+    players.push_back(new Spy("SpyGuy"));
+    players.push_back(new Judge("Justice"));
+
+    for (auto* p : players) {
+        Player* copy = nullptr;
+        if (auto* gov = dynamic_cast<Governor*>(p)) {
+            copy = new Governor(*gov);
+        } else if (auto* spy = dynamic_cast<Spy*>(p)) {
+            copy = new Spy(*spy);
+        } else if (auto* judge = dynamic_cast<Judge*>(p)) {
+            copy = new Judge(*judge);
+        }
+
+        REQUIRE(copy != nullptr);
+        CHECK(copy->getName() == p->getName());
+        CHECK(copy->getRole() == p->getRole());
+        CHECK(copy != p);
+        delete copy;
+        delete p;
+    }
+}
+TEST_CASE("clone preserves exact dynamic type") {
+    vector<Player*> roles;
+    roles.push_back(new Governor("G"));
+    roles.push_back(new Spy("S"));
+    roles.push_back(new Judge("J"));
+
+    for (Player* p : roles) {
+        Player* c = p->clone();
+        CHECK(typeid(*p) == typeid(*c));
+        delete p;
+        delete c;
+    }
+}
+
+TEST_CASE("Repeated sanctions do not stack debuffs") {
+    Game game(names);
+    auto p0 = game.getPlayers()[0];
+    auto p1 = game.getPlayers()[1];
+
+    p0->addCoins(6); // enough for two sanctions
+    game.sanction(p0, p1);
+    CHECK(!p1->isGatherAllow());
+    CHECK(!p1->isTaxAllow());
+
+    game.nextTurn();  // move to p1
+    game.skipTurn(p1); // skip their turn
+
+    p0->addCoins(3); // prepare for another sanction
+    game.sanction(p0, p1); // should not re-debuff, but shouldn't crash either
+    CHECK(!p1->isGatherAllow());
+    CHECK(!p1->isTaxAllow());
+}
+
+
+TEST_CASE("Copied player points to same lastArrestedBy after game copy") {
+    Game game1(names);
+    auto p0 = game1.getPlayers()[0];
+    auto p1 = game1.getPlayers()[1];
+
+    p0->addCoins(1);
+    p1->addCoins(1);
+    game1.arrest(p0, p1);
+
+    Game game2 = game1;
+    auto q0 = game2.getPlayers()[0];
+
+    // Shallow pointer match is expected
+    CHECK(q0->getLastArrestedPlayer()->getName() == p1->getName());
+}
+
+
+TEST_CASE("Game deep copy: mutations on copy do not affect original") {
+    Game g1(names);
+    Game g2 = g1;
+
+    g2.getPlayers()[0]->addCoins(100);
+    CHECK(g1.getPlayers()[0]->getCoins() != 100);
+}
