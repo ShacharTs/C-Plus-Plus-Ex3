@@ -44,11 +44,12 @@ TEST_OBJ := $(OBJ_DIR)/test/test.o
 GAME_OBJ := $(filter-out $(OBJ_DIR)/gui/%.o,$(OBJ))
 TEST_BIN := $(BUILD_DIR)/test_runner$(TARGET_EXT)
 
-.PHONY: all test valgrind-test valgrind-gui clean
+.PHONY: main test valgrind-test valgrind-gui clean
 
 # Default: build app + assets
-all: $(BIN) copy-assets
+main: $(BIN) copy-assets
 	@echo "Build complete → $(BIN)"
+	@./$(BIN)
 
 # Link main executable
 $(BIN): $(OBJ)
