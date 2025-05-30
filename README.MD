@@ -17,7 +17,7 @@ A full-featured modern C++ version of the classic bluffing and deduction game, *
 
 ###  Build the Project
 ```bash
-make
+make / make main
 ```
 
 ###  Run the Unit Test Suite
