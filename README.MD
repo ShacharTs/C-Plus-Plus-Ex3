@@ -1,3 +1,5 @@
+Shachar Tsrafati
+318790169
 #  Coup
 A full-featured modern C++ version of the classic bluffing and deduction game, **Coup** — now with a GUI and unique role mechanics.
 
